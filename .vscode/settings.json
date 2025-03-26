@@ -1,0 +1,5 @@
+{
+    "yaml.schemas": {
+        "https://goreleaser.com/static/schema.json": "file:///home/mendy/code/terraform-provider-svix/.goreleaser.yml"
+    }
+}
