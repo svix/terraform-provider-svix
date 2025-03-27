@@ -216,22 +216,6 @@ func (r *OperationalWebhooksEndpointResource) Delete(ctx context.Context, req re
 
 }
 
-// func elmsToListString(elms []attr.Value) []string {
-// 	out := make([]string, len(elms))
-// 	for _, v := range elms {
-// 		out = append(out, v.String())
-// 	}
-// 	return out
-// }
-
-// func listStringToListElm(elms []string) []attr.Value {
-// 	out := make([]attr.Value, len(elms))
-// 	for _, v := range elms {
-// 		out = append(out, v)
-// 	}
-// 	return out
-// }
-
 func operationalWebhookEndpointOutToModel(ctx context.Context, d *diag.Diagnostics, v models.OperationalWebhookEndpointOut) *OperationalWebhooksEndpointResourceModel {
 	filterTypes, diags := types.ListValueFrom(ctx, types.StringType, v.FilterTypes)
 	d.Append(diags...)
@@ -256,12 +240,4 @@ func operationalWebhookEndpointOutToModel(ctx context.Context, d *diag.Diagnosti
 		Url:         types.StringValue(v.Url),
 	}
 	return &ret
-}
-
-// if unknown return nil, else return value
-func strOrNil(v types.String) *string {
-	if v.IsUnknown() {
-		return nil
-	}
-	return v.ValueStringPointer()
 }

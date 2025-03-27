@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
@@ -76,7 +75,6 @@ func (r *EventTypeResource) Configure(ctx context.Context, req resource.Configur
 }
 
 func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	log.Println("in create")
 	var data EventTypeResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
@@ -114,7 +112,6 @@ func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateReque
 	}
 }
 func (r *EventTypeResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	log.Println("in read")
 	var data EventTypeResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 	res, err := r.svx.EventType.Get(ctx, data.Name.ValueString())
@@ -129,7 +126,6 @@ func (r *EventTypeResource) Read(ctx context.Context, req resource.ReadRequest, 
 }
 
 func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	log.Println("in update")
 	var data EventTypeResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
@@ -150,8 +146,6 @@ func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateReque
 		resp.Diagnostics.AddError("Error while updating event type", err.Error())
 		return
 	}
-	spw(res)
-
 	// TODO: check res.Schemas not null
 	schemasStr := mapStringTToString(&resp.Diagnostics, *res.Schemas)
 

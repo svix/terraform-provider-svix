@@ -2,11 +2,10 @@ package internal
 
 import (
 	"encoding/json"
-	"log"
 	"math/rand"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 func randStr32() *string {
@@ -21,9 +20,9 @@ func randStr32() *string {
 
 }
 
-func spw(v any) {
-	log.Println(spew.Sdump(v))
-}
+// func spw(v any) {
+// 	log.Println(spew.Sdump(v))
+// }
 
 func ptr[T any](value T) *T {
 	return &value
@@ -49,4 +48,12 @@ func stringToMapStringT[T any](d *diag.Diagnostics, v string) *map[string]T {
 	}
 	return &ret
 
+}
+
+// if unknown return nil, else return value
+func strOrNil(v types.String) *string {
+	if v.IsUnknown() {
+		return nil
+	}
+	return v.ValueStringPointer()
 }
