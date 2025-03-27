@@ -27,14 +27,20 @@ resource "svix_operational_webhooks_endpoint" "example_endpoint" {
 
 ### Required
 
+- `filter_types` (List of String)
 - `url` (String)
 
 ### Optional
 
 - `description` (String)
 - `disabled` (Boolean)
-- `filter_types` (List of String)
 - `metadata` (String)
 - `rate_limit` (Number)
 - `secret` (String, Sensitive)
 - `uid` (String)
+
+### Read-Only
+
+- `created_at` (String)
+- `id` (String) The ID of this resource.
+- `updated_at` (String)
