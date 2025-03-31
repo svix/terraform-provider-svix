@@ -81,10 +81,14 @@ func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 	tflog.Debug(ctx, "Converting schemas into a `map[string]any`")
-	var schema map[string]any
-	resp.Diagnostics.Append(data.Schemas.Unmarshal(&schema)...)
-	if resp.Diagnostics.HasError() {
-		return
+	var schema *map[string]any
+	if data.Schemas.IsNull() {
+		schema = nil
+	} else {
+		resp.Diagnostics.Append(data.Schemas.Unmarshal(&schema)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 	tflog.Debug(ctx, "Creating EventTypeIn struct")
 	eventTypeIn := models.EventTypeIn{
@@ -92,7 +96,7 @@ func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateReque
 		Description: data.Description.ValueString(),
 		Archived:    data.Archived.ValueBoolPointer(),
 		Deprecated:  data.Deprecated.ValueBoolPointer(),
-		Schemas:     &schema,
+		Schemas:     schema,
 		FeatureFlag: data.FeatureFlag.ValueStringPointer(),
 		GroupName:   data.GroupName.ValueStringPointer(),
 	}
@@ -129,9 +133,14 @@ func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateReque
 	var data EventTypeResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
-	schemas := stringToMapStringT[any](&resp.Diagnostics, data.Schemas.ValueString())
-	if schemas == nil {
-		return
+	var schemas *map[string]any
+	if data.Schemas.IsNull() {
+		schemas = nil
+	} else {
+		schemas = stringToMapStringT[any](&resp.Diagnostics, data.Schemas.ValueString())
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 	eventType := models.EventTypeUpdate{
 		Archived:    data.Archived.ValueBoolPointer(),
@@ -146,23 +155,22 @@ func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateReque
 		resp.Diagnostics.AddError("Error while updating event type", err.Error())
 		return
 	}
-	// TODO: check res.Schemas not null
-	schemasStr := mapStringTToString(&resp.Diagnostics, *res.Schemas)
-
+	if res.Schemas != nil {
+		schemasStr := mapStringTToString(&resp.Diagnostics, *res.Schemas)
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("schemas"), jsontypes.NewNormalizedPointerValue(schemasStr))...)
+	} else {
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("schemas"), jsontypes.NewNormalizedNull())...)
+	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("archived"), res.Archived)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("deprecated"), res.Deprecated)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("description"), res.Description)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("feature_flag"), res.FeatureFlag)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("group_name"), res.GroupName)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("schemas"), jsontypes.NewNormalizedPointerValue(schemasStr))...)
 
 }
 func (r *EventTypeResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data EventTypeResourceModel
-
-	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
-	// TODO: decide if we want to expunge the event types
 	opts := svix.EventTypeDeleteOptions{
 		Expunge: ptr(true),
 	}
@@ -174,10 +182,16 @@ func (r *EventTypeResource) Delete(ctx context.Context, req resource.DeleteReque
 
 func eventTypeOutToTFModel(ctx context.Context, d *diag.Diagnostics, v models.EventTypeOut) *EventTypeResourceModel {
 	tflog.Debug(ctx, "Converting schemas back into a `NormalizedValue`")
-	schemasString, err := json.Marshal(v.Schemas)
-	if err != nil {
-		d.AddError("Unable to marshal `schemas` back into model (after response)", err.Error())
-		return nil
+	var schemas jsontypes.Normalized
+	if v.Schemas == nil {
+		schemas = jsontypes.NewNormalizedNull()
+	} else {
+		schemasString, err := json.Marshal(v.Schemas)
+		if err != nil {
+			d.AddError("Unable to marshal `schemas` back into model (after response)", err.Error())
+			return nil
+		}
+		schemas = jsontypes.NewNormalizedValue(string(schemasString))
 	}
 	out := EventTypeResourceModel{
 		Archived:    types.BoolPointerValue(v.Archived),
@@ -187,7 +201,7 @@ func eventTypeOutToTFModel(ctx context.Context, d *diag.Diagnostics, v models.Ev
 		FeatureFlag: types.StringPointerValue(v.FeatureFlag),
 		GroupName:   types.StringPointerValue(v.GroupName),
 		Name:        types.StringValue(v.Name),
-		Schemas:     jsontypes.NewNormalizedValue(string(schemasString)),
+		Schemas:     schemas,
 		UpdatedAt:   timetypes.NewRFC3339TimePointerValue(&v.UpdatedAt),
 	}
 	return &out
