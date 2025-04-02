@@ -34,13 +34,14 @@ resource "svix_operational_webhooks_endpoint" "example_endpoint" {
 
 - `description` (String)
 - `disabled` (Boolean)
-- `metadata` (String)
+- `metadata` (String) JSON object encoded as a string, use `jsonencode` to create this field
 - `rate_limit` (Number)
-- `secret` (String, Sensitive)
 - `uid` (String)
 
 ### Read-Only
 
 - `created_at` (String)
 - `id` (String) The ID of this resource.
+- `secret` (String, Sensitive) The endpoint's verification secret.
+Format: base64 encoded random bytes prefixed with whsec_. the server generates the secret.
 - `updated_at` (String)

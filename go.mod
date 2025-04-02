@@ -1,7 +1,6 @@
 module github.com/svix/terraform-provider-svix
 
-go 1.23.7
-toolchain go1.24.1
+go 1.24.1
 
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.14.1

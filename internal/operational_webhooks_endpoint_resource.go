@@ -73,14 +73,24 @@ func (r *OperationalWebhooksEndpointResource) Schema(ctx context.Context, req re
 				listvalidator.UniqueValues(),
 				listvalidator.ValueStringsAre(stringvalidator.OneOf(opWebhookTypes...)),
 			}},
-			"id":       schema.StringAttribute{Computed: true},
-			"metadata": schema.StringAttribute{Computed: true, CustomType: jsontypes.NormalizedType{}, Optional: true, Default: stringdefault.StaticString("{}")},
+			"id": schema.StringAttribute{Computed: true},
+			"metadata": schema.StringAttribute{
+				Computed:            true,
+				CustomType:          jsontypes.NormalizedType{},
+				Default:             stringdefault.StaticString("{}"),
+				MarkdownDescription: "JSON object encoded as a string, use `jsonencode` to create this field",
+				Optional:            true,
+			},
 			"rate_limit": schema.Int32Attribute{Optional: true, Validators: []validator.Int32{
 				// uint16
 				int32validator.AtLeast(1),
 				int32validator.AtMost(65535),
 			}},
-			"secret":     schema.StringAttribute{Optional: true, Sensitive: true},
+			"secret": schema.StringAttribute{
+				Sensitive:           true,
+				Computed:            true,
+				MarkdownDescription: "The endpoint's verification secret.\n" + "Format: base64 encoded random bytes prefixed with whsec_. the server generates the secret.",
+			},
 			"uid":        schema.StringAttribute{Optional: true, Computed: true},
 			"updated_at": schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
 			"url":        schema.StringAttribute{Required: true},
@@ -109,26 +119,37 @@ func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req re
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	metadata := stringToMapStringT[string](&resp.Diagnostics, data.Metadata.ValueStringPointer())
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	var filterTypes []string
-	resp.Diagnostics.Append(data.FilterTypes.ElementsAs(ctx, &filterTypes, false)...)
-	if resp.Diagnostics.HasError() {
-		return
+
+	// create the opWebhookIn struct
+	var opWebhookIn models.OperationalWebhookEndpointIn
+	{
+		metadata := stringToMapStringT[string](&resp.Diagnostics, data.Metadata.ValueStringPointer())
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		var filterTypes []string
+		resp.Diagnostics.Append(data.FilterTypes.ElementsAs(ctx, &filterTypes, false)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		var rateLimit *uint16
+		if !data.RateLimit.IsUnknown() && !data.RateLimit.IsNull() {
+			rateLimit = ptr(uint16(data.RateLimit.ValueInt32()))
+		}
+
+		opWebhookIn = models.OperationalWebhookEndpointIn{
+			Description: data.Description.ValueStringPointer(),
+			Disabled:    data.Disabled.ValueBoolPointer(),
+			FilterTypes: filterTypes,
+			Metadata:    metadata,
+			RateLimit:   rateLimit,
+			Uid:         strOrNil(data.Uid),
+			Url:         data.Url.ValueString(),
+		}
 	}
 
-	opWebhookIn := models.OperationalWebhookEndpointIn{
-		Description: data.Description.ValueStringPointer(),
-		Disabled:    data.Disabled.ValueBoolPointer(),
-		FilterTypes: filterTypes,
-		Metadata:    metadata,
-		RateLimit:   ptr(uint16(data.RateLimit.ValueInt32())),
-		Secret:      data.Secret.ValueStringPointer(),
-		Uid:         strOrNil(data.Uid),
-		Url:         data.Url.ValueString(),
-	}
 	opts := svix.OperationalWebhookEndpointCreateOptions{
 		IdempotencyKey: randStr32(),
 	}
@@ -137,7 +158,12 @@ func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req re
 		resp.Diagnostics.AddError("Unable to create operational webhooks endpoint", err.Error())
 		return
 	}
-	out := operationalWebhookEndpointOutToModel(ctx, &resp.Diagnostics, *res)
+	secretRes, err := r.svx.OperationalWebhook.Endpoint.GetSecret(ctx, res.Id)
+	if err != nil {
+		resp.Diagnostics.AddError("Failed to get op webhook endpoint secret", err.Error())
+		return
+	}
+	out := operationalWebhookEndpointOutToModel(ctx, &resp.Diagnostics, *res, secretRes.Key)
 	if out != nil {
 		resp.Diagnostics.Append(resp.State.Set(ctx, &out)...)
 	}
@@ -151,7 +177,12 @@ func (r *OperationalWebhooksEndpointResource) Read(ctx context.Context, req reso
 		resp.Diagnostics.AddError("Failed to get op webhook endpoint", err.Error())
 		return
 	}
-	out := operationalWebhookEndpointOutToModel(ctx, &resp.Diagnostics, *res)
+	secretRes, err := r.svx.OperationalWebhook.Endpoint.GetSecret(ctx, res.Id)
+	if err != nil {
+		resp.Diagnostics.AddError("Failed to get op webhook endpoint secret", err.Error())
+		return
+	}
+	out := operationalWebhookEndpointOutToModel(ctx, &resp.Diagnostics, *res, secretRes.Key)
 	if out != nil {
 		resp.Diagnostics.Append(resp.State.Set(ctx, &out)...)
 	}
@@ -218,7 +249,7 @@ func (r *OperationalWebhooksEndpointResource) Delete(ctx context.Context, req re
 
 }
 
-func operationalWebhookEndpointOutToModel(ctx context.Context, d *diag.Diagnostics, v models.OperationalWebhookEndpointOut) *OperationalWebhooksEndpointResourceModel {
+func operationalWebhookEndpointOutToModel(ctx context.Context, d *diag.Diagnostics, v models.OperationalWebhookEndpointOut, webhookSecret string) *OperationalWebhooksEndpointResourceModel {
 	filterTypes, diags := types.ListValueFrom(ctx, types.StringType, v.FilterTypes)
 	d.Append(diags...)
 	if d.HasError() {
@@ -229,6 +260,10 @@ func operationalWebhookEndpointOutToModel(ctx context.Context, d *diag.Diagnosti
 		d.AddAttributeError(path.Root("metadata"), "Unable to marshal metadata to a string", err.Error())
 		return nil
 	}
+	var rateLimit *int32
+	if v.RateLimit != nil {
+		rateLimit = ptr(int32(*v.RateLimit))
+	}
 	ret := OperationalWebhooksEndpointResourceModel{
 		CreatedAt:   timetypes.NewRFC3339TimeValue(v.CreatedAt),
 		Description: types.StringValue(v.Description),
@@ -236,7 +271,8 @@ func operationalWebhookEndpointOutToModel(ctx context.Context, d *diag.Diagnosti
 		FilterTypes: filterTypes,
 		Id:          types.StringValue(v.Id),
 		Metadata:    jsontypes.NewNormalizedValue(string(metadata)),
-		RateLimit:   types.Int32Value(int32(*v.RateLimit)),
+		RateLimit:   types.Int32PointerValue(rateLimit),
+		Secret:      types.StringValue(webhookSecret),
 		Uid:         types.StringPointerValue(v.Uid),
 		UpdatedAt:   timetypes.NewRFC3339TimeValue(v.UpdatedAt),
 		Url:         types.StringValue(v.Url),

@@ -29,7 +29,8 @@ func ptr[T any](value T) *T {
 }
 
 // Marshal a map[string]T to a string
-// if v is nil, return nil
+//
+// if v is nil or if Marshaling failed, return nil
 func mapStringTToString[T any](d *diag.Diagnostics, v *map[string]T) *string {
 	if v == nil {
 		return nil
@@ -45,7 +46,8 @@ func mapStringTToString[T any](d *diag.Diagnostics, v *map[string]T) *string {
 }
 
 // Unmarshal a *string to a map[string]T
-// if v is nil, return nil
+//
+// if v is nil or if Unmarshaling failed, return nil
 func stringToMapStringT[T any](d *diag.Diagnostics, v *string) *map[string]T {
 	if v == nil {
 		return nil
