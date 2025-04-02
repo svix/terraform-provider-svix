@@ -28,7 +28,12 @@ func ptr[T any](value T) *T {
 	return &value
 }
 
-func mapStringTToString[T any](d *diag.Diagnostics, v map[string]T) *string {
+// Marshal a map[string]T to a string
+// if v is nil, return nil
+func mapStringTToString[T any](d *diag.Diagnostics, v *map[string]T) *string {
+	if v == nil {
+		return nil
+	}
 	ret, err := json.Marshal(v)
 	if err != nil {
 		d.AddError("Failed to marshal a map[ring]any to a string", err.Error())
@@ -39,9 +44,14 @@ func mapStringTToString[T any](d *diag.Diagnostics, v map[string]T) *string {
 
 }
 
-func stringToMapStringT[T any](d *diag.Diagnostics, v string) *map[string]T {
+// Unmarshal a *string to a map[string]T
+// if v is nil, return nil
+func stringToMapStringT[T any](d *diag.Diagnostics, v *string) *map[string]T {
+	if v == nil {
+		return nil
+	}
 	var ret map[string]T
-	err := json.Unmarshal([]byte(v), &ret)
+	err := json.Unmarshal([]byte(*v), &ret)
 	if err != nil {
 		d.AddError("Unable to convert a json string to a map[string]T", err.Error())
 		return nil

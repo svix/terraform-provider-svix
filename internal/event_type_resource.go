@@ -133,14 +133,9 @@ func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateReque
 	var data EventTypeResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
-	var schemas *map[string]any
-	if data.Schemas.IsNull() {
-		schemas = nil
-	} else {
-		schemas = stringToMapStringT[any](&resp.Diagnostics, data.Schemas.ValueString())
-		if resp.Diagnostics.HasError() {
-			return
-		}
+	schemas := stringToMapStringT[any](&resp.Diagnostics, data.Schemas.ValueStringPointer())
+	if resp.Diagnostics.HasError() {
+		return
 	}
 	eventType := models.EventTypeUpdate{
 		Archived:    data.Archived.ValueBoolPointer(),
@@ -155,12 +150,13 @@ func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateReque
 		resp.Diagnostics.AddError("Error while updating event type", err.Error())
 		return
 	}
-	if res.Schemas != nil {
-		schemasStr := mapStringTToString(&resp.Diagnostics, *res.Schemas)
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("schemas"), jsontypes.NewNormalizedPointerValue(schemasStr))...)
-	} else {
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("schemas"), jsontypes.NewNormalizedNull())...)
+
+	schemasStr := mapStringTToString(&resp.Diagnostics, res.Schemas)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("schemas"), jsontypes.NewNormalizedPointerValue(schemasStr))...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("archived"), res.Archived)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("deprecated"), res.Deprecated)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("description"), res.Description)...)

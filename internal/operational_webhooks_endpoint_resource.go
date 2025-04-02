@@ -76,7 +76,9 @@ func (r *OperationalWebhooksEndpointResource) Schema(ctx context.Context, req re
 			"id":       schema.StringAttribute{Computed: true},
 			"metadata": schema.StringAttribute{Computed: true, CustomType: jsontypes.NormalizedType{}, Optional: true, Default: stringdefault.StaticString("{}")},
 			"rate_limit": schema.Int32Attribute{Optional: true, Validators: []validator.Int32{
+				// uint16
 				int32validator.AtLeast(1),
+				int32validator.AtMost(65535),
 			}},
 			"secret":     schema.StringAttribute{Optional: true, Sensitive: true},
 			"uid":        schema.StringAttribute{Optional: true, Computed: true},
@@ -107,8 +109,8 @@ func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req re
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	metadata := stringToMapStringT[string](&resp.Diagnostics, data.Metadata.ValueString())
-	if metadata == nil {
+	metadata := stringToMapStringT[string](&resp.Diagnostics, data.Metadata.ValueStringPointer())
+	if resp.Diagnostics.HasError() {
 		return
 	}
 	var filterTypes []string
@@ -165,8 +167,8 @@ func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req re
 		return
 	}
 
-	metadata := stringToMapStringT[string](&resp.Diagnostics, data.Metadata.ValueString())
-	if metadata == nil {
+	metadata := stringToMapStringT[string](&resp.Diagnostics, data.Metadata.ValueStringPointer())
+	if resp.Diagnostics.HasError() {
 		return
 	}
 	var filterTypes []string
@@ -189,8 +191,8 @@ func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req re
 		resp.Diagnostics.AddError("Error while updating operational webhook endpoint", err.Error())
 		return
 	}
-	out_metadata := mapStringTToString(&resp.Diagnostics, res.Metadata)
-	if out_metadata == nil {
+	out_metadata := mapStringTToString(&resp.Diagnostics, &res.Metadata)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("description"), res.Description)...)
