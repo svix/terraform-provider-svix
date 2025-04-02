@@ -1,6 +1,7 @@
 module github.com/svix/terraform-provider-svix
 
 go 1.23.7
+toolchain go1.24.1
 
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.14.1
@@ -8,7 +9,7 @@ require (
 	github.com/hashicorp/terraform-plugin-framework-timetypes v0.5.0
 	github.com/hashicorp/terraform-plugin-framework-validators v0.17.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
-	github.com/svix/svix-webhooks v1.62.0
+	github.com/svix/svix-webhooks v1.63.0
 )
 
 require (
