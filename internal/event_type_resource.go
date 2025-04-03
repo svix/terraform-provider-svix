@@ -94,11 +94,11 @@ func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateReque
 	eventTypeIn := models.EventTypeIn{
 		Name:        data.Name.ValueString(),
 		Description: data.Description.ValueString(),
-		Archived:    data.Archived.ValueBoolPointer(),
-		Deprecated:  data.Deprecated.ValueBoolPointer(),
+		Archived:    boolOrNil(data.Archived),
+		Deprecated:  boolOrNil(data.Deprecated),
 		Schemas:     schema,
-		FeatureFlag: data.FeatureFlag.ValueStringPointer(),
-		GroupName:   data.GroupName.ValueStringPointer(),
+		FeatureFlag: strOrNil(data.FeatureFlag),
+		GroupName:   strOrNil(data.GroupName),
 	}
 	tflog.Debug(ctx, "Sending `EventType.Create` request")
 	reqOpts := svix.EventTypeCreateOptions{

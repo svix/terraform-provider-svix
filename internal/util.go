@@ -69,3 +69,11 @@ func strOrNil(v types.String) *string {
 	}
 	return v.ValueStringPointer()
 }
+
+// if unknown return nil, else return value
+func boolOrNil(v types.Bool) *bool {
+	if v.IsUnknown() {
+		return nil
+	}
+	return v.ValueBoolPointer()
+}
