@@ -140,8 +140,8 @@ func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req re
 		}
 
 		opWebhookIn = models.OperationalWebhookEndpointIn{
-			Description: data.Description.ValueStringPointer(),
-			Disabled:    data.Disabled.ValueBoolPointer(),
+			Description: strOrNil(data.Description),
+			Disabled:    boolOrNil(data.Disabled),
 			FilterTypes: filterTypes,
 			Metadata:    metadata,
 			RateLimit:   rateLimit,
@@ -209,8 +209,8 @@ func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req re
 	}
 
 	opWebhook := models.OperationalWebhookEndpointUpdate{
-		Description: data.Description.ValueStringPointer(),
-		Disabled:    data.Disabled.ValueBoolPointer(),
+		Description: strOrNil(data.Description),
+		Disabled:    boolOrNil(data.Disabled),
 		FilterTypes: filterTypes,
 		Metadata:    metadata,
 		RateLimit:   ptr(uint16(data.RateLimit.ValueInt32())),
