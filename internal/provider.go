@@ -74,7 +74,7 @@ func (p *SvixProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	if server_url == "" {
 		resp.Diagnostics.AddError(
 			"Missing Server URL Configuration",
-			"While configuring the provider, the API token was not found in "+
+			"While configuring the provider, the Server URL was not found in "+
 				"the SVIX_SERVER_URL environment variable or provider "+
 				"configuration block server_url attribute.",
 		)
@@ -87,14 +87,15 @@ func (p *SvixProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	url, err := url.Parse(server_url)
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to parse endpoint url", err.Error())
+		return
 	}
+
 	svx, err := svix.New(token, &svix.SvixOptions{ServerUrl: url})
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to create svix client", err.Error())
-	}
-	if resp.Diagnostics.HasError() {
 		return
 	}
+
 	resp.DataSourceData = svx
 	resp.ResourceData = svx
 

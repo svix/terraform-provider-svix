@@ -211,7 +211,7 @@ func eventTypeOutToTFModel(ctx context.Context, d *diag.Diagnostics, v models.Ev
 		GroupName:   types.StringPointerValue(v.GroupName),
 		Name:        types.StringValue(v.Name),
 		Schemas:     schemas,
-		UpdatedAt:   timetypes.NewRFC3339TimePointerValue(&v.UpdatedAt),
+		UpdatedAt:   timetypes.NewRFC3339TimeValue(v.UpdatedAt),
 	}
 	return &out
 }

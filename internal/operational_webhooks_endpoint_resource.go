@@ -212,12 +212,17 @@ func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req re
 		return
 	}
 
+	var rateLimit *uint16
+	if !data.RateLimit.IsUnknown() && !data.RateLimit.IsNull() {
+		rateLimit = ptr(uint16(data.RateLimit.ValueInt32()))
+	}
+
 	opWebhook := models.OperationalWebhookEndpointUpdate{
 		Description: strOrNil(data.Description),
 		Disabled:    boolOrNil(data.Disabled),
 		FilterTypes: filterTypes,
 		Metadata:    metadata,
-		RateLimit:   ptr(uint16(data.RateLimit.ValueInt32())),
+		RateLimit:   rateLimit,
 		Uid:         strOrNil(data.Uid),
 		Url:         data.Url.ValueString(),
 	}
