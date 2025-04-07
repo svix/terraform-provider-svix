@@ -150,11 +150,11 @@ func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 	eventType := models.EventTypeUpdate{
-		Archived:    data.Archived.ValueBoolPointer(),
-		Deprecated:  data.Deprecated.ValueBoolPointer(),
+		Archived:    boolOrNil(data.Archived),
+		Deprecated:  boolOrNil(data.Deprecated),
 		Description: data.Description.ValueString(),
-		FeatureFlag: data.FeatureFlag.ValueStringPointer(),
-		GroupName:   data.GroupName.ValueStringPointer(),
+		FeatureFlag: strOrNil(data.FeatureFlag),
+		GroupName:   strOrNil(data.GroupName),
 		Schemas:     schemas,
 	}
 
