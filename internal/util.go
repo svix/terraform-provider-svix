@@ -2,11 +2,23 @@ package internal
 
 import (
 	"encoding/json"
+	"log"
 	"math/rand"
+	"regexp"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
+
+func saneStringRegex() *regexp.Regexp {
+	saneStringRegex, err := regexp.Compile(`^[a-zA-Z0-9\-_.]+$`)
+	// we should never be changing this regex, so this should never panic
+	if err != nil {
+		log.Panic(err)
+	}
+	return saneStringRegex
+}
 
 func randStr32() *string {
 	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -20,9 +32,9 @@ func randStr32() *string {
 
 }
 
-// func spw(v any) {
-// 	log.Println(spew.Sdump(v))
-// }
+func Spw(v any) {
+	log.Println(spew.Sdump(v))
+}
 
 func ptr[T any](value T) *T {
 	return &value

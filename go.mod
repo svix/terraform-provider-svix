@@ -1,7 +1,9 @@
 module github.com/svix/terraform-provider-svix
 
 go 1.24.1
+
 require (
+	github.com/davecgh/go-spew v1.1.1
 	github.com/hashicorp/terraform-plugin-framework v1.14.1
 	github.com/hashicorp/terraform-plugin-framework-jsontypes v0.2.0
 	github.com/hashicorp/terraform-plugin-framework-timetypes v0.5.0

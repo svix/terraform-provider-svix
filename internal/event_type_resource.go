@@ -7,10 +7,13 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	svix "github.com/svix/svix-webhooks/go"
@@ -46,15 +49,24 @@ func (r *EventTypeResource) Metadata(ctx context.Context, req resource.MetadataR
 func (r *EventTypeResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"archived":     schema.BoolAttribute{Computed: true, Optional: true},
-			"created_at":   schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
-			"deprecated":   schema.BoolAttribute{Computed: true, Optional: true},
-			"description":  schema.StringAttribute{Required: true},
-			"feature_flag": schema.StringAttribute{Computed: true, Optional: true},
-			"group_name":   schema.StringAttribute{Computed: true, Optional: true},
-			"name":         schema.StringAttribute{Required: true},
-			"schemas":      schema.StringAttribute{Optional: true, CustomType: jsontypes.NormalizedType{}},
-			"updated_at":   schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
+			"archived":    schema.BoolAttribute{Computed: true, Optional: true, Default: booldefault.StaticBool(false)},
+			"created_at":  schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
+			"deprecated":  schema.BoolAttribute{Computed: true, Optional: true, Default: booldefault.StaticBool(false)},
+			"description": schema.StringAttribute{Required: true},
+			"feature_flag": schema.StringAttribute{Optional: true, Validators: []validator.String{
+				stringvalidator.LengthAtMost(256),
+				stringvalidator.RegexMatches(saneStringRegex(), "String must match against `^[a-zA-Z0-9\\-_.]+$`"),
+			}},
+			"group_name": schema.StringAttribute{Optional: true, Validators: []validator.String{
+				stringvalidator.LengthAtMost(256),
+				stringvalidator.RegexMatches(saneStringRegex(), "String must match against `^[a-zA-Z0-9\\-_.]+$`"),
+			}},
+			"name": schema.StringAttribute{Required: true, Validators: []validator.String{
+				stringvalidator.LengthAtMost(256),
+				stringvalidator.RegexMatches(saneStringRegex(), "String must match against `^[a-zA-Z0-9\\-_.]+$`"),
+			}},
+			"schemas":    schema.StringAttribute{Optional: true, CustomType: jsontypes.NormalizedType{}},
+			"updated_at": schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
 		},
 	}
 }
@@ -145,6 +157,7 @@ func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateReque
 		GroupName:   data.GroupName.ValueStringPointer(),
 		Schemas:     schemas,
 	}
+
 	res, err := r.svx.EventType.Update(ctx, data.Name.ValueString(), eventType)
 	if err != nil {
 		resp.Diagnostics.AddError("Error while updating event type", err.Error())

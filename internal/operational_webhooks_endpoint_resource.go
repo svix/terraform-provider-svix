@@ -91,7 +91,11 @@ func (r *OperationalWebhooksEndpointResource) Schema(ctx context.Context, req re
 				Computed:            true,
 				MarkdownDescription: "The endpoint's verification secret.\n" + "Format: base64 encoded random bytes prefixed with whsec_. the server generates the secret.",
 			},
-			"uid":        schema.StringAttribute{Optional: true, Computed: true},
+			"uid": schema.StringAttribute{Optional: true, Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+				stringvalidator.LengthAtMost(256),
+				stringvalidator.RegexMatches(saneStringRegex(), "String must match against `^[a-zA-Z0-9\\-_.]+$`"),
+			}},
 			"updated_at": schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
 			"url":        schema.StringAttribute{Required: true},
 		},
