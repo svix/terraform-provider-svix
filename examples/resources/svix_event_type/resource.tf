@@ -1,5 +1,6 @@
 resource "svix_event_type" "example_event_type" {
-  name = "invoice.paid"
+  name        = "invoice.paid"
+  description = "An invoice was paid by a user"
   schemas = jsonencode({
     "1" = {
       description = "An invoice was paid by a user"
