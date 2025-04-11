@@ -12,6 +12,8 @@ require (
 	github.com/svix/svix-webhooks v1.64.0
 )
 
+replace github.com/svix/svix-webhooks v1.64.0 => ../svix-webhooks
+
 require (
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect

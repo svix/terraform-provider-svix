@@ -30,6 +30,7 @@ resource "svix_operational_webhooks_endpoint" "example_endpoint" {
 
 ### Required
 
+- `environment_id` (String) The Id to the environment that this resource will be created in
 - `filter_types` (List of String)
 - `url` (String)
 

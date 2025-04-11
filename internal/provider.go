@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"os"
 
@@ -90,19 +91,20 @@ func (p *SvixProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		return
 	}
 
-	svx, err := svix.New(token, &svix.SvixOptions{ServerUrl: url})
-	if err != nil {
-		resp.Diagnostics.AddError("Unable to create svix client", err.Error())
-		return
+	appState := appState{
+		token:     token,
+		serverUrl: *url,
 	}
 
-	resp.DataSourceData = svx
-	resp.ResourceData = svx
+	resp.DataSourceData = appState
+	resp.ResourceData = appState
 
 }
 
 func (p *SvixProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		NewApiTokenResource,
+		NewEnvironmentResource,
 		NewEventTypeResource,
 		NewOperationalWebhooksEndpoint,
 	}
@@ -125,4 +127,29 @@ func New(version string) func() provider.Provider {
 			version: version,
 		}
 	}
+}
+
+type appState struct {
+	token     string
+	serverUrl url.URL
+}
+
+// get the default client without an envId suffixed
+func (s *appState) defaultSvixClient() (*svix.Svix, error) {
+	svx, err := svix.New(s.token, &svix.SvixOptions{ServerUrl: &s.serverUrl, Debug: true})
+	if err != nil {
+		return nil, err
+	}
+	return svx, nil
+}
+
+// create a new svix client with the envId suffixed on the token
+func (t *appState) clientWithEnvId(envId string) (*svix.Svix, error) {
+	bearerToken := fmt.Sprintf("%s|%s", t.token, envId)
+	svx, err := svix.New(bearerToken, &svix.SvixOptions{ServerUrl: &t.serverUrl, Debug: true})
+	if err != nil {
+		return nil, err
+	}
+	return svx, nil
+
 }

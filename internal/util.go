@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"math/rand/v2"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -97,4 +100,19 @@ func boolOrNil(v types.Bool) *bool {
 		return nil
 	}
 	return v.ValueBoolPointer()
+}
+
+// wrapper function around `resp.Diagnostics.Append(resp.State.SetAttribute())` for *CreateResponse
+func setCreateState(ctx context.Context, resp *resource.CreateResponse, rootPath string, val any) {
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root(rootPath), val)...)
+}
+
+// wrapper function around `resp.Diagnostics.Append(resp.State.SetAttribute())` for *ReadResponse
+func setReadState(ctx context.Context, resp *resource.ReadResponse, rootPath string, val any) {
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root(rootPath), val)...)
+}
+
+// wrapper function around `resp.Diagnostics.Append(resp.State.SetAttribute())` for *UpdateResponse
+func setUpdateState(ctx context.Context, resp *resource.UpdateResponse, rootPath string, val any) {
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root(rootPath), val)...)
 }

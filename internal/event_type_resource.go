@@ -27,7 +27,8 @@ func NewEventTypeResource() resource.Resource {
 }
 
 type EventTypeResource struct {
-	svx *svix.Svix
+	state *appState
+	svx   *svix.Svix
 }
 
 type EventTypeResourceModel struct {
@@ -75,15 +76,15 @@ func (r *EventTypeResource) Configure(ctx context.Context, req resource.Configur
 	if req.ProviderData == nil {
 		return
 	}
-	client, ok := req.ProviderData.(*svix.Svix)
+	state, ok := req.ProviderData.(*appState)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *svix.Svix, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected appState, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 		return
 	}
-	r.svx = client
+	r.state = state
 }
 
 func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
