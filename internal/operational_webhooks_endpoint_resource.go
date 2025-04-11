@@ -15,6 +15,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -41,21 +44,22 @@ func NewOperationalWebhooksEndpoint() resource.Resource {
 }
 
 type OperationalWebhooksEndpointResource struct {
-	svx *svix.Svix
+	state appState
 }
 
 type OperationalWebhooksEndpointResourceModel struct {
-	CreatedAt   timetypes.RFC3339    `tfsdk:"created_at"`
-	Description types.String         `tfsdk:"description"`
-	Disabled    types.Bool           `tfsdk:"disabled"`
-	FilterTypes types.List           `tfsdk:"filter_types"`
-	Id          types.String         `tfsdk:"id"`
-	Metadata    jsontypes.Normalized `tfsdk:"metadata"`
-	RateLimit   types.Int32          `tfsdk:"rate_limit"`
-	Secret      types.String         `tfsdk:"secret"`
-	Uid         types.String         `tfsdk:"uid"`
-	UpdatedAt   timetypes.RFC3339    `tfsdk:"updated_at"`
-	Url         types.String         `tfsdk:"url"`
+	EnvironmentId types.String         `tfsdk:"environment_id"`
+	CreatedAt     timetypes.RFC3339    `tfsdk:"created_at"`
+	Description   types.String         `tfsdk:"description"`
+	Disabled      types.Bool           `tfsdk:"disabled"`
+	FilterTypes   types.List           `tfsdk:"filter_types"`
+	Id            types.String         `tfsdk:"id"`
+	Metadata      jsontypes.Normalized `tfsdk:"metadata"`
+	RateLimit     types.Int32          `tfsdk:"rate_limit"`
+	Secret        types.String         `tfsdk:"secret"`
+	Uid           types.String         `tfsdk:"uid"`
+	UpdatedAt     timetypes.RFC3339    `tfsdk:"updated_at"`
+	Url           types.String         `tfsdk:"url"`
 }
 
 func (r *OperationalWebhooksEndpointResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -65,6 +69,13 @@ func (r *OperationalWebhooksEndpointResource) Metadata(ctx context.Context, req 
 func (r *OperationalWebhooksEndpointResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"environment_id": schema.StringAttribute{
+				Required:    true,
+				Description: ENV_ID_DESC,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
 			"created_at":  schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
 			"description": schema.StringAttribute{Computed: true, Optional: true, Default: stringdefault.StaticString("")},
 			"disabled":    schema.BoolAttribute{Computed: true, Optional: true, Default: booldefault.StaticBool(false)},
@@ -106,21 +117,30 @@ func (r *OperationalWebhooksEndpointResource) Configure(ctx context.Context, req
 	if req.ProviderData == nil {
 		return
 	}
-	client, ok := req.ProviderData.(*svix.Svix)
+	state, ok := req.ProviderData.(appState)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *svix.Svix, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected appState, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 		return
 	}
-	r.svx = client
+	r.state = state
 }
 
 func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data OperationalWebhooksEndpointResourceModel
+	var env_id string
+	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("environment_id"), &env_id)...)
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// create svix client
+	svx, err := r.state.clientWithEnvId(env_id)
+	if err != nil {
+		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
@@ -154,15 +174,14 @@ func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req re
 		}
 	}
 
-	opts := svix.OperationalWebhookEndpointCreateOptions{
+	res, err := svx.OperationalWebhookEndpoint.Create(ctx, opWebhookIn, &svix.OperationalWebhookEndpointCreateOptions{
 		IdempotencyKey: randStr32(),
-	}
-	res, err := r.svx.OperationalWebhookEndpoint.Create(ctx, opWebhookIn, &opts)
+	})
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to create operational webhooks endpoint", err.Error())
 		return
 	}
-	secretRes, err := r.svx.OperationalWebhook.Endpoint.GetSecret(ctx, res.Id)
+	secretRes, err := svx.OperationalWebhook.Endpoint.GetSecret(ctx, res.Id)
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to get op webhook endpoint secret", err.Error())
 		return
@@ -170,18 +189,33 @@ func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req re
 	out := operationalWebhookEndpointOutToModel(ctx, &resp.Diagnostics, *res, secretRes.Key)
 	if out != nil {
 		resp.Diagnostics.Append(resp.State.Set(ctx, &out)...)
+		// environment_id is always set by the user
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("environment_id"), env_id)...)
 	}
 }
 
 func (r *OperationalWebhooksEndpointResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data OperationalWebhooksEndpointResourceModel
+	var env_id string
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &env_id)...)
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
-	res, err := r.svx.OperationalWebhookEndpoint.Get(ctx, data.Id.ValueString())
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// create svix client
+	svx, err := r.state.clientWithEnvId(env_id)
+	if err != nil {
+		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		return
+	}
+
+	res, err := svx.OperationalWebhookEndpoint.Get(ctx, data.Id.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to get op webhook endpoint", err.Error())
 		return
 	}
-	secretRes, err := r.svx.OperationalWebhook.Endpoint.GetSecret(ctx, res.Id)
+	secretRes, err := svx.OperationalWebhook.Endpoint.GetSecret(ctx, res.Id)
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to get op webhook endpoint secret", err.Error())
 		return
@@ -189,16 +223,26 @@ func (r *OperationalWebhooksEndpointResource) Read(ctx context.Context, req reso
 	out := operationalWebhookEndpointOutToModel(ctx, &resp.Diagnostics, *res, secretRes.Key)
 	if out != nil {
 		resp.Diagnostics.Append(resp.State.Set(ctx, &out)...)
+		// environment_id is always set by the user
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("environment_id"), env_id)...)
 	}
 
 }
 
 func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data OperationalWebhooksEndpointResourceModel
-	var ep_id string
+	var env_id, ep_id string
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &env_id)...)
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ep_id)...)
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// create svix client
+	svx, err := r.state.clientWithEnvId(env_id)
+	if err != nil {
+		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
@@ -226,7 +270,7 @@ func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req re
 		Uid:         strOrNil(data.Uid),
 		Url:         data.Url.ValueString(),
 	}
-	res, err := r.svx.OperationalWebhookEndpoint.Update(ctx, ep_id, opWebhook)
+	res, err := svx.OperationalWebhookEndpoint.Update(ctx, ep_id, opWebhook)
 	if err != nil {
 		resp.Diagnostics.AddError("Error while updating operational webhook endpoint", err.Error())
 		return
@@ -246,12 +290,21 @@ func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req re
 }
 
 func (r *OperationalWebhooksEndpointResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var ep_id string
+	var env_id, ep_id string
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &env_id)...)
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ep_id)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	err := r.svx.OperationalWebhookEndpoint.Delete(ctx, ep_id)
+
+	// create svix client
+	svx, err := r.state.clientWithEnvId(env_id)
+	if err != nil {
+		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		return
+	}
+
+	err = svx.OperationalWebhookEndpoint.Delete(ctx, ep_id)
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to delete operational webhooks endpoint", err.Error())
 	}
