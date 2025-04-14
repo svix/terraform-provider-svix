@@ -104,10 +104,16 @@ func (r *ApiTokenResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	// call api
+	var scopes []string
+	resp.Diagnostics.Append(data.Scopes.ElementsAs(ctx, &scopes, false)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 	res, err := svx.Management.Authentication.CreateApiToken(
 		ctx,
 		models.ApiTokenIn{
-			Name: data.Name.ValueString(),
+			Name:   data.Name.ValueString(),
+			Scopes: scopes,
 		},
 		&svix.ManagementAuthenticationCreateApiTokenOptions{
 			IdempotencyKey: randStr32(),
