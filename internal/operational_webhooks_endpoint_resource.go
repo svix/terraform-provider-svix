@@ -10,7 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/int32validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -129,18 +128,19 @@ func (r *OperationalWebhooksEndpointResource) Configure(ctx context.Context, req
 }
 
 func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	// load state/plan
 	var data OperationalWebhooksEndpointResourceModel
-	var env_id string
-	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("environment_id"), &env_id)...)
+	var envId string
+	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(env_id)
+	svx, err := r.state.clientWithEnvId(envId)
 	if err != nil {
-		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
@@ -174,6 +174,7 @@ func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req re
 		}
 	}
 
+	// call api
 	res, err := svx.OperationalWebhookEndpoint.Create(ctx, opWebhookIn, &svix.OperationalWebhookEndpointCreateOptions{
 		IdempotencyKey: randStr32(),
 	})
@@ -186,30 +187,52 @@ func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req re
 		resp.Diagnostics.AddError("Failed to get op webhook endpoint secret", err.Error())
 		return
 	}
-	out := operationalWebhookEndpointOutToModel(ctx, &resp.Diagnostics, *res, secretRes.Key)
-	if out != nil {
-		resp.Diagnostics.Append(resp.State.Set(ctx, &out)...)
-		// environment_id is always set by the user
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("environment_id"), env_id)...)
+
+	// save state
+	filterTypesOut, diags := types.ListValueFrom(ctx, types.StringType, res.FilterTypes)
+	resp.Diagnostics.Append(diags...)
+	metadataOut, err := json.Marshal(res.Metadata)
+	if err != nil {
+		resp.Diagnostics.AddAttributeError(path.Root("metadata"), "Unable to marshal metadata to a string", err.Error())
 	}
+	var rateLimitOut *int32
+	if res.RateLimit != nil {
+		rateLimitOut = ptr(int32(*res.RateLimit))
+	}
+
+	setCreateState(ctx, resp, "environment_id", envId)
+	setCreateState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setCreateState(ctx, resp, "description", types.StringValue(res.Description))
+	setCreateState(ctx, resp, "disabled", types.BoolPointerValue(res.Disabled))
+	setCreateState(ctx, resp, "filter_types", filterTypesOut)
+	setCreateState(ctx, resp, "id", types.StringValue(res.Id))
+	setCreateState(ctx, resp, "metadata", jsontypes.NewNormalizedValue(string(metadataOut)))
+	setCreateState(ctx, resp, "rate_limit", types.Int32PointerValue(rateLimitOut))
+	setCreateState(ctx, resp, "secret", types.StringValue(secretRes.Key))
+	setCreateState(ctx, resp, "uid", types.StringPointerValue(res.Uid))
+	setCreateState(ctx, resp, "updated_at", timetypes.NewRFC3339TimeValue(res.UpdatedAt))
+	setCreateState(ctx, resp, "url", types.StringValue(res.Url))
+
 }
 
 func (r *OperationalWebhooksEndpointResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	// load state/plan
 	var data OperationalWebhooksEndpointResourceModel
-	var env_id string
-	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &env_id)...)
+	var envId string
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(env_id)
+	svx, err := r.state.clientWithEnvId(envId)
 	if err != nil {
-		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
+	// call api
 	res, err := svx.OperationalWebhookEndpoint.Get(ctx, data.Id.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to get op webhook endpoint", err.Error())
@@ -220,36 +243,56 @@ func (r *OperationalWebhooksEndpointResource) Read(ctx context.Context, req reso
 		resp.Diagnostics.AddError("Failed to get op webhook endpoint secret", err.Error())
 		return
 	}
-	out := operationalWebhookEndpointOutToModel(ctx, &resp.Diagnostics, *res, secretRes.Key)
-	if out != nil {
-		resp.Diagnostics.Append(resp.State.Set(ctx, &out)...)
-		// environment_id is always set by the user
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("environment_id"), env_id)...)
+	// save state
+	filterTypesOut, diags := types.ListValueFrom(ctx, types.StringType, res.FilterTypes)
+	resp.Diagnostics.Append(diags...)
+	metadataOut, err := json.Marshal(res.Metadata)
+	if err != nil {
+		resp.Diagnostics.AddAttributeError(path.Root("metadata"), "Unable to marshal metadata to a string", err.Error())
+	}
+	var rateLimitOut *int32
+	if res.RateLimit != nil {
+		rateLimitOut = ptr(int32(*res.RateLimit))
 	}
 
+	setReadState(ctx, resp, "environment_id", envId)
+	setReadState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setReadState(ctx, resp, "description", types.StringValue(res.Description))
+	setReadState(ctx, resp, "disabled", types.BoolPointerValue(res.Disabled))
+	setReadState(ctx, resp, "filter_types", filterTypesOut)
+	setReadState(ctx, resp, "id", types.StringValue(res.Id))
+	setReadState(ctx, resp, "metadata", jsontypes.NewNormalizedValue(string(metadataOut)))
+	setReadState(ctx, resp, "rate_limit", types.Int32PointerValue(rateLimitOut))
+	setReadState(ctx, resp, "secret", types.StringValue(secretRes.Key))
+	setReadState(ctx, resp, "uid", types.StringPointerValue(res.Uid))
+	setReadState(ctx, resp, "updated_at", timetypes.NewRFC3339TimeValue(res.UpdatedAt))
+	setReadState(ctx, resp, "url", types.StringValue(res.Url))
 }
 
 func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	// load state/plan
 	var data OperationalWebhooksEndpointResourceModel
-	var env_id, ep_id string
-	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &env_id)...)
-	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ep_id)...)
+	var envId, epId string
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &epId)...)
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(env_id)
+	svx, err := r.state.clientWithEnvId(envId)
 	if err != nil {
-		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
+	// call api
 	metadata := stringToMapStringT[string](&resp.Diagnostics, data.Metadata.ValueStringPointer())
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
 	var filterTypes []string
 	resp.Diagnostics.Append(data.FilterTypes.ElementsAs(ctx, &filterTypes, false)...)
 	if resp.Diagnostics.HasError() {
@@ -270,74 +313,45 @@ func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req re
 		Uid:         strOrNil(data.Uid),
 		Url:         data.Url.ValueString(),
 	}
-	res, err := svx.OperationalWebhookEndpoint.Update(ctx, ep_id, opWebhook)
+	res, err := svx.OperationalWebhookEndpoint.Update(ctx, epId, opWebhook)
 	if err != nil {
 		resp.Diagnostics.AddError("Error while updating operational webhook endpoint", err.Error())
 		return
 	}
-	out_metadata := mapStringTToString(&resp.Diagnostics, &res.Metadata)
+
+	// save state
+	outMetadata := mapStringTToString(&resp.Diagnostics, &res.Metadata)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("description"), res.Description)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("disabled"), res.Disabled)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("filter_types"), res.FilterTypes)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("metadata"), out_metadata)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("rate_limit"), res.RateLimit)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("uid"), res.Uid)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("url"), res.Url)...)
+	setUpdateState(ctx, resp, "description", res.Description)
+	setUpdateState(ctx, resp, "disabled", res.Disabled)
+	setUpdateState(ctx, resp, "filter_types", res.FilterTypes)
+	setUpdateState(ctx, resp, "metadata", outMetadata)
+	setUpdateState(ctx, resp, "rate_limit", res.RateLimit)
+	setUpdateState(ctx, resp, "uid", res.Uid)
+	setUpdateState(ctx, resp, "url", res.Url)
 
 }
 
 func (r *OperationalWebhooksEndpointResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var env_id, ep_id string
-	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &env_id)...)
-	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ep_id)...)
+	var envId, epId string
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &epId)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(env_id)
+	svx, err := r.state.clientWithEnvId(envId)
 	if err != nil {
-		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
-	err = svx.OperationalWebhookEndpoint.Delete(ctx, ep_id)
+	err = svx.OperationalWebhookEndpoint.Delete(ctx, epId)
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to delete operational webhooks endpoint", err.Error())
 	}
 
-}
-
-func operationalWebhookEndpointOutToModel(ctx context.Context, d *diag.Diagnostics, v models.OperationalWebhookEndpointOut, webhookSecret string) *OperationalWebhooksEndpointResourceModel {
-	filterTypes, diags := types.ListValueFrom(ctx, types.StringType, v.FilterTypes)
-	d.Append(diags...)
-	if d.HasError() {
-		return nil
-	}
-	metadata, err := json.Marshal(v.Metadata)
-	if err != nil {
-		d.AddAttributeError(path.Root("metadata"), "Unable to marshal metadata to a string", err.Error())
-		return nil
-	}
-	var rateLimit *int32
-	if v.RateLimit != nil {
-		rateLimit = ptr(int32(*v.RateLimit))
-	}
-	ret := OperationalWebhooksEndpointResourceModel{
-		CreatedAt:   timetypes.NewRFC3339TimeValue(v.CreatedAt),
-		Description: types.StringValue(v.Description),
-		Disabled:    types.BoolPointerValue(v.Disabled),
-		FilterTypes: filterTypes,
-		Id:          types.StringValue(v.Id),
-		Metadata:    jsontypes.NewNormalizedValue(string(metadata)),
-		RateLimit:   types.Int32PointerValue(rateLimit),
-		Secret:      types.StringValue(webhookSecret),
-		Uid:         types.StringPointerValue(v.Uid),
-		UpdatedAt:   timetypes.NewRFC3339TimeValue(v.UpdatedAt),
-		Url:         types.StringValue(v.Url),
-	}
-	return &ret
 }
