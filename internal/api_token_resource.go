@@ -97,7 +97,7 @@ func (r *ApiTokenResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(env_id)
+	svx, err := r.state.ClientWithEnvId(env_id)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -163,7 +163,7 @@ func (r *ApiTokenResource) Delete(ctx context.Context, req resource.DeleteReques
 	}
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(env_id)
+	svx, err := r.state.ClientWithEnvId(env_id)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return

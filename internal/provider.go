@@ -105,7 +105,7 @@ func (p *SvixProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 func (p *SvixProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewApiTokenResource,
-		// NewEnvironmentResource,
+		NewEnvironmentResource,
 		NewEnvironmentSettingsResource,
 		NewEventTypeResource,
 		NewOperationalWebhooksEndpoint,
@@ -146,7 +146,7 @@ func (s *appState) DefaultSvixClient() (*svix.Svix, error) {
 }
 
 // create a new svix client with the envId suffixed on the token
-func (s *appState) clientWithEnvId(envId string) (*svix.Svix, error) {
+func (s *appState) ClientWithEnvId(envId string) (*svix.Svix, error) {
 	bearerToken := fmt.Sprintf("%s|%s", s.token, envId)
 	svx, err := svix.New(bearerToken, &svix.SvixOptions{ServerUrl: &s.serverUrl, Debug: true})
 	if err != nil {
@@ -168,7 +168,7 @@ func (s *appState) InternalClientWithEnvId(envId string) (*svix_internal.Interna
 }
 
 // get the default internal svix client without an envId suffixed
-func (s *appState) internalDefaultSvixClient() (*svix_internal.InternalSvix, error) {
+func (s *appState) InternalDefaultSvixClient() (*svix_internal.InternalSvix, error) {
 	svx, err := svix_internal.New(s.token, &s.serverUrl, true)
 	if err != nil {
 		return nil, err

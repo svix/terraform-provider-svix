@@ -111,7 +111,7 @@ func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(envId)
+	svx, err := r.state.ClientWithEnvId(envId)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -181,7 +181,7 @@ func (r *EventTypeResource) Read(ctx context.Context, req resource.ReadRequest, 
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("name"), &name)...)
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(envId)
+	svx, err := r.state.ClientWithEnvId(envId)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -229,7 +229,7 @@ func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateReque
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(envId)
+	svx, err := r.state.ClientWithEnvId(envId)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -287,7 +287,7 @@ func (r *EventTypeResource) Delete(ctx context.Context, req resource.DeleteReque
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(envId)
+	svx, err := r.state.ClientWithEnvId(envId)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return

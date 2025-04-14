@@ -138,7 +138,7 @@ func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req re
 	}
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(envId)
+	svx, err := r.state.ClientWithEnvId(envId)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -226,7 +226,7 @@ func (r *OperationalWebhooksEndpointResource) Read(ctx context.Context, req reso
 	}
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(envId)
+	svx, err := r.state.ClientWithEnvId(envId)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -281,7 +281,7 @@ func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req re
 	}
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(envId)
+	svx, err := r.state.ClientWithEnvId(envId)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -343,7 +343,7 @@ func (r *OperationalWebhooksEndpointResource) Delete(ctx context.Context, req re
 	}
 
 	// create svix client
-	svx, err := r.state.clientWithEnvId(envId)
+	svx, err := r.state.ClientWithEnvId(envId)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
