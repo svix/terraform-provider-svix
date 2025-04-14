@@ -1,6 +1,12 @@
+resource "svix_environment" "example_environment" {
+  name = "Staging env"
+  type = "development"
+}
+
 resource "svix_event_type" "example_event_type" {
-  name        = "invoice.paid"
-  description = "An invoice was paid by a user"
+  environment_id = svix_environment.example_environment.id
+  name           = "invoice.paid"
+  description    = "An invoice was paid by a user"
   schemas = jsonencode({
     "1" = {
       description = "An invoice was paid by a user"
