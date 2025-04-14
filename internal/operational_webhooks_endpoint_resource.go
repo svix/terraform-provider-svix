@@ -75,7 +75,13 @@ func (r *OperationalWebhooksEndpointResource) Schema(ctx context.Context, req re
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"created_at":  schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
+			"created_at": schema.StringAttribute{
+				Computed:   true,
+				CustomType: timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"description": schema.StringAttribute{Computed: true, Optional: true, Default: stringdefault.StaticString("")},
 			"disabled":    schema.BoolAttribute{Computed: true, Optional: true, Default: booldefault.StaticBool(false)},
 			"filter_types": schema.ListAttribute{ElementType: types.StringType, Required: true, Validators: []validator.List{
@@ -106,8 +112,14 @@ func (r *OperationalWebhooksEndpointResource) Schema(ctx context.Context, req re
 				stringvalidator.LengthAtMost(256),
 				stringvalidator.RegexMatches(saneStringRegex(), "String must match against `^[a-zA-Z0-9\\-_.]+$`"),
 			}},
-			"updated_at": schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
-			"url":        schema.StringAttribute{Required: true},
+			"updated_at": schema.StringAttribute{
+				Computed:   true,
+				CustomType: timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
+			"url": schema.StringAttribute{Required: true},
 		},
 	}
 }

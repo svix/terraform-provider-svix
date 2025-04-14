@@ -57,8 +57,14 @@ func (r *EventTypeResource) Schema(ctx context.Context, req resource.SchemaReque
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"archived":    schema.BoolAttribute{Computed: true, Optional: true, Default: booldefault.StaticBool(false)},
-			"created_at":  schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
+			"archived": schema.BoolAttribute{Computed: true, Optional: true, Default: booldefault.StaticBool(false)},
+			"created_at": schema.StringAttribute{
+				Computed:   true,
+				CustomType: timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"deprecated":  schema.BoolAttribute{Computed: true, Optional: true, Default: booldefault.StaticBool(false)},
 			"description": schema.StringAttribute{Required: true},
 			"feature_flag": schema.StringAttribute{Optional: true, Validators: []validator.String{
@@ -79,8 +85,14 @@ func (r *EventTypeResource) Schema(ctx context.Context, req resource.SchemaReque
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"schemas":    schema.StringAttribute{Optional: true, CustomType: jsontypes.NormalizedType{}},
-			"updated_at": schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
+			"schemas": schema.StringAttribute{Optional: true, CustomType: jsontypes.NormalizedType{}},
+			"updated_at": schema.StringAttribute{
+				Computed:   true,
+				CustomType: timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 		},
 	}
 }

@@ -17,7 +17,7 @@ import (
 	"github.com/svix/svix-webhooks/go/models"
 )
 
-var _ resource.Resource = &ApiTokenResource{}
+var _ resource.Resource = &EnvironmentResource{}
 
 func NewEnvironmentResource() resource.Resource {
 	return &EnvironmentResource{}
@@ -71,10 +71,22 @@ func (r *EnvironmentResource) Schema(ctx context.Context, req resource.SchemaReq
 					stringplanmodifier.RequiresReplace(),
 				}},
 			// non modifiable fields
-			"id":         schema.StringAttribute{Computed: true},
-			"region":     schema.StringAttribute{Computed: true},
-			"created_at": schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
-			"updated_at": schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
+			"id":     schema.StringAttribute{Computed: true},
+			"region": schema.StringAttribute{Computed: true},
+			"created_at": schema.StringAttribute{
+				Computed:   true,
+				CustomType: timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
+			"updated_at": schema.StringAttribute{
+				Computed:   true,
+				CustomType: timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 		},
 	}
 }

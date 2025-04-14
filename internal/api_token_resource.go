@@ -25,6 +25,7 @@ func NewApiTokenResource() resource.Resource {
 type ApiTokenResource struct {
 	state appState
 }
+
 type ApiTokenResourceModel struct {
 	EnvironmentId types.String      `tfsdk:"environment_id"`
 	Name          types.String      `tfsdk:"name"`
@@ -78,9 +79,15 @@ func (r *ApiTokenResource) Schema(ctx context.Context, req resource.SchemaReques
 				},
 			},
 			// non modifiable fields
-			"token":      schema.StringAttribute{Sensitive: true, Computed: true, Description: "The api token"},
-			"id":         schema.StringAttribute{Computed: true},
-			"created_at": schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
+			"token": schema.StringAttribute{Sensitive: true, Computed: true, Description: "The api token"},
+			"id":    schema.StringAttribute{Computed: true},
+			"created_at": schema.StringAttribute{
+				Computed:   true,
+				CustomType: timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"expires_at": schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
 		},
 	}
