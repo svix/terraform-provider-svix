@@ -143,7 +143,7 @@ func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateReque
 	// call api
 	res, err := svx.EventType.Create(ctx, eventTypeIn, &reqOpts)
 	if err != nil {
-		resp.Diagnostics.AddError("Unable to create event type", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to create event type")
 		return
 	}
 
@@ -190,7 +190,7 @@ func (r *EventTypeResource) Read(ctx context.Context, req resource.ReadRequest, 
 	// call api
 	res, err := svx.EventType.Get(ctx, name)
 	if err != nil {
-		resp.Diagnostics.AddError("Error while fetching state", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to read event type")
 		return
 	}
 
@@ -252,7 +252,7 @@ func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateReque
 	// call api
 	res, err := svx.EventType.Update(ctx, data.Name.ValueString(), eventType)
 	if err != nil {
-		resp.Diagnostics.AddError("Error while updating event type", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to update event type")
 		return
 	}
 
@@ -298,6 +298,7 @@ func (r *EventTypeResource) Delete(ctx context.Context, req resource.DeleteReque
 	})
 
 	if err != nil {
-		resp.Diagnostics.AddError("Failed to delete event type", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to delete event type")
+		return
 	}
 }

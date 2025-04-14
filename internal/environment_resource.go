@@ -103,7 +103,7 @@ func (r *EnvironmentResource) Create(ctx context.Context, req resource.CreateReq
 		&svix.ManagementEnvironmentCreateOptions{IdempotencyKey: randStr32()},
 	)
 	if err != nil {
-		resp.Diagnostics.AddError("Unable to create environment", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to create environment")
 		return
 	}
 
@@ -134,7 +134,7 @@ func (r *EnvironmentResource) Read(ctx context.Context, req resource.ReadRequest
 	// call api
 	res, err := svx.Management.Environment.Get(ctx, env_id)
 	if err != nil {
-		resp.Diagnostics.AddError("Failed to get environment", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to read environment")
 		return
 	}
 
@@ -169,7 +169,7 @@ func (r *EnvironmentResource) Update(ctx context.Context, req resource.UpdateReq
 		Name: data.Name.ValueString(),
 	})
 	if err != nil {
-		resp.Diagnostics.AddError("Failed to get environment", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to update environment")
 		return
 	}
 
@@ -200,7 +200,7 @@ func (r *EnvironmentResource) Delete(ctx context.Context, req resource.DeleteReq
 	// call api
 	err = svx.Management.Environment.Delete(ctx, env_id)
 	if err != nil {
-		resp.Diagnostics.AddError("Failed to get environment", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to delete environment")
 		return
 	}
 }

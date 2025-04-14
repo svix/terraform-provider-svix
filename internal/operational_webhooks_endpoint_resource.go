@@ -179,12 +179,12 @@ func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req re
 		IdempotencyKey: randStr32(),
 	})
 	if err != nil {
-		resp.Diagnostics.AddError("Unable to create operational webhooks endpoint", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to create operational webhooks endpoint")
 		return
 	}
 	secretRes, err := svx.OperationalWebhook.Endpoint.GetSecret(ctx, res.Id)
 	if err != nil {
-		resp.Diagnostics.AddError("Failed to get op webhook endpoint secret", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to get op webhook endpoint secret")
 		return
 	}
 
@@ -235,12 +235,12 @@ func (r *OperationalWebhooksEndpointResource) Read(ctx context.Context, req reso
 	// call api
 	res, err := svx.OperationalWebhookEndpoint.Get(ctx, data.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Failed to get op webhook endpoint", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to read operational webhooks endpoint")
 		return
 	}
 	secretRes, err := svx.OperationalWebhook.Endpoint.GetSecret(ctx, res.Id)
 	if err != nil {
-		resp.Diagnostics.AddError("Failed to get op webhook endpoint secret", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to get op webhook endpoint secret")
 		return
 	}
 	// save state
@@ -315,7 +315,7 @@ func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req re
 	}
 	res, err := svx.OperationalWebhookEndpoint.Update(ctx, epId, opWebhook)
 	if err != nil {
-		resp.Diagnostics.AddError("Error while updating operational webhook endpoint", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to update operational webhooks endpoint")
 		return
 	}
 
@@ -351,7 +351,7 @@ func (r *OperationalWebhooksEndpointResource) Delete(ctx context.Context, req re
 
 	err = svx.OperationalWebhookEndpoint.Delete(ctx, epId)
 	if err != nil {
-		resp.Diagnostics.AddError("Failed to delete operational webhooks endpoint", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Failed to delete operational webhooks endpoint")
 	}
 
 }

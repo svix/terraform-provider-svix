@@ -121,7 +121,7 @@ func (r *ApiTokenResource) Create(ctx context.Context, req resource.CreateReques
 	)
 
 	if err != nil {
-		resp.Diagnostics.AddError("Unable to create api token", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Unable to create api token")
 		return
 	}
 
@@ -180,7 +180,7 @@ func (r *ApiTokenResource) Delete(ctx context.Context, req resource.DeleteReques
 	)
 
 	if err != nil {
-		resp.Diagnostics.AddError("Unable to expire api token", err.Error())
+		logSvixError(&resp.Diagnostics, err, "Unable to expire api token")
 		return
 	}
 
