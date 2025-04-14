@@ -8,14 +8,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	svix "github.com/svix/svix-webhooks/go"
 	"github.com/svix/svix-webhooks/go/models"
 )
@@ -27,20 +27,20 @@ func NewEventTypeResource() resource.Resource {
 }
 
 type EventTypeResource struct {
-	state *appState
-	svx   *svix.Svix
+	state appState
 }
 
 type EventTypeResourceModel struct {
-	Archived    types.Bool           `tfsdk:"archived"`
-	CreatedAt   timetypes.RFC3339    `tfsdk:"created_at"`
-	Deprecated  types.Bool           `tfsdk:"deprecated"`
-	Description types.String         `tfsdk:"description"`
-	FeatureFlag types.String         `tfsdk:"feature_flag"`
-	GroupName   types.String         `tfsdk:"group_name"`
-	Name        types.String         `tfsdk:"name"`
-	Schemas     jsontypes.Normalized `tfsdk:"schemas"`
-	UpdatedAt   timetypes.RFC3339    `tfsdk:"updated_at"`
+	EnvironmentId types.String         `tfsdk:"environment_id"`
+	Archived      types.Bool           `tfsdk:"archived"`
+	CreatedAt     timetypes.RFC3339    `tfsdk:"created_at"`
+	Deprecated    types.Bool           `tfsdk:"deprecated"`
+	Description   types.String         `tfsdk:"description"`
+	FeatureFlag   types.String         `tfsdk:"feature_flag"`
+	GroupName     types.String         `tfsdk:"group_name"`
+	Name          types.String         `tfsdk:"name"`
+	Schemas       jsontypes.Normalized `tfsdk:"schemas"`
+	UpdatedAt     timetypes.RFC3339    `tfsdk:"updated_at"`
 }
 
 func (r *EventTypeResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -50,6 +50,13 @@ func (r *EventTypeResource) Metadata(ctx context.Context, req resource.MetadataR
 func (r *EventTypeResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"environment_id": schema.StringAttribute{
+				Required:    true,
+				Description: ENV_ID_DESC,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
 			"archived":    schema.BoolAttribute{Computed: true, Optional: true, Default: booldefault.StaticBool(false)},
 			"created_at":  schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
 			"deprecated":  schema.BoolAttribute{Computed: true, Optional: true, Default: booldefault.StaticBool(false)},
@@ -62,10 +69,16 @@ func (r *EventTypeResource) Schema(ctx context.Context, req resource.SchemaReque
 				stringvalidator.LengthAtMost(256),
 				stringvalidator.RegexMatches(saneStringRegex(), "String must match against `^[a-zA-Z0-9\\-_.]+$`"),
 			}},
-			"name": schema.StringAttribute{Required: true, Validators: []validator.String{
-				stringvalidator.LengthAtMost(256),
-				stringvalidator.RegexMatches(saneStringRegex(), "String must match against `^[a-zA-Z0-9\\-_.]+$`"),
-			}},
+			"name": schema.StringAttribute{
+				Required: true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(256),
+					stringvalidator.RegexMatches(saneStringRegex(), "String must match against `^[a-zA-Z0-9\\-_.]+$`"),
+				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
 			"schemas":    schema.StringAttribute{Optional: true, CustomType: jsontypes.NormalizedType{}},
 			"updated_at": schema.StringAttribute{Computed: true, CustomType: timetypes.RFC3339Type{}},
 		},
@@ -76,7 +89,7 @@ func (r *EventTypeResource) Configure(ctx context.Context, req resource.Configur
 	if req.ProviderData == nil {
 		return
 	}
-	state, ok := req.ProviderData.(*appState)
+	state, ok := req.ProviderData.(appState)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -88,12 +101,23 @@ func (r *EventTypeResource) Configure(ctx context.Context, req resource.Configur
 }
 
 func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	// load state/plan
 	var data EventTypeResourceModel
+	var envId string
+	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	tflog.Debug(ctx, "Converting schemas into a `map[string]any`")
+
+	// create svix client
+	svx, err := r.state.clientWithEnvId(envId)
+	if err != nil {
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		return
+	}
+
+	// create the EventTypeIn struct
 	var schema *map[string]any
 	if data.Schemas.IsNull() {
 		schema = nil
@@ -103,7 +127,6 @@ func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateReque
 			return
 		}
 	}
-	tflog.Debug(ctx, "Creating EventTypeIn struct")
 	eventTypeIn := models.EventTypeIn{
 		Name:        data.Name.ValueString(),
 		Description: data.Description.ValueString(),
@@ -113,39 +136,106 @@ func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateReque
 		FeatureFlag: strOrNil(data.FeatureFlag),
 		GroupName:   strOrNil(data.GroupName),
 	}
-	tflog.Debug(ctx, "Sending `EventType.Create` request")
 	reqOpts := svix.EventTypeCreateOptions{
 		IdempotencyKey: randStr32(),
 	}
-	res, err := r.svx.EventType.Create(ctx, eventTypeIn, &reqOpts)
+
+	// call api
+	res, err := svx.EventType.Create(ctx, eventTypeIn, &reqOpts)
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to create event type", err.Error())
 		return
 	}
 
-	out := eventTypeOutToTFModel(ctx, &resp.Diagnostics, *res)
-	if out != nil {
-		resp.Diagnostics.Append(resp.State.Set(ctx, &out)...)
+	// save state
+	var schemasJson *string
+	if res.Schemas != nil {
+		jsonV, err := json.Marshal(res.Schemas)
+		if err != nil {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("schemas"),
+				"Failed to marshal a map[string]any to a string",
+				err.Error(),
+			)
+			return
+		}
+		schemasJson = ptr(string(jsonV))
 	}
+
+	setCreateState(ctx, resp, "environment_id", envId)
+	setCreateState(ctx, resp, "archived", res.Archived)
+	setCreateState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setCreateState(ctx, resp, "deprecated", res.Deprecated)
+	setCreateState(ctx, resp, "description", res.Description)
+	setCreateState(ctx, resp, "feature_flag", res.FeatureFlag)
+	setCreateState(ctx, resp, "group_name", res.GroupName)
+	setCreateState(ctx, resp, "name", res.Name)
+	setCreateState(ctx, resp, "schemas", jsontypes.NewNormalizedPointerValue(schemasJson))
+	setCreateState(ctx, resp, "updated_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
 }
+
 func (r *EventTypeResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var data EventTypeResourceModel
-	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
-	res, err := r.svx.EventType.Get(ctx, data.Name.ValueString())
+	// load state/plan
+	var envId, name string
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("name"), &name)...)
+
+	// create svix client
+	svx, err := r.state.clientWithEnvId(envId)
+	if err != nil {
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		return
+	}
+
+	// call api
+	res, err := svx.EventType.Get(ctx, name)
 	if err != nil {
 		resp.Diagnostics.AddError("Error while fetching state", err.Error())
 		return
 	}
-	out := eventTypeOutToTFModel(ctx, &resp.Diagnostics, *res)
-	if out != nil {
-		resp.Diagnostics.Append(resp.State.Set(ctx, &out)...)
+
+	// save state
+	var schemasJson *string
+	if res.Schemas != nil {
+		jsonV, err := json.Marshal(res.Schemas)
+		if err != nil {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("schemas"),
+				"Failed to marshal a map[string]any to a string",
+				err.Error(),
+			)
+			return
+		}
+		schemasJson = ptr(string(jsonV))
 	}
+
+	setReadState(ctx, resp, "environment_id", envId)
+	setReadState(ctx, resp, "archived", res.Archived)
+	setReadState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setReadState(ctx, resp, "deprecated", res.Deprecated)
+	setReadState(ctx, resp, "description", res.Description)
+	setReadState(ctx, resp, "feature_flag", res.FeatureFlag)
+	setReadState(ctx, resp, "group_name", res.GroupName)
+	setReadState(ctx, resp, "name", res.Name)
+	setReadState(ctx, resp, "schemas", jsontypes.NewNormalizedPointerValue(schemasJson))
+	setReadState(ctx, resp, "updated_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
 }
 
 func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	// load state/plan
 	var data EventTypeResourceModel
+	var envId string
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 
+	// create svix client
+	svx, err := r.state.clientWithEnvId(envId)
+	if err != nil {
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		return
+	}
+
+	// create EventTypeUpdate model
 	schemas := stringToMapStringT[any](&resp.Diagnostics, data.Schemas.ValueStringPointer())
 	if resp.Diagnostics.HasError() {
 		return
@@ -159,60 +249,55 @@ func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateReque
 		Schemas:     schemas,
 	}
 
-	res, err := r.svx.EventType.Update(ctx, data.Name.ValueString(), eventType)
+	// call api
+	res, err := svx.EventType.Update(ctx, data.Name.ValueString(), eventType)
 	if err != nil {
 		resp.Diagnostics.AddError("Error while updating event type", err.Error())
 		return
 	}
 
-	schemasStr := mapStringTToString(&resp.Diagnostics, res.Schemas)
-	if resp.Diagnostics.HasError() {
+	// save state
+	var schemasJson *string
+	if res.Schemas != nil {
+		jsonV, err := json.Marshal(res.Schemas)
+		if err != nil {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("schemas"),
+				"Failed to marshal a map[string]any to a string",
+				err.Error(),
+			)
+			return
+		}
+		schemasJson = ptr(string(jsonV))
+	}
+
+	setUpdateState(ctx, resp, "schemas", jsontypes.NewNormalizedPointerValue(schemasJson))
+	setUpdateState(ctx, resp, "archived", res.Archived)
+	setUpdateState(ctx, resp, "deprecated", res.Deprecated)
+	setUpdateState(ctx, resp, "description", res.Description)
+	setUpdateState(ctx, resp, "feature_flag", res.FeatureFlag)
+	setUpdateState(ctx, resp, "group_name", res.GroupName)
+
+}
+
+func (r *EventTypeResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	// load state/plan
+	var envId, name string
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("name"), &name)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
+
+	// create svix client
+	svx, err := r.state.clientWithEnvId(envId)
+	if err != nil {
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("schemas"), jsontypes.NewNormalizedPointerValue(schemasStr))...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("archived"), res.Archived)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("deprecated"), res.Deprecated)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("description"), res.Description)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("feature_flag"), res.FeatureFlag)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("group_name"), res.GroupName)...)
-
-}
-func (r *EventTypeResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var data EventTypeResourceModel
-	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
-	opts := svix.EventTypeDeleteOptions{
+	err = svx.EventType.Delete(ctx, name, &svix.EventTypeDeleteOptions{
 		Expunge: ptr(true),
-	}
-	err := r.svx.EventType.Delete(ctx, data.Name.ValueString(), &opts)
+	})
+
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to delete event type", err.Error())
 	}
-}
-
-func eventTypeOutToTFModel(ctx context.Context, d *diag.Diagnostics, v models.EventTypeOut) *EventTypeResourceModel {
-	tflog.Debug(ctx, "Converting schemas back into a `NormalizedValue`")
-	var schemas jsontypes.Normalized
-	if v.Schemas == nil {
-		schemas = jsontypes.NewNormalizedNull()
-	} else {
-		schemasString, err := json.Marshal(v.Schemas)
-		if err != nil {
-			d.AddError("Unable to marshal `schemas` back into model (after response)", err.Error())
-			return nil
-		}
-		schemas = jsontypes.NewNormalizedValue(string(schemasString))
-	}
-	out := EventTypeResourceModel{
-		Archived:    types.BoolPointerValue(v.Archived),
-		CreatedAt:   timetypes.NewRFC3339TimeValue(v.CreatedAt),
-		Deprecated:  types.BoolValue(v.Deprecated),
-		Description: types.StringValue(v.Description),
-		FeatureFlag: types.StringPointerValue(v.FeatureFlag),
-		GroupName:   types.StringPointerValue(v.GroupName),
-		Name:        types.StringValue(v.Name),
-		Schemas:     schemas,
-		UpdatedAt:   timetypes.NewRFC3339TimeValue(v.UpdatedAt),
-	}
-	return &out
 }
