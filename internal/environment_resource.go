@@ -13,7 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	svix "github.com/svix/svix-webhooks/go"
+	svix_internal "github.com/svix/svix-webhooks/go/internalapi"
 	"github.com/svix/svix-webhooks/go/models"
 )
 
@@ -88,7 +88,7 @@ func (r *EnvironmentResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	// create svix client
-	svx, err := r.state.defaultSvixClient()
+	svx, err := r.state.internalDefaultSvixClient()
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -100,7 +100,7 @@ func (r *EnvironmentResource) Create(ctx context.Context, req resource.CreateReq
 			Name: data.Name.ValueString(),
 			Type: models.EnvironmentType(data.Type.ValueString()),
 		},
-		&svix.ManagementEnvironmentCreateOptions{IdempotencyKey: randStr32()},
+		&svix_internal.ManagementEnvironmentCreateOptions{IdempotencyKey: randStr32()},
 	)
 	if err != nil {
 		logSvixError(&resp.Diagnostics, err, "Failed to create environment")
@@ -125,7 +125,7 @@ func (r *EnvironmentResource) Read(ctx context.Context, req resource.ReadRequest
 	}
 
 	// create svix client
-	svx, err := r.state.defaultSvixClient()
+	svx, err := r.state.internalDefaultSvixClient()
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -158,7 +158,7 @@ func (r *EnvironmentResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// create svix client
-	svx, err := r.state.defaultSvixClient()
+	svx, err := r.state.internalDefaultSvixClient()
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -191,13 +191,14 @@ func (r *EnvironmentResource) Delete(ctx context.Context, req resource.DeleteReq
 	}
 
 	// create svix client
-	svx, err := r.state.defaultSvixClient()
+	svx, err := r.state.internalDefaultSvixClient()
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
 	// call api
+
 	err = svx.Management.Environment.Delete(ctx, env_id)
 	if err != nil {
 		logSvixError(&resp.Diagnostics, err, "Failed to delete environment")

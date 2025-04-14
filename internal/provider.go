@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	svix "github.com/svix/svix-webhooks/go"
+	svix_internal "github.com/svix/svix-webhooks/go/internalapi"
 )
 
 var _ provider.Provider = &SvixProvider{}
@@ -104,7 +105,8 @@ func (p *SvixProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 func (p *SvixProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewApiTokenResource,
-		NewEnvironmentResource,
+		// NewEnvironmentResource,
+		NewEnvironmentSettingsResource,
 		NewEventTypeResource,
 		NewOperationalWebhooksEndpoint,
 	}
@@ -135,7 +137,7 @@ type appState struct {
 }
 
 // get the default client without an envId suffixed
-func (s *appState) defaultSvixClient() (*svix.Svix, error) {
+func (s *appState) DefaultSvixClient() (*svix.Svix, error) {
 	svx, err := svix.New(s.token, &svix.SvixOptions{ServerUrl: &s.serverUrl, Debug: true})
 	if err != nil {
 		return nil, err
@@ -144,12 +146,32 @@ func (s *appState) defaultSvixClient() (*svix.Svix, error) {
 }
 
 // create a new svix client with the envId suffixed on the token
-func (t *appState) clientWithEnvId(envId string) (*svix.Svix, error) {
-	bearerToken := fmt.Sprintf("%s|%s", t.token, envId)
-	svx, err := svix.New(bearerToken, &svix.SvixOptions{ServerUrl: &t.serverUrl, Debug: true})
+func (s *appState) clientWithEnvId(envId string) (*svix.Svix, error) {
+	bearerToken := fmt.Sprintf("%s|%s", s.token, envId)
+	svx, err := svix.New(bearerToken, &svix.SvixOptions{ServerUrl: &s.serverUrl, Debug: true})
 	if err != nil {
 		return nil, err
 	}
 	return svx, nil
 
+}
+
+// create a new internal svix client with the envId suffixed on the token
+func (s *appState) InternalClientWithEnvId(envId string) (*svix_internal.InternalSvix, error) {
+	bearerToken := fmt.Sprintf("%s|%s", s.token, envId)
+	svx, err := svix_internal.New(bearerToken, &s.serverUrl, true)
+	if err != nil {
+		return nil, err
+	}
+	return svx, nil
+
+}
+
+// get the default internal svix client without an envId suffixed
+func (s *appState) internalDefaultSvixClient() (*svix_internal.InternalSvix, error) {
+	svx, err := svix_internal.New(s.token, &s.serverUrl, true)
+	if err != nil {
+		return nil, err
+	}
+	return svx, nil
 }
