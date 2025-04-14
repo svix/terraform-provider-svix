@@ -90,7 +90,7 @@ func (r *EnvironmentResource) Create(ctx context.Context, req resource.CreateReq
 	// create svix client
 	svx, err := r.state.defaultSvixClient()
 	if err != nil {
-		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
@@ -127,7 +127,7 @@ func (r *EnvironmentResource) Read(ctx context.Context, req resource.ReadRequest
 	// create svix client
 	svx, err := r.state.defaultSvixClient()
 	if err != nil {
-		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
@@ -160,7 +160,7 @@ func (r *EnvironmentResource) Update(ctx context.Context, req resource.UpdateReq
 	// create svix client
 	svx, err := r.state.defaultSvixClient()
 	if err != nil {
-		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
@@ -193,7 +193,7 @@ func (r *EnvironmentResource) Delete(ctx context.Context, req resource.DeleteReq
 	// create svix client
 	svx, err := r.state.defaultSvixClient()
 	if err != nil {
-		resp.Diagnostics.AddError(ENABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
 	}
 
