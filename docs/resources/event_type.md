@@ -43,6 +43,7 @@ resource "svix_event_type" "example_event_type" {
 ### Required
 
 - `description` (String)
+- `environment_id` (String) The Id to the environment that this resource will be created in
 - `name` (String)
 
 ### Optional
