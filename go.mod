@@ -8,7 +8,7 @@ require (
 	github.com/hashicorp/terraform-plugin-framework-jsontypes v0.2.0
 	github.com/hashicorp/terraform-plugin-framework-timetypes v0.5.0
 	github.com/hashicorp/terraform-plugin-framework-validators v0.17.0
-	github.com/svix/svix-webhooks v1.64.1-0.20250414224103-fdb797d339e2
+	github.com/svix/svix-webhooks v1.64.1-0.20250415135555-1be4f2b37db1
 
 )
 
