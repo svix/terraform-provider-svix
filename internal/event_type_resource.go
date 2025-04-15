@@ -306,7 +306,7 @@ func (r *EventTypeResource) Delete(ctx context.Context, req resource.DeleteReque
 	}
 
 	err = svx.EventType.Delete(ctx, name, &svix.EventTypeDeleteOptions{
-		Expunge: ptr(true),
+		Expunge: ptr(false),
 	})
 
 	if err != nil {
