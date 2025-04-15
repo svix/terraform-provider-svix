@@ -13,11 +13,17 @@ description: |-
 ## Example Usage
 
 ```terraform
+resource "svix_environment" "example_environment" {
+  name = "Staging env"
+  type = "development"
+}
+
 resource "svix_operational_webhooks_endpoint" "example_endpoint" {
-  url          = "https://example.com"
-  description  = "example description"
-  rate_limit   = 1
-  filter_types = ["background_task.finished"]
+  environment_id = svix_environment.example_environment.id
+  url            = "https://example.com"
+  description    = "example description"
+  rate_limit     = 1
+  filter_types   = ["background_task.finished"]
   metadata = jsonencode({
     key1 = "foo"
     key2 = "bar"
@@ -30,6 +36,7 @@ resource "svix_operational_webhooks_endpoint" "example_endpoint" {
 
 ### Required
 
+- `environment_id` (String) The Id to the environment that this resource will be created in
 - `filter_types` (List of String)
 - `url` (String)
 

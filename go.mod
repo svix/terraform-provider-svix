@@ -8,9 +8,11 @@ require (
 	github.com/hashicorp/terraform-plugin-framework-jsontypes v0.2.0
 	github.com/hashicorp/terraform-plugin-framework-timetypes v0.5.0
 	github.com/hashicorp/terraform-plugin-framework-validators v0.17.0
-	github.com/hashicorp/terraform-plugin-log v0.9.0
-	github.com/svix/svix-webhooks v1.64.0
+	github.com/svix/svix-webhooks v1.64.1-0.20250414224103-fdb797d339e2
+
 )
+
+// replace github.com/svix/svix-webhooks v1.64.0 => ../svix-webhooks
 
 require (
 	github.com/fatih/color v1.16.0 // indirect
@@ -20,6 +22,7 @@ require (
 	github.com/hashicorp/go-plugin v1.6.2 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/terraform-plugin-go v0.26.0 // indirect
+	github.com/hashicorp/terraform-plugin-log v0.9.0 // indirect
 	github.com/hashicorp/terraform-registry-address v0.2.4 // indirect
 	github.com/hashicorp/terraform-svchost v0.1.1 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
