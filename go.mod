@@ -1,6 +1,6 @@
 module github.com/svix/terraform-provider-svix
 
-go 1.24.1
+go 1.24.2
 
 require (
 	github.com/davecgh/go-spew v1.1.1
@@ -8,11 +8,8 @@ require (
 	github.com/hashicorp/terraform-plugin-framework-jsontypes v0.2.0
 	github.com/hashicorp/terraform-plugin-framework-timetypes v0.5.0
 	github.com/hashicorp/terraform-plugin-framework-validators v0.17.0
-	github.com/svix/svix-webhooks v1.64.1-0.20250415135555-1be4f2b37db1
-
+	github.com/svix/svix-webhooks v1.64.1
 )
-
-// replace github.com/svix/svix-webhooks v1.64.0 => ../svix-webhooks
 
 require (
 	github.com/fatih/color v1.16.0 // indirect
