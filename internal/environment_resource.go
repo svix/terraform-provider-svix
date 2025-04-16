@@ -58,10 +58,13 @@ func (r *EnvironmentResource) Metadata(ctx context.Context, req resource.Metadat
 func (r *EnvironmentResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"name": schema.StringAttribute{Required: true, Validators: []validator.String{
-				stringvalidator.LengthAtLeast(1),
-				stringvalidator.LengthAtMost(256),
-			}},
+			"name": schema.StringAttribute{
+				Required: true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtLeast(1),
+					stringvalidator.LengthAtMost(256),
+				},
+			},
 			"type": schema.StringAttribute{
 				Required: true,
 				Validators: []validator.String{
@@ -71,7 +74,12 @@ func (r *EnvironmentResource) Schema(ctx context.Context, req resource.SchemaReq
 					stringplanmodifier.RequiresReplace(),
 				}},
 			// non modifiable fields
-			"id":     schema.StringAttribute{Computed: true},
+			"id": schema.StringAttribute{
+				Computed: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"region": schema.StringAttribute{Computed: true},
 			"created_at": schema.StringAttribute{
 				Computed:   true,
@@ -83,9 +91,6 @@ func (r *EnvironmentResource) Schema(ctx context.Context, req resource.SchemaReq
 			"updated_at": schema.StringAttribute{
 				Computed:   true,
 				CustomType: timetypes.RFC3339Type{},
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
 			},
 		},
 	}

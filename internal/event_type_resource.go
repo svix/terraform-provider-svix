@@ -89,9 +89,6 @@ func (r *EventTypeResource) Schema(ctx context.Context, req resource.SchemaReque
 			"updated_at": schema.StringAttribute{
 				Computed:   true,
 				CustomType: timetypes.RFC3339Type{},
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
 			},
 		},
 	}

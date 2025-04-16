@@ -89,7 +89,11 @@ func (r *OperationalWebhooksEndpointResource) Schema(ctx context.Context, req re
 				listvalidator.UniqueValues(),
 				listvalidator.ValueStringsAre(stringvalidator.OneOf(opWebhookTypes...)),
 			}},
-			"id": schema.StringAttribute{Computed: true},
+			"id": schema.StringAttribute{
+				Computed: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				}},
 			"metadata": schema.StringAttribute{
 				Computed:            true,
 				CustomType:          jsontypes.NormalizedType{},
@@ -115,9 +119,6 @@ func (r *OperationalWebhooksEndpointResource) Schema(ctx context.Context, req re
 			"updated_at": schema.StringAttribute{
 				Computed:   true,
 				CustomType: timetypes.RFC3339Type{},
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
 			},
 			"url": schema.StringAttribute{Required: true},
 		},
