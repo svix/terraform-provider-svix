@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -163,7 +162,6 @@ func (r *EventTypeOpenapiImportResource) Update(ctx context.Context, req resourc
 		return
 	}
 
-	log.Println(data.SpecRaw.ValueStringPointer())
 	// call API
 	res, err := svx.EventType.ImportOpenapi(
 		ctx,
