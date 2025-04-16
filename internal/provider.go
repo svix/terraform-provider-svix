@@ -92,9 +92,12 @@ func (p *SvixProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		return
 	}
 
+	_, debug := os.LookupEnv("SVIX_DEBUG")
+
 	appState := appState{
 		token:     token,
 		serverUrl: *url,
+		debug:     debug,
 	}
 
 	resp.DataSourceData = appState
@@ -134,11 +137,12 @@ func New(version string) func() provider.Provider {
 type appState struct {
 	token     string
 	serverUrl url.URL
+	debug     bool
 }
 
 // get the default client without an envId suffixed
 func (s *appState) DefaultSvixClient() (*svix.Svix, error) {
-	svx, err := svix.New(s.token, &svix.SvixOptions{ServerUrl: &s.serverUrl, Debug: true})
+	svx, err := svix.New(s.token, &svix.SvixOptions{ServerUrl: &s.serverUrl, Debug: s.debug})
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +152,7 @@ func (s *appState) DefaultSvixClient() (*svix.Svix, error) {
 // create a new svix client with the envId suffixed on the token
 func (s *appState) ClientWithEnvId(envId string) (*svix.Svix, error) {
 	bearerToken := fmt.Sprintf("%s|%s", s.token, envId)
-	svx, err := svix.New(bearerToken, &svix.SvixOptions{ServerUrl: &s.serverUrl, Debug: true})
+	svx, err := svix.New(bearerToken, &svix.SvixOptions{ServerUrl: &s.serverUrl, Debug: s.debug})
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +163,7 @@ func (s *appState) ClientWithEnvId(envId string) (*svix.Svix, error) {
 // create a new internal svix client with the envId suffixed on the token
 func (s *appState) InternalClientWithEnvId(envId string) (*svix_internal.InternalSvix, error) {
 	bearerToken := fmt.Sprintf("%s|%s", s.token, envId)
-	svx, err := svix_internal.New(bearerToken, &s.serverUrl, true)
+	svx, err := svix_internal.New(bearerToken, &s.serverUrl, s.debug)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +173,7 @@ func (s *appState) InternalClientWithEnvId(envId string) (*svix_internal.Interna
 
 // get the default internal svix client without an envId suffixed
 func (s *appState) InternalDefaultSvixClient() (*svix_internal.InternalSvix, error) {
-	svx, err := svix_internal.New(s.token, &s.serverUrl, true)
+	svx, err := svix_internal.New(s.token, &s.serverUrl, s.debug)
 	if err != nil {
 		return nil, err
 	}
