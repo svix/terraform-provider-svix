@@ -123,10 +123,10 @@ func (r *EventTypeOpenapiImportResource) Create(ctx context.Context, req resourc
 	createdEventTypes, diags := types.ListValueFrom(ctx, types.StringType, res.Data.Modified)
 	resp.Diagnostics.Append(diags...)
 
-	setCreateState(ctx, resp, "environment_id", envId)
-	setCreateState(ctx, resp, "replace_all", data.ReplaceAll)
-	setCreateState(ctx, resp, "spec_raw", data.SpecRaw)
-	setCreateState(ctx, resp, "created_event_types", createdEventTypes)
+	setCreateState(ctx, resp, rp("environment_id"), envId)
+	setCreateState(ctx, resp, rp("replace_all"), data.ReplaceAll)
+	setCreateState(ctx, resp, rp("spec_raw"), data.SpecRaw)
+	setCreateState(ctx, resp, rp("created_event_types"), createdEventTypes)
 
 }
 
@@ -138,10 +138,10 @@ func (r *EventTypeOpenapiImportResource) Read(ctx context.Context, req resource.
 		return
 	}
 
-	setReadState(ctx, resp, "environment_id", data.EnvironmentId)
-	setReadState(ctx, resp, "replace_all", data.ReplaceAll)
-	setReadState(ctx, resp, "spec_raw", data.SpecRaw)
-	setReadState(ctx, resp, "created_event_types", data.CreatedEventTypes)
+	setReadState(ctx, resp, rp("environment_id"), data.EnvironmentId)
+	setReadState(ctx, resp, rp("replace_all"), data.ReplaceAll)
+	setReadState(ctx, resp, rp("spec_raw"), data.SpecRaw)
+	setReadState(ctx, resp, rp("created_event_types"), data.CreatedEventTypes)
 
 }
 
@@ -182,10 +182,10 @@ func (r *EventTypeOpenapiImportResource) Update(ctx context.Context, req resourc
 	createdEventTypes, diags := types.ListValueFrom(ctx, types.StringType, res.Data.Modified)
 	resp.Diagnostics.Append(diags...)
 
-	setUpdateState(ctx, resp, "environment_id", envId)
-	setUpdateState(ctx, resp, "replace_all", data.ReplaceAll)
-	setUpdateState(ctx, resp, "spec_raw", data.SpecRaw)
-	setUpdateState(ctx, resp, "created_event_types", createdEventTypes)
+	setUpdateState(ctx, resp, rp("environment_id"), envId)
+	setUpdateState(ctx, resp, rp("replace_all"), data.ReplaceAll)
+	setUpdateState(ctx, resp, rp("spec_raw"), data.SpecRaw)
+	setUpdateState(ctx, resp, rp("created_event_types"), createdEventTypes)
 }
 
 func (r *EventTypeOpenapiImportResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

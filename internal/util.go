@@ -107,18 +107,22 @@ func boolOrNil(v types.Bool) *bool {
 }
 
 // wrapper function around `resp.Diagnostics.Append(resp.State.SetAttribute())` for *CreateResponse
-func setCreateState(ctx context.Context, resp *resource.CreateResponse, rootPath string, val any) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root(rootPath), val)...)
+func setCreateState(ctx context.Context, resp *resource.CreateResponse, path path.Path, val any) {
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path, val)...)
 }
 
 // wrapper function around `resp.Diagnostics.Append(resp.State.SetAttribute())` for *ReadResponse
-func setReadState(ctx context.Context, resp *resource.ReadResponse, rootPath string, val any) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root(rootPath), val)...)
+func setReadState(ctx context.Context, resp *resource.ReadResponse, path path.Path, val any) {
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path, val)...)
 }
 
 // wrapper function around `resp.Diagnostics.Append(resp.State.SetAttribute())` for *UpdateResponse
-func setUpdateState(ctx context.Context, resp *resource.UpdateResponse, rootPath string, val any) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root(rootPath), val)...)
+func setUpdateState(ctx context.Context, resp *resource.UpdateResponse, path path.Path, val any) {
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path, val)...)
+}
+
+func rp(rootPath string) path.Path {
+	return path.Root(rootPath)
 }
 
 func logSvixError(d *diag.Diagnostics, err error, msg string) {

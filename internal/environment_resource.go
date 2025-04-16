@@ -125,12 +125,12 @@ func (r *EnvironmentResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	// set the state
-	setCreateState(ctx, resp, "id", res.Id)
-	setCreateState(ctx, resp, "name", res.Name)
-	setCreateState(ctx, resp, "type", res.Type)
-	setCreateState(ctx, resp, "region", res.Region)
-	setCreateState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
-	setCreateState(ctx, resp, "updated_at", timetypes.NewRFC3339TimeValue(res.UpdatedAt))
+	setCreateState(ctx, resp, rp("id"), res.Id)
+	setCreateState(ctx, resp, rp("name"), res.Name)
+	setCreateState(ctx, resp, rp("type"), res.Type)
+	setCreateState(ctx, resp, rp("region"), res.Region)
+	setCreateState(ctx, resp, rp("created_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setCreateState(ctx, resp, rp("updated_at"), timetypes.NewRFC3339TimeValue(res.UpdatedAt))
 }
 
 func (r *EnvironmentResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -156,12 +156,12 @@ func (r *EnvironmentResource) Read(ctx context.Context, req resource.ReadRequest
 	}
 
 	// set the state
-	setReadState(ctx, resp, "id", res.Id)
-	setReadState(ctx, resp, "name", res.Name)
-	setReadState(ctx, resp, "type", res.Type)
-	setReadState(ctx, resp, "region", res.Region)
-	setReadState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
-	setReadState(ctx, resp, "updated_at", timetypes.NewRFC3339TimeValue(res.UpdatedAt))
+	setReadState(ctx, resp, rp("id"), res.Id)
+	setReadState(ctx, resp, rp("name"), res.Name)
+	setReadState(ctx, resp, rp("type"), res.Type)
+	setReadState(ctx, resp, rp("region"), res.Region)
+	setReadState(ctx, resp, rp("created_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setReadState(ctx, resp, rp("updated_at"), timetypes.NewRFC3339TimeValue(res.UpdatedAt))
 }
 
 func (r *EnvironmentResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -191,12 +191,12 @@ func (r *EnvironmentResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// set the state
-	setUpdateState(ctx, resp, "id", res.Id)
-	setUpdateState(ctx, resp, "name", res.Name)
-	setUpdateState(ctx, resp, "type", res.Type)
-	setUpdateState(ctx, resp, "region", res.Region)
-	setUpdateState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
-	setUpdateState(ctx, resp, "updated_at", timetypes.NewRFC3339TimeValue(res.UpdatedAt))
+	setUpdateState(ctx, resp, rp("id"), res.Id)
+	setUpdateState(ctx, resp, rp("name"), res.Name)
+	setUpdateState(ctx, resp, rp("type"), res.Type)
+	setUpdateState(ctx, resp, rp("region"), res.Region)
+	setUpdateState(ctx, resp, rp("created_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setUpdateState(ctx, resp, rp("updated_at"), timetypes.NewRFC3339TimeValue(res.UpdatedAt))
 }
 
 func (r *EnvironmentResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

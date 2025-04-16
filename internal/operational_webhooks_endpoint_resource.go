@@ -213,18 +213,18 @@ func (r *OperationalWebhooksEndpointResource) Create(ctx context.Context, req re
 		rateLimitOut = ptr(int32(*res.RateLimit))
 	}
 
-	setCreateState(ctx, resp, "environment_id", envId)
-	setCreateState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
-	setCreateState(ctx, resp, "description", types.StringValue(res.Description))
-	setCreateState(ctx, resp, "disabled", types.BoolPointerValue(res.Disabled))
-	setCreateState(ctx, resp, "filter_types", filterTypesOut)
-	setCreateState(ctx, resp, "id", types.StringValue(res.Id))
-	setCreateState(ctx, resp, "metadata", jsontypes.NewNormalizedValue(string(metadataOut)))
-	setCreateState(ctx, resp, "rate_limit", types.Int32PointerValue(rateLimitOut))
-	setCreateState(ctx, resp, "secret", types.StringValue(secretRes.Key))
-	setCreateState(ctx, resp, "uid", types.StringPointerValue(res.Uid))
-	setCreateState(ctx, resp, "updated_at", timetypes.NewRFC3339TimeValue(res.UpdatedAt))
-	setCreateState(ctx, resp, "url", types.StringValue(res.Url))
+	setCreateState(ctx, resp, rp("environment_id"), envId)
+	setCreateState(ctx, resp, rp("created_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setCreateState(ctx, resp, rp("description"), types.StringValue(res.Description))
+	setCreateState(ctx, resp, rp("disabled"), types.BoolPointerValue(res.Disabled))
+	setCreateState(ctx, resp, rp("filter_types"), filterTypesOut)
+	setCreateState(ctx, resp, rp("id"), types.StringValue(res.Id))
+	setCreateState(ctx, resp, rp("metadata"), jsontypes.NewNormalizedValue(string(metadataOut)))
+	setCreateState(ctx, resp, rp("rate_limit"), types.Int32PointerValue(rateLimitOut))
+	setCreateState(ctx, resp, rp("secret"), types.StringValue(secretRes.Key))
+	setCreateState(ctx, resp, rp("uid"), types.StringPointerValue(res.Uid))
+	setCreateState(ctx, resp, rp("updated_at"), timetypes.NewRFC3339TimeValue(res.UpdatedAt))
+	setCreateState(ctx, resp, rp("url"), types.StringValue(res.Url))
 
 }
 
@@ -268,18 +268,18 @@ func (r *OperationalWebhooksEndpointResource) Read(ctx context.Context, req reso
 		rateLimitOut = ptr(int32(*res.RateLimit))
 	}
 
-	setReadState(ctx, resp, "environment_id", envId)
-	setReadState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
-	setReadState(ctx, resp, "description", types.StringValue(res.Description))
-	setReadState(ctx, resp, "disabled", types.BoolPointerValue(res.Disabled))
-	setReadState(ctx, resp, "filter_types", filterTypesOut)
-	setReadState(ctx, resp, "id", types.StringValue(res.Id))
-	setReadState(ctx, resp, "metadata", jsontypes.NewNormalizedValue(string(metadataOut)))
-	setReadState(ctx, resp, "rate_limit", types.Int32PointerValue(rateLimitOut))
-	setReadState(ctx, resp, "secret", types.StringValue(secretRes.Key))
-	setReadState(ctx, resp, "uid", types.StringPointerValue(res.Uid))
-	setReadState(ctx, resp, "updated_at", timetypes.NewRFC3339TimeValue(res.UpdatedAt))
-	setReadState(ctx, resp, "url", types.StringValue(res.Url))
+	setReadState(ctx, resp, rp("environment_id"), envId)
+	setReadState(ctx, resp, rp("created_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setReadState(ctx, resp, rp("description"), types.StringValue(res.Description))
+	setReadState(ctx, resp, rp("disabled"), types.BoolPointerValue(res.Disabled))
+	setReadState(ctx, resp, rp("filter_types"), filterTypesOut)
+	setReadState(ctx, resp, rp("id"), types.StringValue(res.Id))
+	setReadState(ctx, resp, rp("metadata"), jsontypes.NewNormalizedValue(string(metadataOut)))
+	setReadState(ctx, resp, rp("rate_limit"), types.Int32PointerValue(rateLimitOut))
+	setReadState(ctx, resp, rp("secret"), types.StringValue(secretRes.Key))
+	setReadState(ctx, resp, rp("uid"), types.StringPointerValue(res.Uid))
+	setReadState(ctx, resp, rp("updated_at"), timetypes.NewRFC3339TimeValue(res.UpdatedAt))
+	setReadState(ctx, resp, rp("url"), types.StringValue(res.Url))
 }
 
 func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -337,13 +337,13 @@ func (r *OperationalWebhooksEndpointResource) Update(ctx context.Context, req re
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	setUpdateState(ctx, resp, "description", res.Description)
-	setUpdateState(ctx, resp, "disabled", res.Disabled)
-	setUpdateState(ctx, resp, "filter_types", res.FilterTypes)
-	setUpdateState(ctx, resp, "metadata", outMetadata)
-	setUpdateState(ctx, resp, "rate_limit", res.RateLimit)
-	setUpdateState(ctx, resp, "uid", res.Uid)
-	setUpdateState(ctx, resp, "url", res.Url)
+	setUpdateState(ctx, resp, rp("description"), res.Description)
+	setUpdateState(ctx, resp, rp("disabled"), res.Disabled)
+	setUpdateState(ctx, resp, rp("filter_types"), res.FilterTypes)
+	setUpdateState(ctx, resp, rp("metadata"), outMetadata)
+	setUpdateState(ctx, resp, rp("rate_limit"), res.RateLimit)
+	setUpdateState(ctx, resp, rp("uid"), res.Uid)
+	setUpdateState(ctx, resp, rp("url"), res.Url)
 
 }
 

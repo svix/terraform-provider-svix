@@ -171,16 +171,16 @@ func (r *EventTypeResource) Create(ctx context.Context, req resource.CreateReque
 		schemasJson = ptr(string(jsonV))
 	}
 
-	setCreateState(ctx, resp, "environment_id", envId)
-	setCreateState(ctx, resp, "archived", res.Archived)
-	setCreateState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
-	setCreateState(ctx, resp, "deprecated", res.Deprecated)
-	setCreateState(ctx, resp, "description", res.Description)
-	setCreateState(ctx, resp, "feature_flag", res.FeatureFlag)
-	setCreateState(ctx, resp, "group_name", res.GroupName)
-	setCreateState(ctx, resp, "name", res.Name)
-	setCreateState(ctx, resp, "schemas", jsontypes.NewNormalizedPointerValue(schemasJson))
-	setCreateState(ctx, resp, "updated_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setCreateState(ctx, resp, rp("environment_id"), envId)
+	setCreateState(ctx, resp, rp("archived"), res.Archived)
+	setCreateState(ctx, resp, rp("created_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setCreateState(ctx, resp, rp("deprecated"), res.Deprecated)
+	setCreateState(ctx, resp, rp("description"), res.Description)
+	setCreateState(ctx, resp, rp("feature_flag"), res.FeatureFlag)
+	setCreateState(ctx, resp, rp("group_name"), res.GroupName)
+	setCreateState(ctx, resp, rp("name"), res.Name)
+	setCreateState(ctx, resp, rp("schemas"), jsontypes.NewNormalizedPointerValue(schemasJson))
+	setCreateState(ctx, resp, rp("updated_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
 }
 
 func (r *EventTypeResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -218,16 +218,16 @@ func (r *EventTypeResource) Read(ctx context.Context, req resource.ReadRequest, 
 		schemasJson = ptr(string(jsonV))
 	}
 
-	setReadState(ctx, resp, "environment_id", envId)
-	setReadState(ctx, resp, "archived", res.Archived)
-	setReadState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
-	setReadState(ctx, resp, "deprecated", res.Deprecated)
-	setReadState(ctx, resp, "description", res.Description)
-	setReadState(ctx, resp, "feature_flag", res.FeatureFlag)
-	setReadState(ctx, resp, "group_name", res.GroupName)
-	setReadState(ctx, resp, "name", res.Name)
-	setReadState(ctx, resp, "schemas", jsontypes.NewNormalizedPointerValue(schemasJson))
-	setReadState(ctx, resp, "updated_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setReadState(ctx, resp, rp("environment_id"), envId)
+	setReadState(ctx, resp, rp("archived"), res.Archived)
+	setReadState(ctx, resp, rp("created_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setReadState(ctx, resp, rp("deprecated"), res.Deprecated)
+	setReadState(ctx, resp, rp("description"), res.Description)
+	setReadState(ctx, resp, rp("feature_flag"), res.FeatureFlag)
+	setReadState(ctx, resp, rp("group_name"), res.GroupName)
+	setReadState(ctx, resp, rp("name"), res.Name)
+	setReadState(ctx, resp, rp("schemas"), jsontypes.NewNormalizedPointerValue(schemasJson))
+	setReadState(ctx, resp, rp("updated_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
 }
 
 func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -280,12 +280,12 @@ func (r *EventTypeResource) Update(ctx context.Context, req resource.UpdateReque
 		schemasJson = ptr(string(jsonV))
 	}
 
-	setUpdateState(ctx, resp, "schemas", jsontypes.NewNormalizedPointerValue(schemasJson))
-	setUpdateState(ctx, resp, "archived", res.Archived)
-	setUpdateState(ctx, resp, "deprecated", res.Deprecated)
-	setUpdateState(ctx, resp, "description", res.Description)
-	setUpdateState(ctx, resp, "feature_flag", res.FeatureFlag)
-	setUpdateState(ctx, resp, "group_name", res.GroupName)
+	setUpdateState(ctx, resp, rp("schemas"), jsontypes.NewNormalizedPointerValue(schemasJson))
+	setUpdateState(ctx, resp, rp("archived"), res.Archived)
+	setUpdateState(ctx, resp, rp("deprecated"), res.Deprecated)
+	setUpdateState(ctx, resp, rp("description"), res.Description)
+	setUpdateState(ctx, resp, rp("feature_flag"), res.FeatureFlag)
+	setUpdateState(ctx, resp, rp("group_name"), res.GroupName)
 
 }
 

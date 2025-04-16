@@ -133,13 +133,13 @@ func (r *ApiTokenResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	// set the state
-	setCreateState(ctx, resp, "environment_id", env_id)
-	setCreateState(ctx, resp, "name", res.Name)
-	setCreateState(ctx, resp, "scopes", res.Scopes)
-	setCreateState(ctx, resp, "token", res.Token)
-	setCreateState(ctx, resp, "id", res.Id)
-	setCreateState(ctx, resp, "created_at", timetypes.NewRFC3339TimeValue(res.CreatedAt))
-	setCreateState(ctx, resp, "expires_at", timetypes.NewRFC3339TimePointerValue(res.ExpiresAt))
+	setCreateState(ctx, resp, rp("environment_id"), env_id)
+	setCreateState(ctx, resp, rp("name"), res.Name)
+	setCreateState(ctx, resp, rp("scopes"), res.Scopes)
+	setCreateState(ctx, resp, rp("token"), res.Token)
+	setCreateState(ctx, resp, rp("id"), res.Id)
+	setCreateState(ctx, resp, rp("created_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
+	setCreateState(ctx, resp, rp("expires_at"), timetypes.NewRFC3339TimePointerValue(res.ExpiresAt))
 }
 
 func (r *ApiTokenResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -151,13 +151,13 @@ func (r *ApiTokenResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 
 	// set the state
-	setReadState(ctx, resp, "environment_id", stateData.EnvironmentId)
-	setReadState(ctx, resp, "name", stateData.Name)
-	setReadState(ctx, resp, "scopes", stateData.Scopes)
-	setReadState(ctx, resp, "token", stateData.Token)
-	setReadState(ctx, resp, "id", stateData.Id)
-	setReadState(ctx, resp, "created_at", stateData.CreatedAt)
-	setReadState(ctx, resp, "expires_at", stateData.ExpiresAt)
+	setReadState(ctx, resp, rp("environment_id"), stateData.EnvironmentId)
+	setReadState(ctx, resp, rp("name"), stateData.Name)
+	setReadState(ctx, resp, rp("scopes"), stateData.Scopes)
+	setReadState(ctx, resp, rp("token"), stateData.Token)
+	setReadState(ctx, resp, rp("id"), stateData.Id)
+	setReadState(ctx, resp, rp("created_at"), stateData.CreatedAt)
+	setReadState(ctx, resp, rp("expires_at"), stateData.ExpiresAt)
 }
 
 func (r *ApiTokenResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
