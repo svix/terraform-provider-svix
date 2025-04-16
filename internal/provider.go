@@ -106,7 +106,7 @@ func (p *SvixProvider) Resources(ctx context.Context) []func() resource.Resource
 	return []func() resource.Resource{
 		NewApiTokenResource,
 		NewEnvironmentResource,
-		// NewEnvironmentSettingsResource,
+		NewEventTypeOpenapiImportResource,
 		NewEventTypeResource,
 		NewOperationalWebhooksEndpoint,
 	}
