@@ -50,8 +50,14 @@ resource "svix_environment_settings" "example_environment_settings" {
   enable_channels               = false
   enable_endpoint_mtls_config   = false # Requires Enterprise plan
   enable_endpoint_oauth_config  = false # Requires Enterprise plan
-  enable_integration_management = false
+  enable_integration_management = true
   enable_message_stream         = false # Requires Pro or Enterprise plan
   enable_transformations        = false
   enforce_https                 = true
+  event_catalog_published       = false
+  read_only                     = false
+  require_endpoint_channel      = false
+  show_use_svix_play            = true
+  whitelabel_headers            = false # Requires Pro or Enterprise plan
+  wipe_successful_payload       = false # Requires Pro or Enterprise plan
 }

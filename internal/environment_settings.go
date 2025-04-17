@@ -345,6 +345,8 @@ method, destination URL, and payload body in-flight.`,
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:      true,
 				Computed:      true,
+				MarkdownDescription: "Enable this to make your Event Catalog public. " +
+					"You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog",
 			},
 			"read_only": schema.BoolAttribute{
 				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
@@ -361,9 +363,11 @@ method, destination URL, and payload body in-flight.`,
 				MarkdownDescription: "If enabled, all new Endpoints must filter on at least one channel.",
 			},
 			"show_use_svix_play": schema.BoolAttribute{
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Computed:      true,
+				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+				Optional:            true,
+				Computed:            true,
+				Description:         "Show 'Use Svix Play'",
+				MarkdownDescription: `Show the "Use Svix Play" button when creating an endpoint in the AppPortal.`,
 			},
 			"whitelabel_headers": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},

@@ -65,10 +65,16 @@ resource "svix_environment_settings" "example_environment_settings" {
   enable_channels               = false
   enable_endpoint_mtls_config   = false # Requires Enterprise plan
   enable_endpoint_oauth_config  = false # Requires Enterprise plan
-  enable_integration_management = false
+  enable_integration_management = true
   enable_message_stream         = false # Requires Pro or Enterprise plan
   enable_transformations        = false
   enforce_https                 = true
+  event_catalog_published       = false
+  read_only                     = false
+  require_endpoint_channel      = false
+  show_use_svix_play            = true
+  whitelabel_headers            = false # Requires Pro or Enterprise plan
+  wipe_successful_payload       = false # Requires Pro or Enterprise plan
 }
 ```
 
@@ -112,10 +118,10 @@ messages. Read more about them in the [docs](https://docs.svix.com/advanced-endp
 endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.
 - `enforce_https` (Boolean) Enforces HTTPS on all endpoints of this environment
-- `event_catalog_published` (Boolean)
+- `event_catalog_published` (Boolean) Enable this to make your Event Catalog public. You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog
 - `read_only` (Boolean) Sets your Consumer App Portal to read only so your customers can view but not modify their data
 - `require_endpoint_channel` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
-- `show_use_svix_play` (Boolean)
+- `show_use_svix_play` (Boolean) Show the "Use Svix Play" button when creating an endpoint in the AppPortal.
 - `whitelabel_headers` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Changes the prefix of the webhook HTTP headers to use the`webhook-` prefix. <strong>Changing this setting can break existing integrations<strong/>
 - `wipe_successful_payload` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Delete message payloads from Svix after they are successfully
 delivered to the endpoint. Only affects messages sent after this
