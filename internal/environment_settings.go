@@ -382,7 +382,7 @@ method, destination URL, and payload body in-flight.`,
 				Description:   "White label headers",
 				MarkdownDescription: REQUIRES_PRO_OR_ENTERPRISE_PLAN +
 					"Changes the prefix of the webhook HTTP headers to use the" +
-					"`webhook-` prefix. <string>Changing this setting can break existing integrations<strong/>",
+					"`webhook-` prefix. <strong>Changing this setting can break existing integrations<strong/>",
 			},
 			"wipe_successful_payload": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
