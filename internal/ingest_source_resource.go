@@ -147,7 +147,7 @@ func (r *SvixIngestSourceResource) Schema(ctx context.Context, req resource.Sche
 				CustomType: jsontypes.NormalizedType{},
 				Default:    nil,
 				Sensitive:  true,
-				MarkdownDescription: "This config may include sensitive field\n\n" +
+				MarkdownDescription: "The config may include sensitive fields(webhook signing secret for example)\n\n" +
 					"Documentation for the config can be found in the [API docs](https://api.svix.com/docs#tag/Ingest-Source/operation/v1.ingest.source.create)",
 			},
 			"id": schema.StringAttribute{

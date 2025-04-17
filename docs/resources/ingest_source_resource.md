@@ -41,7 +41,7 @@ resource "svix_ingest_source_resource" "example_ingest_source" {
 
 ### Optional
 
-- `config` (String, Sensitive) This config may include sensitive field
+- `config` (String, Sensitive) The config may include sensitive fields(webhook signing secret for example)
 
 Documentation for the config can be found in the [API docs](https://api.svix.com/docs#tag/Ingest-Source/operation/v1.ingest.source.create)
 - `ingest_url` (String)
