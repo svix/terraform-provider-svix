@@ -530,6 +530,10 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 	d.Append(diags...)
 
 	out := generated.EnvironmentSettingsResourceModel{
+		ColorPaletteDark:            basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
+		ColorPaletteLight:           basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
+		CustomStringsOverride:       basetypes.NewObjectNull(generated.CustomStringsOverride_TF_AttributeTypes()),
+		CustomThemeOverride:         basetypes.NewObjectNull(generated.CustomThemeOverride_TF_AttributeTypes()),
 		EnvironmentId:               types.StringValue(envId),
 		CustomBaseFontSize:          types.Int64PointerValue(v.CustomBaseFontSize),
 		CustomColor:                 types.StringPointerValue(v.CustomColor),
@@ -562,8 +566,11 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		d.Append(diags...)
 	}
 	if v.ColorPaletteLight != nil {
+		Spw(v.ColorPaletteLight)
 		colorPaletteLightTf := customColorPaletteToTF(*v.ColorPaletteLight)
+		Spw(colorPaletteLightTf)
 		colorPaletteLight, diags := types.ObjectValueFrom(ctx, colorPaletteLightTf.AttributeTypes(), colorPaletteLightTf)
+		Spw(colorPaletteLight)
 		out.ColorPaletteLight = colorPaletteLight
 		d.Append(diags...)
 	}

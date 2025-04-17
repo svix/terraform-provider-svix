@@ -264,7 +264,7 @@ type CustomColorPalette_TF struct {
 	TextPrimary         types.String `tfsdk:"text_primary"`
 }
 
-func (v *CustomColorPalette_TF) AttributeTypes() map[string]attr.Type {
+func CustomColorPalette_TF_AttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
 		"background_hover":     types.StringType,
 		"background_primary":   types.StringType,
@@ -276,6 +276,11 @@ func (v *CustomColorPalette_TF) AttributeTypes() map[string]attr.Type {
 		"text_danger":          types.StringType,
 		"text_primary":         types.StringType,
 	}
+}
+
+func (v *CustomColorPalette_TF) AttributeTypes() map[string]attr.Type {
+	return CustomColorPalette_TF_AttributeTypes()
+
 }
 
 func PatchCustomColorPaletteWithPlan(
@@ -336,12 +341,16 @@ type CustomStringsOverride_TF struct {
 	ChannelsOne  types.String `tfsdk:"channels_one"`
 }
 
-func (v *CustomStringsOverride_TF) AttributeTypes() map[string]attr.Type {
+func CustomStringsOverride_TF_AttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
 		"channels_help": types.StringType,
 		"channels_many": types.StringType,
 		"channels_one":  types.StringType,
 	}
+}
+
+func (v *CustomStringsOverride_TF) AttributeTypes() map[string]attr.Type {
+	return CustomStringsOverride_TF_AttributeTypes()
 }
 
 func PatchCustomStringsOverrideWithPlan(
@@ -377,7 +386,7 @@ type CustomThemeOverride_TF struct {
 	FontSize     basetypes.ObjectValue `tfsdk:"font_size"`
 }
 
-func (v *CustomThemeOverride_TF) AttributeTypes() map[string]attr.Type {
+func CustomThemeOverride_TF_AttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
 		"border_radius": basetypes.ObjectType{
 			AttrTypes: map[string]attr.Type{
@@ -392,6 +401,10 @@ func (v *CustomThemeOverride_TF) AttributeTypes() map[string]attr.Type {
 			},
 		},
 	}
+}
+
+func (v *CustomThemeOverride_TF) AttributeTypes() map[string]attr.Type {
+	return CustomThemeOverride_TF_AttributeTypes()
 }
 
 func PatchCustomThemeOverrideWithPlan(
