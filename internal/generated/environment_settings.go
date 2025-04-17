@@ -3,7 +3,9 @@ package generated
 
 import (
 	"context"
+	"log"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -13,6 +15,9 @@ import (
 
 func ptr[T any](value T) *T {
 	return &value
+}
+func Spw(v any) {
+	log.Println(spew.Sdump(v))
 }
 
 // Terraform wrapper around `svixmodels.FontSizeConfig`
@@ -78,7 +83,6 @@ type EnvironmentSettingsResourceModel struct {
 	EventCatalogPublished       types.Bool            `tfsdk:"event_catalog_published"`
 	ReadOnly                    types.Bool            `tfsdk:"read_only"`
 	RequireEndpointChannel      types.Bool            `tfsdk:"require_endpoint_channel"`
-	RetryPolicy                 types.List            `tfsdk:"retry_policy"`
 	ShowUseSvixPlay             types.Bool            `tfsdk:"show_use_svix_play"`
 	WhitelabelHeaders           types.Bool            `tfsdk:"whitelabel_headers"`
 	WipeSuccessfulPayload       types.Bool            `tfsdk:"wipe_successful_payload"`
@@ -117,7 +121,6 @@ func PatchSettingsInternalInWithPlan(
 		outModel.EventCatalogPublished = existingModel.EventCatalogPublished
 		outModel.ReadOnly = existingModel.ReadOnly
 		outModel.RequireEndpointChannel = existingModel.RequireEndpointChannel
-		outModel.RetryPolicy = existingModel.RetryPolicy
 		outModel.ShowUseSvixPlay = existingModel.ShowUseSvixPlay
 		outModel.WhitelabelHeaders = existingModel.WhitelabelHeaders
 		outModel.WipeSuccessfulPayload = existingModel.WipeSuccessfulPayload
@@ -229,15 +232,6 @@ func PatchSettingsInternalInWithPlan(
 	}
 	if !planedModel.RequireEndpointChannel.IsUnknown() {
 		outModel.RequireEndpointChannel = planedModel.RequireEndpointChannel.ValueBoolPointer()
-	}
-	if !planedModel.RetryPolicy.IsUnknown() {
-		if planedModel.RetryPolicy.IsNull() {
-			outModel.RetryPolicy = nil
-		} else {
-			var retryPolicy []int32
-			d.Append(planedModel.RetryPolicy.ElementsAs(ctx, retryPolicy, false)...)
-		}
-
 	}
 	if !planedModel.ShowUseSvixPlay.IsUnknown() {
 		outModel.ShowUseSvixPlay = planedModel.ShowUseSvixPlay.ValueBoolPointer()
@@ -430,7 +424,14 @@ func PatchCustomThemeOverrideWithPlan(
 				UnhandledNullAsEmpty:    false,
 				UnhandledUnknownAsEmpty: false,
 			})...)
-			outModel.BorderRadius = ptr(PatchBorderRadiusConfigWithPlan(ctx, d, existingModel.BorderRadius, existingBorderRadius))
+			var existingBorderRadiusConfig *svixmodels.BorderRadiusConfig
+			if existingModel != nil {
+				if existingModel.BorderRadius != nil {
+					existingBorderRadiusConfig = existingModel.BorderRadius
+				}
+			}
+
+			outModel.BorderRadius = ptr(PatchBorderRadiusConfigWithPlan(ctx, d, existingBorderRadiusConfig, existingBorderRadius))
 		}
 
 	}
@@ -443,7 +444,13 @@ func PatchCustomThemeOverrideWithPlan(
 				UnhandledNullAsEmpty:    false,
 				UnhandledUnknownAsEmpty: false,
 			})...)
-			outModel.FontSize = ptr(PatchFontSizeConfigWithPlan(ctx, d, existingModel.FontSize, existingFontSize))
+			var existingFontSizeConfig *svixmodels.FontSizeConfig
+			if existingModel != nil {
+				if existingModel.FontSize != nil {
+					existingFontSizeConfig = existingModel.FontSize
+				}
+			}
+			outModel.FontSize = ptr(PatchFontSizeConfigWithPlan(ctx, d, existingFontSizeConfig, existingFontSize))
 		}
 
 	}

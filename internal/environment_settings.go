@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -57,200 +56,214 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 			},
 			"color_palette_dark": schema.SingleNestedAttribute{
 				Optional:      true,
-				Computed:      true,
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"background_hover": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Surface Header",
+						MarkdownDescription: "Background for card headers and table headers",
 					},
 					"background_primary": schema.StringAttribute{
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Optional:      true,
-						Computed:      true,
+						Description:   "Background",
 					},
 					"background_secondary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Surface Background",
+						MarkdownDescription: "Background for cards, tables and other surfaces",
 					},
 					"button_primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Button Primary",
+						MarkdownDescription: "For the main action buttons",
 					},
 					"interactive_accent": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Interactive Accent",
+						MarkdownDescription: "For secondary buttons, links, and other interactive elements",
 					},
 					"navigation_accent": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Navigation Accent",
+						MarkdownDescription: "For the top-level navigation items",
 					},
 					"primary": schema.StringAttribute{
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Optional:      true,
-						Computed:      true,
+						Description:   "Primary color",
 					},
 					"text_danger": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Text Danger",
+						MarkdownDescription: "For error messages and other warnings",
 					},
 					"text_primary": schema.StringAttribute{
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Optional:      true,
-						Computed:      true,
+						Description:   "Text Primary",
 					},
 				},
 			},
+
 			"color_palette_light": schema.SingleNestedAttribute{
 				Optional:      true,
-				Computed:      true,
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"background_hover": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Surface Header",
+						MarkdownDescription: "Background for card headers and table headers",
 					},
 					"background_primary": schema.StringAttribute{
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Optional:      true,
-						Computed:      true,
+						Description:   "Background",
 					},
 					"background_secondary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Surface Background",
+						MarkdownDescription: "Background for cards, tables and other surfaces",
 					},
 					"button_primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Button Primary",
+						MarkdownDescription: "For the main action buttons",
 					},
 					"interactive_accent": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Interactive Accent",
+						MarkdownDescription: "For secondary buttons, links, and other interactive elements",
 					},
 					"navigation_accent": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Navigation Accent",
+						MarkdownDescription: "For the top-level navigation items",
 					},
 					"primary": schema.StringAttribute{
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Optional:      true,
-						Computed:      true,
+						Description:   "Primary color",
 					},
 					"text_danger": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Text Danger",
+						MarkdownDescription: "For error messages and other warnings",
 					},
 					"text_primary": schema.StringAttribute{
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Optional:      true,
-						Computed:      true,
+						Description:   "Text Primary",
 					},
 				},
 			},
 			"custom_base_font_size": schema.Int64Attribute{
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Computed:      true,
+				PlanModifiers:       []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+				Optional:            true,
+				MarkdownDescription: "This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px",
+				Description:         "Base Font Size (in pixels)",
 			},
 			"custom_color": schema.StringAttribute{
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Optional:      true,
-				Computed:      true,
 			},
 			"custom_font_family": schema.StringAttribute{
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{customFontFamilyValidator{}},
 				Optional:      true,
-				Computed:      true,
+				Description:   "Custom Font",
+				MarkdownDescription: "You can also set a custom font by providing a URL to a font file. \n\n" +
+					"If you chose to use the `custom_font_family_url` make sure to set this to `Custom`",
 			},
 			"custom_font_family_url": schema.StringAttribute{
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{customFontURLValidator{}},
 				Optional:      true,
-				Computed:      true,
+				Description:   "Custom Font URL",
+				MarkdownDescription: "URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)\n\n" +
+					"Make sure to set `custom_font_family` to `Custom`",
 			},
 			"custom_logo_url": schema.StringAttribute{
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Computed:      true,
+				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Optional:            true,
+				Description:         "Icon URL",
+				MarkdownDescription: "Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).",
 			},
 			"custom_strings_override": schema.SingleNestedAttribute{
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Optional:      true,
-				Computed:      true,
+				Description:   "Rename 'channels' in the App Portal, depending on the usage you give them in your application.",
 				Attributes: map[string]schema.Attribute{
 					"channels_help": schema.StringAttribute{
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Optional:      true,
-						Computed:      true,
+						Description:   "Channels help text.",
 					},
 					"channels_many": schema.StringAttribute{
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Optional:      true,
-						Computed:      true,
+						Description:   "Plural form.",
 					},
 					"channels_one": schema.StringAttribute{
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Optional:      true,
-						Computed:      true,
+						Description:   "Singular form.",
 					},
 				},
 			},
 			"custom_theme_override": schema.SingleNestedAttribute{
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Computed:      true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"border_radius": schema.SingleNestedAttribute{
-						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						Optional:    true,
+						Description: "Borders",
 						Attributes: map[string]schema.Attribute{
 							"button": schema.StringAttribute{
 								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 								Optional:      true,
-								Computed:      true,
 								Validators: []validator.String{
 									stringvalidator.OneOf(borderRadiusEnum...),
 								},
+								Description:         "Button corners",
+								MarkdownDescription: "Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped",
 							},
 							"card": schema.StringAttribute{
 								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 								Optional:      true,
-								Computed:      true,
 								Validators: []validator.String{
 									stringvalidator.OneOf(borderRadiusEnum...),
 								},
+								Description:         "Card corners",
+								MarkdownDescription: "Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped",
 							},
 							"input": schema.StringAttribute{
 								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 								Optional:      true,
-								Computed:      true,
 								Validators: []validator.String{
 									stringvalidator.OneOf(borderRadiusEnum...),
 								},
+								Description:         "Input corners",
+								MarkdownDescription: "Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped",
 							},
 						},
 					},
 					"font_size": schema.SingleNestedAttribute{
-						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Computed:      true,
+						Optional: true,
 						Attributes: map[string]schema.Attribute{
 							"base": schema.Int64Attribute{
-								PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
-								Optional:      true,
-								Computed:      true,
+								Optional: true,
 							},
 						},
 					},
@@ -267,9 +280,11 @@ you know [via webhook](https://docs.svix.com/incoming-webhooks). Read
 more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endpoints).`,
 			},
 			"display_name": schema.StringAttribute{
-				Optional:      true,
-				Computed:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Description:         "Display Name",
+				MarkdownDescription: "The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).",
 			},
 			"enable_channels": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
@@ -354,12 +369,6 @@ method, destination URL, and payload body in-flight.`,
 				Computed:            true,
 				Description:         "Require channel filters for endpoints",
 				MarkdownDescription: "If enabled, all new Endpoints must filter on at least one channel.",
-			},
-			"retry_policy": schema.ListAttribute{
-				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Computed:      true,
-				ElementType:   types.StringType,
 			},
 			"show_use_svix_play": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
@@ -446,6 +455,7 @@ func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.C
 func (r *EnvironmentSettingsResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// load state/plan
 	var envId string
+	Spw(req.State.Raw)
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -463,9 +473,11 @@ func (r *EnvironmentSettingsResource) Read(ctx context.Context, req resource.Rea
 		logSvixError(&resp.Diagnostics, err, "Failed to get environment settings")
 		return
 	}
-
+	Spw(res)
 	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, *res, envId)
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, outModel)...)
+	Spw(resp.State.Raw)
 }
 
 func (r *EnvironmentSettingsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -526,9 +538,6 @@ func customColorPaletteToTF(v models.CustomColorPalette) generated.CustomColorPa
 
 }
 func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string) generated.EnvironmentSettingsResourceModel {
-	retryPolicy, diags := types.ListValueFrom(ctx, types.StringType, v.RetryPolicy)
-	d.Append(diags...)
-
 	out := generated.EnvironmentSettingsResourceModel{
 		ColorPaletteDark:            basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
 		ColorPaletteLight:           basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
@@ -554,7 +563,6 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		EventCatalogPublished:       types.BoolPointerValue(v.EventCatalogPublished),
 		ReadOnly:                    types.BoolPointerValue(v.ReadOnly),
 		RequireEndpointChannel:      types.BoolPointerValue(v.RequireEndpointChannel),
-		RetryPolicy:                 retryPolicy,
 		ShowUseSvixPlay:             types.BoolPointerValue(v.ShowUseSvixPlay),
 		WhitelabelHeaders:           types.BoolPointerValue(v.WhitelabelHeaders),
 		WipeSuccessfulPayload:       types.BoolPointerValue(v.WipeSuccessfulPayload),
@@ -566,11 +574,8 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		d.Append(diags...)
 	}
 	if v.ColorPaletteLight != nil {
-		Spw(v.ColorPaletteLight)
 		colorPaletteLightTf := customColorPaletteToTF(*v.ColorPaletteLight)
-		Spw(colorPaletteLightTf)
 		colorPaletteLight, diags := types.ObjectValueFrom(ctx, colorPaletteLightTf.AttributeTypes(), colorPaletteLightTf)
-		Spw(colorPaletteLight)
 		out.ColorPaletteLight = colorPaletteLight
 		d.Append(diags...)
 	}
@@ -640,4 +645,108 @@ func BorderRadiusEnumStringValue(v *models.BorderRadiusEnum) basetypes.StringVal
 		return types.StringValue("full")
 	}
 	return types.StringPointerValue(nil)
+}
+
+type customFontURLValidator struct{}
+
+// Description returns a description of the validator
+func (v customFontURLValidator) Description(ctx context.Context) string {
+	return "When a custom font URL is provided, custom_font_family must be set to 'Custom'"
+}
+
+// MarkdownDescription returns a markdown description of the validator
+func (v customFontURLValidator) MarkdownDescription(ctx context.Context) string {
+	return "When a custom font URL is provided, custom_font_family must be set to 'Custom'"
+}
+
+// ValidateString performs the validation
+func (v customFontURLValidator) ValidateString(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+	// Skip validation if value is unknown or null
+	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
+		return
+	}
+
+	// Get the font URL value
+	fontURL := req.ConfigValue.ValueString()
+
+	// Skip validation if URL is empty
+	if fontURL == "" {
+		return
+	}
+
+	// Get the custom_font_family value to check
+	var fontFamily types.String
+	diags := req.Config.GetAttribute(ctx, path.Root("custom_font_family"), &fontFamily)
+
+	if diags.HasError() {
+		resp.Diagnostics.Append(diags...)
+		return
+	}
+
+	// If custom_font_family is unknown or null, add error
+	if fontFamily.IsNull() || fontFamily.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			req.Path,
+			"Invalid Custom Font Configuration",
+			"When providing a custom_font_family_url, the custom_font_family attribute must be set to 'Custom'",
+		)
+		return
+	}
+
+	// Verify that custom_font_family is set to "Custom"
+	if fontFamily.ValueString() != "Custom" {
+		resp.Diagnostics.AddAttributeError(
+			req.Path,
+			"Invalid Custom Font Configuration",
+			"When providing a custom_font_family_url, the custom_font_family attribute must be set to 'Custom'",
+		)
+	}
+}
+
+// customFontFamilyValidator validates that when custom_font_family is set to "Custom",
+// a custom_font_family_url must be provided
+type customFontFamilyValidator struct{}
+
+// Description returns a description of the validator
+func (v customFontFamilyValidator) Description(ctx context.Context) string {
+	return "When custom_font_family is set to 'Custom', a custom_font_family_url must be provided"
+}
+
+// MarkdownDescription returns a markdown description of the validator
+func (v customFontFamilyValidator) MarkdownDescription(ctx context.Context) string {
+	return "When custom_font_family is set to 'Custom', a custom_font_family_url must be provided"
+}
+
+// ValidateString performs the validation
+func (v customFontFamilyValidator) ValidateString(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+	// Skip validation if value is unknown or null
+	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
+		return
+	}
+
+	// Get the font family value
+	fontFamily := req.ConfigValue.ValueString()
+
+	// Skip validation if not set to "Custom"
+	if fontFamily != "Custom" {
+		return
+	}
+
+	// Get the custom_font_family_url value to check
+	var fontURL types.String
+	diags := req.Config.GetAttribute(ctx, path.Root("custom_font_family_url"), &fontURL)
+
+	if diags.HasError() {
+		resp.Diagnostics.Append(diags...)
+		return
+	}
+
+	// If custom_font_family_url is null, unknown, or empty, add error
+	if fontURL.IsNull() || fontURL.IsUnknown() || fontURL.ValueString() == "" {
+		resp.Diagnostics.AddAttributeError(
+			req.Path,
+			"Missing Custom Font URL",
+			"When custom_font_family is set to 'Custom', a valid custom_font_family_url must be provided",
+		)
+	}
 }
