@@ -325,16 +325,6 @@ integrations on your users' behalf.`,
 				MarkdownDescription: REQUIRES_PRO_OR_ENTERPRISE_PLAN + `Allows users to configure Polling Endpoints and FIFO endpoints to get
 messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).`,
 			},
-			"enable_msg_atmpt_log": schema.BoolAttribute{
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Computed:      true,
-			},
-			"enable_otlp": schema.BoolAttribute{
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Computed:      true,
-			},
 			"enable_transformations": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:      true,
@@ -556,8 +546,6 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		EnableEndpointOauthConfig:   types.BoolPointerValue(v.EnableEndpointOauthConfig),
 		EnableIntegrationManagement: types.BoolPointerValue(v.EnableIntegrationManagement),
 		EnableMessageStream:         types.BoolPointerValue(v.EnableMessageStream),
-		EnableMsgAtmptLog:           types.BoolPointerValue(v.EnableMsgAtmptLog),
-		EnableOtlp:                  types.BoolPointerValue(v.EnableOtlp),
 		EnableTransformations:       types.BoolPointerValue(v.EnableTransformations),
 		EnforceHttps:                types.BoolPointerValue(v.EnforceHttps),
 		EventCatalogPublished:       types.BoolPointerValue(v.EventCatalogPublished),

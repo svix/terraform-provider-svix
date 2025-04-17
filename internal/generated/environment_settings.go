@@ -76,8 +76,6 @@ type EnvironmentSettingsResourceModel struct {
 	EnableEndpointOauthConfig   types.Bool            `tfsdk:"enable_endpoint_oauth_config"`
 	EnableIntegrationManagement types.Bool            `tfsdk:"enable_integration_management"`
 	EnableMessageStream         types.Bool            `tfsdk:"enable_message_stream"`
-	EnableMsgAtmptLog           types.Bool            `tfsdk:"enable_msg_atmpt_log"`
-	EnableOtlp                  types.Bool            `tfsdk:"enable_otlp"`
 	EnableTransformations       types.Bool            `tfsdk:"enable_transformations"`
 	EnforceHttps                types.Bool            `tfsdk:"enforce_https"`
 	EventCatalogPublished       types.Bool            `tfsdk:"event_catalog_published"`
@@ -211,12 +209,6 @@ func PatchSettingsInternalInWithPlan(
 	}
 	if !planedModel.EnableMessageStream.IsUnknown() {
 		outModel.EnableMessageStream = planedModel.EnableMessageStream.ValueBoolPointer()
-	}
-	if !planedModel.EnableMsgAtmptLog.IsUnknown() {
-		outModel.EnableMsgAtmptLog = planedModel.EnableMsgAtmptLog.ValueBoolPointer()
-	}
-	if !planedModel.EnableOtlp.IsUnknown() {
-		outModel.EnableOtlp = planedModel.EnableOtlp.ValueBoolPointer()
 	}
 	if !planedModel.EnableTransformations.IsUnknown() {
 		outModel.EnableTransformations = planedModel.EnableTransformations.ValueBoolPointer()

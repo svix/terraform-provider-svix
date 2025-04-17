@@ -108,8 +108,6 @@ Consumer App Portal. We recommend disabling this if you manage
 integrations on your users' behalf.
 - `enable_message_stream` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Allows users to configure Polling Endpoints and FIFO endpoints to get
 messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).
-- `enable_msg_atmpt_log` (Boolean)
-- `enable_otlp` (Boolean)
 - `enable_transformations` (Boolean) Controls whether or not your users can add transformations to their
 endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.
