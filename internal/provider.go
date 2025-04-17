@@ -113,6 +113,7 @@ func (p *SvixProvider) Resources(ctx context.Context) []func() resource.Resource
 		NewEventTypeOpenapiImportResource,
 		NewEventTypeResource,
 		NewOperationalWebhooksEndpoint,
+		NewSvixIngestSourceResource,
 	}
 }
 func (p *SvixProvider) EphemeralResources(ctx context.Context) []func() ephemeral.EphemeralResource {
