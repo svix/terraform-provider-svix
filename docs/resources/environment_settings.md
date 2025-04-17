@@ -69,9 +69,6 @@ resource "svix_environment_settings" "example_environment_settings" {
   enable_message_stream         = false # Requires Pro or Enterprise plan
   enable_transformations        = false
   enforce_https                 = true
-
-
-
 }
 ```
 
