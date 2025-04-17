@@ -3,7 +3,7 @@ resource "svix_environment" "example_environment" {
   type = "development"
 }
 
-resource "svix_ingest_source_resource" "example_ingest_source" {
+resource "svix_ingest_source" "example_ingest_source" {
   environment_id = svix_environment.example_environment.id
   type           = "cron"
   name           = "example cron source"

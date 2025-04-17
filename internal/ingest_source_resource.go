@@ -100,7 +100,7 @@ func ingestSourceInTypesForDocs() []string {
 }
 
 func (r *SvixIngestSourceResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = "svix_ingest_source_resource"
+	resp.TypeName = "svix_ingest_source"
 }
 
 func (r *SvixIngestSourceResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
