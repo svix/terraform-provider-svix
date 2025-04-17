@@ -29,7 +29,7 @@ resource "svix_ingest_source" "example_ingest_source" {
   })
 }
 
-resource "svix_operational_webhooks_endpoint" "example_endpoint" {
+resource "svix_ingest_endpoint" "example_endpoint" {
   environment_id   = svix_environment.example_environment.id
   ingest_source_id = svix_ingest_source.example_ingest_source.id
   url              = "https://example.com"
