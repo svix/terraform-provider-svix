@@ -241,7 +241,7 @@ func (r *SvixIngestSourceResource) Create(ctx context.Context, req resource.Crea
 	setCreateState(ctx, resp, rp("name"), res.Name)
 	setCreateState(ctx, resp, rp("uid"), res.Uid)
 	setCreateState(ctx, resp, rp("config"), jsontypes.NewNormalizedPointerValue(configOut))
-	setCreateState(ctx, resp, rp("ingest_url"), res.IngestUrl)
+	setCreateState(ctx, resp, rp("ingest_url"), types.StringPointerValue(res.IngestUrl))
 	setCreateState(ctx, resp, rp("created_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
 	setCreateState(ctx, resp, rp("updated_at"), timetypes.NewRFC3339TimeValue(res.UpdatedAt))
 }
@@ -285,7 +285,7 @@ func (r *SvixIngestSourceResource) Read(ctx context.Context, req resource.ReadRe
 	setReadState(ctx, resp, rp("name"), res.Name)
 	setReadState(ctx, resp, rp("uid"), res.Uid)
 	setReadState(ctx, resp, rp("config"), jsontypes.NewNormalizedPointerValue(configOut))
-	setReadState(ctx, resp, rp("ingest_url"), res.IngestUrl)
+	setReadState(ctx, resp, rp("ingest_url"), types.StringPointerValue(res.IngestUrl))
 	setReadState(ctx, resp, rp("created_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
 	setReadState(ctx, resp, rp("updated_at"), timetypes.NewRFC3339TimeValue(res.UpdatedAt))
 }
@@ -293,12 +293,11 @@ func (r *SvixIngestSourceResource) Read(ctx context.Context, req resource.ReadRe
 func (r *SvixIngestSourceResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// load state/plan
 	var data SvixIngestSourceResourceModel
-	var envId, srcId, currentIngestUrl string
+	var envId, srcId string
 	var currentConfig *string
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &srcId)...)
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("config"), &currentConfig)...)
-	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("ingest_url"), &currentIngestUrl)...)
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -347,7 +346,7 @@ func (r *SvixIngestSourceResource) Update(ctx context.Context, req resource.Upda
 	setUpdateState(ctx, resp, rp("name"), res.Name)
 	setUpdateState(ctx, resp, rp("uid"), res.Uid)
 	setUpdateState(ctx, resp, rp("config"), jsontypes.NewNormalizedPointerValue(configOut))
-	setUpdateState(ctx, resp, rp("ingest_url"), res.IngestUrl)
+	setUpdateState(ctx, resp, rp("ingest_url"), types.StringPointerValue(res.IngestUrl))
 	setUpdateState(ctx, resp, rp("created_at"), timetypes.NewRFC3339TimeValue(res.CreatedAt))
 	setUpdateState(ctx, resp, rp("updated_at"), timetypes.NewRFC3339TimeValue(res.UpdatedAt))
 
