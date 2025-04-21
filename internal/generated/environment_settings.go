@@ -81,7 +81,6 @@ type EnvironmentSettingsResourceModel struct {
 	EventCatalogPublished       types.Bool            `tfsdk:"event_catalog_published"`
 	ReadOnly                    types.Bool            `tfsdk:"read_only"`
 	RequireEndpointChannel      types.Bool            `tfsdk:"require_endpoint_channel"`
-	ShowUseSvixPlay             types.Bool            `tfsdk:"show_use_svix_play"`
 	WhitelabelHeaders           types.Bool            `tfsdk:"whitelabel_headers"`
 	WipeSuccessfulPayload       types.Bool            `tfsdk:"wipe_successful_payload"`
 }
@@ -119,7 +118,6 @@ func PatchSettingsInternalInWithPlan(
 		outModel.EventCatalogPublished = existingModel.EventCatalogPublished
 		outModel.ReadOnly = existingModel.ReadOnly
 		outModel.RequireEndpointChannel = existingModel.RequireEndpointChannel
-		outModel.ShowUseSvixPlay = existingModel.ShowUseSvixPlay
 		outModel.WhitelabelHeaders = existingModel.WhitelabelHeaders
 		outModel.WipeSuccessfulPayload = existingModel.WipeSuccessfulPayload
 	}
@@ -224,9 +222,6 @@ func PatchSettingsInternalInWithPlan(
 	}
 	if !planedModel.RequireEndpointChannel.IsUnknown() {
 		outModel.RequireEndpointChannel = planedModel.RequireEndpointChannel.ValueBoolPointer()
-	}
-	if !planedModel.ShowUseSvixPlay.IsUnknown() {
-		outModel.ShowUseSvixPlay = planedModel.ShowUseSvixPlay.ValueBoolPointer()
 	}
 	if !planedModel.WhitelabelHeaders.IsUnknown() {
 		outModel.WhitelabelHeaders = planedModel.WhitelabelHeaders.ValueBoolPointer()

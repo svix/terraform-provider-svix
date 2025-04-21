@@ -362,13 +362,6 @@ method, destination URL, and payload body in-flight.`,
 				Description:         "Require channel filters for endpoints",
 				MarkdownDescription: "If enabled, all new Endpoints must filter on at least one channel.",
 			},
-			"show_use_svix_play": schema.BoolAttribute{
-				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
-				Optional:            true,
-				Computed:            true,
-				Description:         "Show 'Use Svix Play'",
-				MarkdownDescription: `Show the "Use Svix Play" button when creating an endpoint in the AppPortal.`,
-			},
 			"whitelabel_headers": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:      true,
@@ -555,7 +548,6 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		EventCatalogPublished:       types.BoolPointerValue(v.EventCatalogPublished),
 		ReadOnly:                    types.BoolPointerValue(v.ReadOnly),
 		RequireEndpointChannel:      types.BoolPointerValue(v.RequireEndpointChannel),
-		ShowUseSvixPlay:             types.BoolPointerValue(v.ShowUseSvixPlay),
 		WhitelabelHeaders:           types.BoolPointerValue(v.WhitelabelHeaders),
 		WipeSuccessfulPayload:       types.BoolPointerValue(v.WipeSuccessfulPayload),
 	}

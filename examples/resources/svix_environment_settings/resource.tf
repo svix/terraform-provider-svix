@@ -57,7 +57,6 @@ resource "svix_environment_settings" "example_environment_settings" {
   event_catalog_published       = false
   read_only                     = false
   require_endpoint_channel      = false
-  show_use_svix_play            = true
   whitelabel_headers            = false # Requires Pro or Enterprise plan
   wipe_successful_payload       = false # Requires Pro or Enterprise plan
 }
