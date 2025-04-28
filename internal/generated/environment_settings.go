@@ -60,8 +60,6 @@ func PatchFontSizeConfigWithPlan(
 // Terraform wrapper around `svixmodels.SettingsInternalIn`
 type EnvironmentSettingsResourceModel struct {
 	EnvironmentId               types.String          `tfsdk:"environment_id"`
-	ColorPaletteDark            basetypes.ObjectValue `tfsdk:"color_palette_dark"`
-	ColorPaletteLight           basetypes.ObjectValue `tfsdk:"color_palette_light"`
 	CustomStringsOverride       basetypes.ObjectValue `tfsdk:"channels_strings_override"`
 	DisableEndpointOnFailure    types.Bool            `tfsdk:"disable_endpoint_on_failure"`
 	EnableChannels              types.Bool            `tfsdk:"enable_channels"`
@@ -87,7 +85,9 @@ type WhitelabelSettings struct {
 	CustomFontFamilyUrl types.String `tfsdk:"font_family_url"`
 	CustomLogoUrl       types.String `tfsdk:"logo_url"`
 
-	BorderRadius basetypes.ObjectValue `tfsdk:"border_radius"`
+	BorderRadius      basetypes.ObjectValue `tfsdk:"border_radius"`
+	ColorPaletteDark  basetypes.ObjectValue `tfsdk:"color_palette_dark"`
+	ColorPaletteLight basetypes.ObjectValue `tfsdk:"color_palette_light"`
 }
 
 func WhitelabelSettings_TF_AttributeTypes() map[string]attr.Type {
@@ -97,6 +97,13 @@ func WhitelabelSettings_TF_AttributeTypes() map[string]attr.Type {
 		"font_family":     types.StringType,
 		"font_family_url": types.StringType,
 		"logo_url":        types.StringType,
+
+		"color_palette_dark": basetypes.ObjectType{
+			AttrTypes: CustomColorPalette_TF_AttributeTypes(),
+		},
+		"color_palette_light": basetypes.ObjectType{
+			AttrTypes: CustomColorPalette_TF_AttributeTypes(),
+		},
 
 		"border_radius": basetypes.ObjectType{
 			AttrTypes: map[string]attr.Type{
@@ -199,32 +206,28 @@ func PatchSettingsInternalInWithPlan(
 
 		}
 
-	}
-	// override fields in outModel with variables from planed model
-	if !planedModel.ColorPaletteDark.IsUnknown() {
-		if planedModel.ColorPaletteDark.IsNull() {
-			outModel.ColorPaletteDark = nil
-		} else {
-			var existingColorPaletteDark CustomColorPalette_TF
-			d.Append(planedModel.ColorPaletteDark.As(ctx, &existingColorPaletteDark, basetypes.ObjectAsOptions{
+		{
+			var planedColorPaletteDark CustomColorPalette_TF
+			d.Append(planedWhitelabelSettings.ColorPaletteDark.As(ctx, &planedColorPaletteDark, basetypes.ObjectAsOptions{
 				UnhandledNullAsEmpty:    false,
 				UnhandledUnknownAsEmpty: false,
 			})...)
-			outModel.ColorPaletteDark = ptr(PatchCustomColorPaletteWithPlan(ctx, d, existingModel.ColorPaletteDark, existingColorPaletteDark))
+			colorPaletteOut := patchColorPaletteWithPlan(ctx, d, planedWhitelabelSettings)
+			outModel.ColorPaletteDark = colorPaletteOut
 		}
-	}
-	if !planedModel.ColorPaletteLight.IsUnknown() {
-		if planedModel.ColorPaletteLight.IsNull() {
-			outModel.ColorPaletteLight = nil
-		} else {
-			var existingColorPaletteLight CustomColorPalette_TF
-			d.Append(planedModel.ColorPaletteLight.As(ctx, &existingColorPaletteLight, basetypes.ObjectAsOptions{
+
+		{
+			var planedColorPaletteLight CustomColorPalette_TF
+			d.Append(planedWhitelabelSettings.ColorPaletteLight.As(ctx, &planedColorPaletteLight, basetypes.ObjectAsOptions{
 				UnhandledNullAsEmpty:    false,
 				UnhandledUnknownAsEmpty: false,
 			})...)
-			outModel.ColorPaletteLight = ptr(PatchCustomColorPaletteWithPlan(ctx, d, existingModel.ColorPaletteLight, existingColorPaletteLight))
+			colorPaletteOut := patchColorPaletteWithPlan(ctx, d, planedWhitelabelSettings)
+			outModel.ColorPaletteLight = colorPaletteOut
 		}
+
 	}
+
 	if !planedModel.CustomStringsOverride.IsUnknown() {
 		if planedModel.CustomStringsOverride.IsNull() {
 			outModel.CustomStringsOverride = nil
@@ -472,3 +475,53 @@ func PatchBorderRadiusConfigWithPlan(
 // 	}
 // 	return v.ValueStringPointer()
 // }
+
+func patchColorPaletteWithPlan(ctx context.Context, d *diag.Diagnostics, planedWhitelabelSettings WhitelabelSettings) *svixmodels.CustomColorPalette {
+	var planedColorPalette CustomColorPalette_TF
+	d.Append(planedWhitelabelSettings.ColorPaletteLight.As(ctx, &planedColorPalette, basetypes.ObjectAsOptions{
+		UnhandledNullAsEmpty:    false,
+		UnhandledUnknownAsEmpty: false,
+	})...)
+	if !planedColorPalette.Primary.IsUnknown() ||
+		!planedColorPalette.BackgroundPrimary.IsUnknown() ||
+		!planedColorPalette.BackgroundSecondary.IsUnknown() ||
+		!planedColorPalette.BackgroundHover.IsUnknown() ||
+		!planedColorPalette.InteractiveAccent.IsUnknown() ||
+		!planedColorPalette.NavigationAccent.IsUnknown() ||
+		!planedColorPalette.ButtonPrimary.IsUnknown() ||
+		!planedColorPalette.TextPrimary.IsUnknown() ||
+		!planedColorPalette.TextDanger.IsUnknown() {
+		colorPaletteOut := svixmodels.CustomColorPalette{}
+		if !planedColorPalette.Primary.IsUnknown() {
+			colorPaletteOut.Primary = planedColorPalette.Primary.ValueStringPointer()
+		}
+		if !planedColorPalette.BackgroundPrimary.IsUnknown() {
+			colorPaletteOut.BackgroundPrimary = planedColorPalette.BackgroundPrimary.ValueStringPointer()
+		}
+		if !planedColorPalette.BackgroundSecondary.IsUnknown() {
+			colorPaletteOut.BackgroundSecondary = planedColorPalette.BackgroundSecondary.ValueStringPointer()
+		}
+		if !planedColorPalette.BackgroundHover.IsUnknown() {
+			colorPaletteOut.BackgroundHover = planedColorPalette.BackgroundHover.ValueStringPointer()
+		}
+		if !planedColorPalette.InteractiveAccent.IsUnknown() {
+			colorPaletteOut.InteractiveAccent = planedColorPalette.InteractiveAccent.ValueStringPointer()
+		}
+		if !planedColorPalette.NavigationAccent.IsUnknown() {
+			colorPaletteOut.NavigationAccent = planedColorPalette.NavigationAccent.ValueStringPointer()
+		}
+		if !planedColorPalette.ButtonPrimary.IsUnknown() {
+			colorPaletteOut.ButtonPrimary = planedColorPalette.ButtonPrimary.ValueStringPointer()
+		}
+		if !planedColorPalette.TextPrimary.IsUnknown() {
+			colorPaletteOut.TextPrimary = planedColorPalette.TextPrimary.ValueStringPointer()
+		}
+		if !planedColorPalette.TextDanger.IsUnknown() {
+			colorPaletteOut.TextDanger = planedColorPalette.TextDanger.ValueStringPointer()
+		}
+		return &colorPaletteOut
+	} else {
+		return nil
+	}
+
+}

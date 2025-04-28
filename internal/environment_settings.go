@@ -180,6 +180,9 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 						MarkdownDescription: "Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).",
 					},
 
+					"color_palette_dark":  colorPaletteSchema,
+					"color_palette_light": colorPaletteSchema,
+
 					"border_radius": schema.SingleNestedAttribute{
 						Optional:    true,
 						Description: "Borders",
@@ -215,8 +218,6 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 					},
 				},
 			},
-			"color_palette_dark":  colorPaletteSchema,
-			"color_palette_light": colorPaletteSchema,
 			"channels_strings_override": schema.SingleNestedAttribute{
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Optional:      true,
@@ -491,8 +492,6 @@ func customColorPaletteToTF(v models.CustomColorPalette) generated.CustomColorPa
 }
 func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string) generated.EnvironmentSettingsResourceModel {
 	out := generated.EnvironmentSettingsResourceModel{
-		ColorPaletteDark:            basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
-		ColorPaletteLight:           basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
 		CustomStringsOverride:       basetypes.NewObjectNull(generated.CustomStringsOverride_TF_AttributeTypes()),
 		WhitelabelSettings:          basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
 		EnvironmentId:               types.StringValue(envId),
@@ -514,7 +513,10 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 	{
 
 		whitelabelSettingsTf := generated.WhitelabelSettings{
-			BorderRadius:        basetypes.NewObjectNull(generated.BorderRadius_AttributeTypes()),
+			BorderRadius:      basetypes.NewObjectNull(generated.BorderRadius_AttributeTypes()),
+			ColorPaletteDark:  basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
+			ColorPaletteLight: basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
+
 			DisplayName:         types.StringPointerValue(v.DisplayName),
 			CustomBaseFontSize:  types.Int64PointerValue(v.CustomBaseFontSize),
 			CustomFontFamily:    types.StringPointerValue(v.CustomFontFamily),
@@ -534,22 +536,22 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 				whitelabelSettingsTf.BorderRadius = borderRadius
 			}
 		}
+		if v.ColorPaletteDark != nil {
+			colorPaletteDarkTf := customColorPaletteToTF(*v.ColorPaletteDark)
+			colorPaletteDark, diags := types.ObjectValueFrom(ctx, colorPaletteDarkTf.AttributeTypes(), colorPaletteDarkTf)
+			whitelabelSettingsTf.ColorPaletteDark = colorPaletteDark
+			d.Append(diags...)
+		}
+		if v.ColorPaletteLight != nil {
+			colorPaletteLightTf := customColorPaletteToTF(*v.ColorPaletteLight)
+			colorPaletteLight, diags := types.ObjectValueFrom(ctx, colorPaletteLightTf.AttributeTypes(), colorPaletteLightTf)
+			whitelabelSettingsTf.ColorPaletteLight = colorPaletteLight
+			d.Append(diags...)
+		}
+
 		whitelabelSettings, diags := types.ObjectValueFrom(ctx, whitelabelSettingsTf.AttributeTypes(), whitelabelSettingsTf)
 		d.Append(diags...)
 		out.WhitelabelSettings = whitelabelSettings
-	}
-
-	if v.ColorPaletteDark != nil {
-		colorPaletteDarkTf := customColorPaletteToTF(*v.ColorPaletteDark)
-		colorPaletteDark, diags := types.ObjectValueFrom(ctx, colorPaletteDarkTf.AttributeTypes(), colorPaletteDarkTf)
-		out.ColorPaletteDark = colorPaletteDark
-		d.Append(diags...)
-	}
-	if v.ColorPaletteLight != nil {
-		colorPaletteLightTf := customColorPaletteToTF(*v.ColorPaletteLight)
-		colorPaletteLight, diags := types.ObjectValueFrom(ctx, colorPaletteLightTf.AttributeTypes(), colorPaletteLightTf)
-		out.ColorPaletteLight = colorPaletteLight
-		d.Append(diags...)
 	}
 
 	if v.CustomStringsOverride != nil {

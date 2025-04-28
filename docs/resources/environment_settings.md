@@ -71,8 +71,6 @@ resource "svix_environment_settings" "example_environment_settings" {
 ### Optional
 
 - `channels_strings_override` (Attributes) Rename 'channels' in the App Portal, depending on the usage you give them in your application. (see [below for nested schema](#nestedatt--channels_strings_override))
-- `color_palette_dark` (Attributes) (see [below for nested schema](#nestedatt--color_palette_dark))
-- `color_palette_light` (Attributes) (see [below for nested schema](#nestedatt--color_palette_light))
 - `disable_endpoint_on_failure` (Boolean) If messages to a particular endpoint have been consistently failing for
 some time, we will automatically disable the endpoint and let 
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
@@ -109,38 +107,6 @@ Optional:
 - `channels_one` (String) Singular form.
 
 
-<a id="nestedatt--color_palette_dark"></a>
-### Nested Schema for `color_palette_dark`
-
-Optional:
-
-- `background` (String) Background
-- `button_primary` (String) For the main action buttons
-- `interactive_accent` (String) For secondary buttons, links, and other interactive elements
-- `navigation_accent` (String) For the top-level navigation items
-- `primary` (String) Primary color
-- `surface_background` (String) Background for cards, tables and other surfaces
-- `surface_hover` (String) Background for card headers and table headers
-- `text_danger` (String) For error messages and other warnings
-- `text_primary` (String) Text Primary
-
-
-<a id="nestedatt--color_palette_light"></a>
-### Nested Schema for `color_palette_light`
-
-Optional:
-
-- `background` (String) Background
-- `button_primary` (String) For the main action buttons
-- `interactive_accent` (String) For secondary buttons, links, and other interactive elements
-- `navigation_accent` (String) For the top-level navigation items
-- `primary` (String) Primary color
-- `surface_background` (String) Background for cards, tables and other surfaces
-- `surface_hover` (String) Background for card headers and table headers
-- `text_danger` (String) For error messages and other warnings
-- `text_primary` (String) Text Primary
-
-
 <a id="nestedatt--whitelabel_settings"></a>
 ### Nested Schema for `whitelabel_settings`
 
@@ -148,6 +114,8 @@ Optional:
 
 - `base_font_size` (Number) This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px
 - `border_radius` (Attributes) Borders (see [below for nested schema](#nestedatt--whitelabel_settings--border_radius))
+- `color_palette_dark` (Attributes) (see [below for nested schema](#nestedatt--whitelabel_settings--color_palette_dark))
+- `color_palette_light` (Attributes) (see [below for nested schema](#nestedatt--whitelabel_settings--color_palette_light))
 - `display_name` (String) The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).
 - `font_family` (String) Can be one of `Helvetica`, `Roboto`, `Open Sans`, `Lato`, `Source Sans Pro`, `Raleway`, `Ubuntu`, `Manrope`, `DM Sans`, `Poppins`, `Lexend Deca`, `Rubik` and `Custom`
 
@@ -167,3 +135,35 @@ Optional:
 - `button` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
 - `card` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
 - `input` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
+
+
+<a id="nestedatt--whitelabel_settings--color_palette_dark"></a>
+### Nested Schema for `whitelabel_settings.color_palette_dark`
+
+Optional:
+
+- `background` (String) Background
+- `button_primary` (String) For the main action buttons
+- `interactive_accent` (String) For secondary buttons, links, and other interactive elements
+- `navigation_accent` (String) For the top-level navigation items
+- `primary` (String) Primary color
+- `surface_background` (String) Background for cards, tables and other surfaces
+- `surface_hover` (String) Background for card headers and table headers
+- `text_danger` (String) For error messages and other warnings
+- `text_primary` (String) Text Primary
+
+
+<a id="nestedatt--whitelabel_settings--color_palette_light"></a>
+### Nested Schema for `whitelabel_settings.color_palette_light`
+
+Optional:
+
+- `background` (String) Background
+- `button_primary` (String) For the main action buttons
+- `interactive_accent` (String) For secondary buttons, links, and other interactive elements
+- `navigation_accent` (String) For the top-level navigation items
+- `primary` (String) Primary color
+- `surface_background` (String) Background for cards, tables and other surfaces
+- `surface_hover` (String) Background for card headers and table headers
+- `text_danger` (String) For error messages and other warnings
+- `text_primary` (String) Text Primary
