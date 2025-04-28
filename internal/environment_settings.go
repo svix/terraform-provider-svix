@@ -259,14 +259,6 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 							},
 						},
 					},
-					"font_size": schema.SingleNestedAttribute{
-						Optional: true,
-						Attributes: map[string]schema.Attribute{
-							"base": schema.Int64Attribute{
-								Optional: true,
-							},
-						},
-					},
 				},
 			},
 			"disable_endpoint_on_failure": schema.BoolAttribute{
@@ -577,7 +569,6 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 
 	if v.CustomThemeOverride != nil {
 		customThemeOverrideTF := generated.CustomThemeOverride_TF{
-			FontSize:     basetypes.NewObjectNull(generated.FontSizeConfig_TF_AttributeTypes()),
 			BorderRadius: basetypes.NewObjectNull(generated.BorderRadiusConfig_TF_AttributeTypes()),
 		}
 		if v.CustomThemeOverride.BorderRadius != nil {
@@ -588,19 +579,6 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 			}
 			borderRadius, diags := types.ObjectValueFrom(ctx, borderRadiusTF.AttributeTypes(), borderRadiusTF)
 			customThemeOverrideTF.BorderRadius = borderRadius
-			d.Append(diags...)
-		}
-
-		if v.CustomThemeOverride.FontSize != nil {
-			var base types.Int64
-			if v.CustomThemeOverride.FontSize.Base != nil {
-				base = basetypes.NewInt64Value(int64(*v.CustomThemeOverride.FontSize.Base))
-			} else {
-				base = basetypes.NewInt64Null()
-			}
-			fontSizeTF := generated.FontSizeConfig_TF{Base: base}
-			fontSize, diags := types.ObjectValueFrom(ctx, fontSizeTF.AttributeTypes(), fontSizeTF)
-			customThemeOverrideTF.FontSize = fontSize
 			d.Append(diags...)
 		}
 		customThemeOverride, diags := types.ObjectValueFrom(ctx, customThemeOverrideTF.AttributeTypes(), customThemeOverrideTF)

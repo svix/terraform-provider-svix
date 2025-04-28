@@ -56,9 +56,6 @@ resource "svix_environment_settings" "example_environment_settings" {
       card   = "lg"
       input  = "none"
     }
-    font_size = {
-      base = 18
-    }
   }
   disable_endpoint_on_failure   = false
   display_name                  = "My company"
@@ -173,7 +170,6 @@ Optional:
 Optional:
 
 - `border_radius` (Attributes) Borders (see [below for nested schema](#nestedatt--custom_theme_override--border_radius))
-- `font_size` (Attributes) (see [below for nested schema](#nestedatt--custom_theme_override--font_size))
 
 <a id="nestedatt--custom_theme_override--border_radius"></a>
 ### Nested Schema for `custom_theme_override.border_radius`
@@ -183,11 +179,3 @@ Optional:
 - `button` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
 - `card` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
 - `input` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
-
-
-<a id="nestedatt--custom_theme_override--font_size"></a>
-### Nested Schema for `custom_theme_override.font_size`
-
-Optional:
-
-- `base` (Number)

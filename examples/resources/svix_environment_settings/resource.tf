@@ -41,9 +41,6 @@ resource "svix_environment_settings" "example_environment_settings" {
       card   = "lg"
       input  = "none"
     }
-    font_size = {
-      base = 18
-    }
   }
   disable_endpoint_on_failure   = false
   display_name                  = "My company"

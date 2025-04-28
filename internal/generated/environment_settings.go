@@ -364,7 +364,6 @@ func PatchCustomStringsOverrideWithPlan(
 // Terraform wrapper around `svixmodels.CustomThemeOverride`
 type CustomThemeOverride_TF struct {
 	BorderRadius basetypes.ObjectValue `tfsdk:"border_radius"`
-	FontSize     basetypes.ObjectValue `tfsdk:"font_size"`
 }
 
 func CustomThemeOverride_TF_AttributeTypes() map[string]attr.Type {
@@ -374,11 +373,6 @@ func CustomThemeOverride_TF_AttributeTypes() map[string]attr.Type {
 				"button": types.StringType,
 				"card":   types.StringType,
 				"input":  types.StringType,
-			},
-		},
-		"font_size": basetypes.ObjectType{
-			AttrTypes: map[string]attr.Type{
-				"base": types.Int64Type,
 			},
 		},
 	}
@@ -419,25 +413,6 @@ func PatchCustomThemeOverrideWithPlan(
 			}
 
 			outModel.BorderRadius = ptr(PatchBorderRadiusConfigWithPlan(ctx, d, existingBorderRadiusConfig, existingBorderRadius))
-		}
-
-	}
-	if !planedModel.FontSize.IsUnknown() {
-		if planedModel.FontSize.IsNull() {
-			outModel.FontSize = nil
-		} else {
-			var existingFontSize FontSizeConfig_TF
-			d.Append(planedModel.FontSize.As(ctx, &existingFontSize, basetypes.ObjectAsOptions{
-				UnhandledNullAsEmpty:    false,
-				UnhandledUnknownAsEmpty: false,
-			})...)
-			var existingFontSizeConfig *svixmodels.FontSizeConfig
-			if existingModel != nil {
-				if existingModel.FontSize != nil {
-					existingFontSizeConfig = existingModel.FontSize
-				}
-			}
-			outModel.FontSize = ptr(PatchFontSizeConfigWithPlan(ctx, d, existingFontSizeConfig, existingFontSize))
 		}
 
 	}
