@@ -277,7 +277,7 @@ more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endp
 Consumer App Portal. We recommend disabling this if you manage
 integrations on your users' behalf.`,
 			},
-			"enable_message_stream": schema.BoolAttribute{
+			"enable_advanced_endpoint_types": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:      true,
 				Computed:      true,

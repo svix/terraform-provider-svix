@@ -37,20 +37,20 @@ resource "svix_environment_settings" "example_environment_settings" {
       input  = "none"
     }
   }
-  disable_endpoint_on_failure   = false
-  display_name                  = "My company"
-  enable_channels               = false
-  enable_endpoint_mtls_config   = false # Requires Enterprise plan
-  enable_endpoint_oauth_config  = false # Requires Enterprise plan
-  enable_integration_management = true
-  enable_message_stream         = false # Requires Pro or Enterprise plan
-  enable_transformations        = false
-  enforce_https                 = true
-  event_catalog_published       = false
-  read_only                     = false
-  require_endpoint_channel      = false
-  whitelabel_headers            = false # Requires Pro or Enterprise plan
-  wipe_successful_payload       = false # Requires Pro or Enterprise plan
+  disable_endpoint_on_failure    = false
+  display_name                   = "My company"
+  enable_channels                = false
+  enable_endpoint_mtls_config    = false # Requires Enterprise plan
+  enable_endpoint_oauth_config   = false # Requires Enterprise plan
+  enable_integration_management  = true
+  enable_advanced_endpoint_types = false # Requires Pro or Enterprise plan
+  enable_transformations         = false
+  enforce_https                  = true
+  event_catalog_published        = false
+  read_only                      = false
+  require_endpoint_channel       = false
+  whitelabel_headers             = false # Requires Pro or Enterprise plan
+  wipe_successful_payload        = false # Requires Pro or Enterprise plan
 
   # Advanced settings
   channels_strings_override = {
@@ -79,6 +79,8 @@ some time, we will automatically disable the endpoint and let
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
 more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endpoints).
 - `display_name` (String) The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).
+- `enable_advanced_endpoint_types` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Allows users to configure Polling Endpoints and FIFO endpoints to get
+messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).
 - `enable_channels` (Boolean) Controls whether or not your users can configure
 <strong>channels</strong> from the Consumer App Portal.
 - `enable_endpoint_mtls_config` (Boolean) <strong>Requires Enterprise plan</strong>, Allows users to configure mutual TLS (mTLS) for their endpoints.
@@ -86,8 +88,6 @@ more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endp
 - `enable_integration_management` (Boolean) Controls whether or not your users can manage integrations from the
 Consumer App Portal. We recommend disabling this if you manage
 integrations on your users' behalf.
-- `enable_message_stream` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Allows users to configure Polling Endpoints and FIFO endpoints to get
-messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).
 - `enable_transformations` (Boolean) Controls whether or not your users can add transformations to their
 endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.
