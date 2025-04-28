@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -38,6 +39,22 @@ var borderRadiusEnum = []string{
 	"md",
 	"sm",
 	"full",
+}
+
+var fontFamilyEnum = []string{
+	"Helvetica",
+	"Roboto",
+	"Open Sans",
+	"Lato",
+	"Source Sans Pro",
+	"Raleway",
+	"Ubuntu",
+	"Manrope",
+	"DM Sans",
+	"Poppins",
+	"Lexend Deca",
+	"Rubik",
+	"Custom",
 }
 
 // Metadata implements resource.Resource.
@@ -187,11 +204,15 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 			},
 			"font_family": schema.StringAttribute{
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Validators:    []validator.String{customFontFamilyValidator{}},
-				Optional:      true,
-				Description:   "Font Family",
-				MarkdownDescription: "You can also set a custom font by providing a URL to a font file. \n\n" +
-					"If you chose to use the `font_family_url` make sure to set this to `Custom`",
+				Validators: []validator.String{
+					stringvalidator.OneOf(fontFamilyEnum...),
+					customFontFamilyValidator{},
+				},
+				Optional:    true,
+				Description: "Font Family",
+				MarkdownDescription: "Can be one of `" + strings.Join(fontFamilyEnum[:len(fontFamilyEnum)-1], "`, `") + "` and `Custom`\n\n" +
+					"You can also set a custom font by providing a URL to a font file. \n\n" +
+					"If you chose to use the `font_family_url` make sure to set this to `Custom`\n",
 			},
 			"font_family_url": schema.StringAttribute{
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},

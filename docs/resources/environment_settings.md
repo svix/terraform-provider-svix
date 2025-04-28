@@ -109,7 +109,9 @@ endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.
 - `enforce_https` (Boolean) Enforces HTTPS on all endpoints of this environment
 - `event_catalog_published` (Boolean) Enable this to make your Event Catalog public. You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog
-- `font_family` (String) You can also set a custom font by providing a URL to a font file. 
+- `font_family` (String) Can be one of `Helvetica`, `Roboto`, `Open Sans`, `Lato`, `Source Sans Pro`, `Raleway`, `Ubuntu`, `Manrope`, `DM Sans`, `Poppins`, `Lexend Deca`, `Rubik` and `Custom`
+
+You can also set a custom font by providing a URL to a font file. 
 
 If you chose to use the `font_family_url` make sure to set this to `Custom`
 - `font_family_url` (String) URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)
