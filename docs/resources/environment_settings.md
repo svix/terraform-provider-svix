@@ -125,13 +125,13 @@ Optional:
 
 Optional:
 
-- `background_hover` (String) Background for card headers and table headers
-- `background_primary` (String) Background
-- `background_secondary` (String) Background for cards, tables and other surfaces
+- `background` (String) Background
 - `button_primary` (String) For the main action buttons
 - `interactive_accent` (String) For secondary buttons, links, and other interactive elements
 - `navigation_accent` (String) For the top-level navigation items
 - `primary` (String) Primary color
+- `surface_background` (String) Background for cards, tables and other surfaces
+- `surface_hover` (String) Background for card headers and table headers
 - `text_danger` (String) For error messages and other warnings
 - `text_primary` (String) Text Primary
 
@@ -141,13 +141,13 @@ Optional:
 
 Optional:
 
-- `background_hover` (String) Background for card headers and table headers
-- `background_primary` (String) Background
-- `background_secondary` (String) Background for cards, tables and other surfaces
+- `background` (String) Background
 - `button_primary` (String) For the main action buttons
 - `interactive_accent` (String) For secondary buttons, links, and other interactive elements
 - `navigation_accent` (String) For the top-level navigation items
 - `primary` (String) Primary color
+- `surface_background` (String) Background for cards, tables and other surfaces
+- `surface_hover` (String) Background for card headers and table headers
 - `text_danger` (String) For error messages and other warnings
 - `text_primary` (String) Text Primary
 

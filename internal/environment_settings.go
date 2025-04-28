@@ -57,6 +57,64 @@ var fontFamilyEnum = []string{
 	"Custom",
 }
 
+var colorPaletteSchema = schema.SingleNestedAttribute{
+	Optional:      true,
+	PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+	Attributes: map[string]schema.Attribute{
+		"primary": schema.StringAttribute{
+			PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:      true,
+			Description:   "Primary color",
+		},
+		"background": schema.StringAttribute{
+			PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:      true,
+			Description:   "Background",
+		},
+		"surface_background": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Surface Background",
+			MarkdownDescription: "Background for cards, tables and other surfaces",
+		},
+		"surface_hover": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Surface Header",
+			MarkdownDescription: "Background for card headers and table headers",
+		},
+		"interactive_accent": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Interactive Accent",
+			MarkdownDescription: "For secondary buttons, links, and other interactive elements",
+		},
+		"navigation_accent": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Navigation Accent",
+			MarkdownDescription: "For the top-level navigation items",
+		},
+		"button_primary": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Button Primary",
+			MarkdownDescription: "For the main action buttons",
+		},
+		"text_primary": schema.StringAttribute{
+			PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:      true,
+			Description:   "Text Primary",
+		},
+		"text_danger": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Text Danger",
+			MarkdownDescription: "For error messages and other warnings",
+		},
+	},
+}
+
 // Metadata implements resource.Resource.
 func (r *EnvironmentSettingsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = "svix_environment_settings"
@@ -72,121 +130,8 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"color_palette_dark": schema.SingleNestedAttribute{
-				Optional:      true,
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-				Attributes: map[string]schema.Attribute{
-					"background_hover": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Surface Header",
-						MarkdownDescription: "Background for card headers and table headers",
-					},
-					"background_primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Background",
-					},
-					"background_secondary": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Surface Background",
-						MarkdownDescription: "Background for cards, tables and other surfaces",
-					},
-					"button_primary": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Button Primary",
-						MarkdownDescription: "For the main action buttons",
-					},
-					"interactive_accent": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Interactive Accent",
-						MarkdownDescription: "For secondary buttons, links, and other interactive elements",
-					},
-					"navigation_accent": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Navigation Accent",
-						MarkdownDescription: "For the top-level navigation items",
-					},
-					"primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Primary color",
-					},
-					"text_danger": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Text Danger",
-						MarkdownDescription: "For error messages and other warnings",
-					},
-					"text_primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Text Primary",
-					},
-				},
-			},
-
-			"color_palette_light": schema.SingleNestedAttribute{
-				Optional:      true,
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-				Attributes: map[string]schema.Attribute{
-					"background_hover": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Surface Header",
-						MarkdownDescription: "Background for card headers and table headers",
-					},
-					"background_primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Background",
-					},
-					"background_secondary": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Surface Background",
-						MarkdownDescription: "Background for cards, tables and other surfaces",
-					},
-					"button_primary": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Button Primary",
-						MarkdownDescription: "For the main action buttons",
-					},
-					"interactive_accent": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Interactive Accent",
-						MarkdownDescription: "For secondary buttons, links, and other interactive elements",
-					},
-					"navigation_accent": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Navigation Accent",
-						MarkdownDescription: "For the top-level navigation items",
-					},
-					"primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Primary color",
-					},
-					"text_danger": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Text Danger",
-						MarkdownDescription: "For error messages and other warnings",
-					},
-					"text_primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Text Primary",
-					},
-				},
-			},
+			"color_palette_dark":  colorPaletteSchema,
+			"color_palette_light": colorPaletteSchema,
 			"base_font_size": schema.Int64Attribute{
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 				Validators: []validator.Int64{

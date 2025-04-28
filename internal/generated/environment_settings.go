@@ -230,28 +230,28 @@ func PatchSettingsInternalInWithPlan(
 
 // Terraform wrapper around `svixmodels.CustomColorPalette`
 type CustomColorPalette_TF struct {
-	BackgroundHover     types.String `tfsdk:"background_hover"`
-	BackgroundPrimary   types.String `tfsdk:"background_primary"`
-	BackgroundSecondary types.String `tfsdk:"background_secondary"`
-	ButtonPrimary       types.String `tfsdk:"button_primary"`
+	Primary             types.String `tfsdk:"primary"`
+	BackgroundPrimary   types.String `tfsdk:"background"`
+	BackgroundSecondary types.String `tfsdk:"surface_background"`
+	BackgroundHover     types.String `tfsdk:"surface_hover"`
 	InteractiveAccent   types.String `tfsdk:"interactive_accent"`
 	NavigationAccent    types.String `tfsdk:"navigation_accent"`
-	Primary             types.String `tfsdk:"primary"`
-	TextDanger          types.String `tfsdk:"text_danger"`
+	ButtonPrimary       types.String `tfsdk:"button_primary"`
 	TextPrimary         types.String `tfsdk:"text_primary"`
+	TextDanger          types.String `tfsdk:"text_danger"`
 }
 
 func CustomColorPalette_TF_AttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
-		"background_hover":     types.StringType,
-		"background_primary":   types.StringType,
-		"background_secondary": types.StringType,
-		"button_primary":       types.StringType,
-		"interactive_accent":   types.StringType,
-		"navigation_accent":    types.StringType,
-		"primary":              types.StringType,
-		"text_danger":          types.StringType,
-		"text_primary":         types.StringType,
+		"primary":            types.StringType,
+		"background":         types.StringType,
+		"surface_background": types.StringType,
+		"surface_hover":      types.StringType,
+		"interactive_accent": types.StringType,
+		"navigation_accent":  types.StringType,
+		"button_primary":     types.StringType,
+		"text_primary":       types.StringType,
+		"text_danger":        types.StringType,
 	}
 }
 
