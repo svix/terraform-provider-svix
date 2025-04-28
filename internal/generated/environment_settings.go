@@ -63,7 +63,6 @@ type EnvironmentSettingsResourceModel struct {
 	ColorPaletteDark            basetypes.ObjectValue `tfsdk:"color_palette_dark"`
 	ColorPaletteLight           basetypes.ObjectValue `tfsdk:"color_palette_light"`
 	CustomBaseFontSize          types.Int64           `tfsdk:"base_font_size"`
-	CustomColor                 types.String          `tfsdk:"custom_color"`
 	CustomFontFamily            types.String          `tfsdk:"font_family"`
 	CustomFontFamilyUrl         types.String          `tfsdk:"font_family_url"`
 	CustomLogoUrl               types.String          `tfsdk:"custom_logo_url"`
@@ -174,9 +173,6 @@ func PatchSettingsInternalInWithPlan(
 
 	if !planedModel.CustomBaseFontSize.IsUnknown() {
 		outModel.CustomBaseFontSize = planedModel.CustomBaseFontSize.ValueInt64Pointer()
-	}
-	if !planedModel.CustomColor.IsUnknown() {
-		outModel.CustomColor = planedModel.CustomColor.ValueStringPointer()
 	}
 	if !planedModel.CustomFontFamily.IsUnknown() {
 		outModel.CustomFontFamily = planedModel.CustomFontFamily.ValueStringPointer()

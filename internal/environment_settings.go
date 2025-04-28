@@ -198,10 +198,6 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 				MarkdownDescription: "This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px",
 				Description:         "Base Font Size (in pixels)",
 			},
-			"custom_color": schema.StringAttribute{
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-			},
 			"font_family": schema.StringAttribute{
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators: []validator.String{
@@ -551,7 +547,6 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		CustomThemeOverride:         basetypes.NewObjectNull(generated.CustomThemeOverride_TF_AttributeTypes()),
 		EnvironmentId:               types.StringValue(envId),
 		CustomBaseFontSize:          types.Int64PointerValue(v.CustomBaseFontSize),
-		CustomColor:                 types.StringPointerValue(v.CustomColor),
 		CustomFontFamily:            types.StringPointerValue(v.CustomFontFamily),
 		CustomFontFamilyUrl:         types.StringPointerValue(v.CustomFontFamilyUrl),
 		CustomLogoUrl:               types.StringPointerValue(v.CustomLogoUrl),

@@ -86,7 +86,6 @@ resource "svix_environment_settings" "example_environment_settings" {
 - `base_font_size` (Number) This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px
 - `color_palette_dark` (Attributes) (see [below for nested schema](#nestedatt--color_palette_dark))
 - `color_palette_light` (Attributes) (see [below for nested schema](#nestedatt--color_palette_light))
-- `custom_color` (String)
 - `custom_logo_url` (String) Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).
 - `custom_strings_override` (Attributes) Rename 'channels' in the App Portal, depending on the usage you give them in your application. (see [below for nested schema](#nestedatt--custom_strings_override))
 - `custom_theme_override` (Attributes) (see [below for nested schema](#nestedatt--custom_theme_override))
