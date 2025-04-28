@@ -78,7 +78,6 @@ resource "svix_environment_settings" "example_environment_settings" {
 some time, we will automatically disable the endpoint and let 
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
 more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endpoints).
-- `display_name` (String) The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).
 - `enable_advanced_endpoint_types` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Allows users to configure Polling Endpoints and FIFO endpoints to get
 messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).
 - `enable_channels` (Boolean) Controls whether or not your users can configure
@@ -106,6 +105,7 @@ Make sure to set `font_family` to `Custom`
 - `require_endpoint_channel` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
 - `theme_override` (Attributes) (see [below for nested schema](#nestedatt--theme_override))
 - `whitelabel_headers` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Changes the prefix of the webhook HTTP headers to use the`webhook-` prefix. <strong>Changing this setting can break existing integrations</strong>
+- `whitelabel_settings` (Attributes) Customize how the [Consumer App Portal](https://docs.svix.com/management-ui) will look for your users in this environment. (see [below for nested schema](#nestedatt--whitelabel_settings))
 - `wipe_successful_payload` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Delete message payloads from Svix after they are successfully
 delivered to the endpoint. Only affects messages sent after this
 setting is enabled.
@@ -167,3 +167,12 @@ Optional:
 - `button` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
 - `card` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
 - `input` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
+
+
+
+<a id="nestedatt--whitelabel_settings"></a>
+### Nested Schema for `whitelabel_settings`
+
+Optional:
+
+- `display_name` (String) The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).

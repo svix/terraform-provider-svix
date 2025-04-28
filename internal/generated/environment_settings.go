@@ -69,7 +69,6 @@ type EnvironmentSettingsResourceModel struct {
 	CustomStringsOverride       basetypes.ObjectValue `tfsdk:"channels_strings_override"`
 	CustomThemeOverride         basetypes.ObjectValue `tfsdk:"theme_override"`
 	DisableEndpointOnFailure    types.Bool            `tfsdk:"disable_endpoint_on_failure"`
-	DisplayName                 types.String          `tfsdk:"display_name"`
 	EnableChannels              types.Bool            `tfsdk:"enable_channels"`
 	EnableEndpointMtlsConfig    types.Bool            `tfsdk:"enable_endpoint_mtls_config"`
 	EnableEndpointOauthConfig   types.Bool            `tfsdk:"enable_endpoint_oauth_config"`
@@ -82,6 +81,22 @@ type EnvironmentSettingsResourceModel struct {
 	RequireEndpointChannel      types.Bool            `tfsdk:"require_endpoint_channel"`
 	WhitelabelHeaders           types.Bool            `tfsdk:"whitelabel_headers"`
 	WipeSuccessfulPayload       types.Bool            `tfsdk:"wipe_successful_payload"`
+
+	WhitelabelSettings basetypes.ObjectValue `tfsdk:"whitelabel_settings"`
+}
+
+type WhitelabelSettings struct {
+	DisplayName types.String `tfsdk:"display_name"`
+}
+
+func WhitelabelSettings_TF_AttributeTypes() map[string]attr.Type {
+	return map[string]attr.Type{
+		"display_name": types.StringType,
+	}
+}
+
+func (v *WhitelabelSettings) AttributeTypes() map[string]attr.Type {
+	return WhitelabelSettings_TF_AttributeTypes()
 }
 
 func PatchSettingsInternalInWithPlan(
@@ -119,6 +134,17 @@ func PatchSettingsInternalInWithPlan(
 		outModel.RequireEndpointChannel = existingModel.RequireEndpointChannel
 		outModel.WhitelabelHeaders = existingModel.WhitelabelHeaders
 		outModel.WipeSuccessfulPayload = existingModel.WipeSuccessfulPayload
+	}
+
+	if !planedModel.WhitelabelSettings.IsUnknown() && !planedModel.WhitelabelSettings.IsNull() {
+		var existingWhitelabelSettings WhitelabelSettings
+		d.Append(planedModel.WhitelabelSettings.As(ctx, &existingWhitelabelSettings, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    false,
+			UnhandledUnknownAsEmpty: false,
+		})...)
+		outModel.DisplayName = strOrNil(existingWhitelabelSettings.DisplayName)
+		Spw(outModel)
+
 	}
 	// override fields in outModel with variables from planed model
 	if !planedModel.ColorPaletteDark.IsUnknown() {
@@ -185,9 +211,6 @@ func PatchSettingsInternalInWithPlan(
 	}
 	if !planedModel.DisableEndpointOnFailure.IsUnknown() {
 		outModel.DisableEndpointOnFailure = planedModel.DisableEndpointOnFailure.ValueBoolPointer()
-	}
-	if !planedModel.DisplayName.IsUnknown() {
-		outModel.DisplayName = planedModel.DisplayName.ValueStringPointer()
 	}
 	if !planedModel.EnableChannels.IsUnknown() {
 		outModel.EnableChannels = planedModel.EnableChannels.ValueBoolPointer()
@@ -471,3 +494,19 @@ func PatchBorderRadiusConfigWithPlan(
 	}
 	return outModel
 }
+
+// if unknown return nil, else return value
+func strOrNil(v types.String) *string {
+	if v.IsUnknown() {
+		return nil
+	}
+	return v.ValueStringPointer()
+}
+
+// // if unknown return nil, else return value
+// func boolOrNil(v types.Bool) *bool {
+// 	if v.IsUnknown() {
+// 		return nil
+// 	}
+// 	return v.ValueBoolPointer()
+// }

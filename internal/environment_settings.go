@@ -130,6 +130,20 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"whitelabel_settings": schema.SingleNestedAttribute{
+				PlanModifiers:       []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				Optional:            true,
+				MarkdownDescription: "Customize how the [Consumer App Portal](https://docs.svix.com/management-ui) will look for your users in this environment.",
+				Attributes: map[string]schema.Attribute{
+					"display_name": schema.StringAttribute{
+						Optional:            true,
+						Computed:            true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Description:         "Display Name",
+						MarkdownDescription: "The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).",
+					},
+				},
+			},
 			"color_palette_dark":  colorPaletteSchema,
 			"color_palette_light": colorPaletteSchema,
 			"base_font_size": schema.Int64Attribute{
@@ -238,13 +252,6 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 some time, we will automatically disable the endpoint and let 
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
 more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endpoints).`,
-			},
-			"display_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Description:         "Display Name",
-				MarkdownDescription: "The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).",
 			},
 			"enable_channels": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
@@ -371,6 +378,8 @@ func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
+	Spw(data)
+
 	// create svix client
 	svx, err := r.state.InternalClientWithEnvId(envId)
 	if err != nil {
@@ -490,13 +499,13 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		ColorPaletteLight:           basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
 		CustomStringsOverride:       basetypes.NewObjectNull(generated.CustomStringsOverride_TF_AttributeTypes()),
 		CustomThemeOverride:         basetypes.NewObjectNull(generated.CustomThemeOverride_TF_AttributeTypes()),
+		WhitelabelSettings:          basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
 		EnvironmentId:               types.StringValue(envId),
 		CustomBaseFontSize:          types.Int64PointerValue(v.CustomBaseFontSize),
 		CustomFontFamily:            types.StringPointerValue(v.CustomFontFamily),
 		CustomFontFamilyUrl:         types.StringPointerValue(v.CustomFontFamilyUrl),
 		CustomLogoUrl:               types.StringPointerValue(v.CustomLogoUrl),
 		DisableEndpointOnFailure:    types.BoolPointerValue(v.DisableEndpointOnFailure),
-		DisplayName:                 types.StringPointerValue(v.DisplayName),
 		EnableChannels:              types.BoolPointerValue(v.EnableChannels),
 		EnableEndpointMtlsConfig:    types.BoolPointerValue(v.EnableEndpointMtlsConfig),
 		EnableEndpointOauthConfig:   types.BoolPointerValue(v.EnableEndpointOauthConfig),
@@ -510,6 +519,20 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		WhitelabelHeaders:           types.BoolPointerValue(v.WhitelabelHeaders),
 		WipeSuccessfulPayload:       types.BoolPointerValue(v.WipeSuccessfulPayload),
 	}
+
+	//  whitelabelSettings
+	Spw(v)
+	whitelabelSettingsTf := generated.WhitelabelSettings{
+		DisplayName: types.StringPointerValue(v.DisplayName),
+	}
+	Spw(whitelabelSettingsTf)
+	whitelabelSettings, diags := types.ObjectValueFrom(ctx, whitelabelSettingsTf.AttributeTypes(), whitelabelSettingsTf)
+	Spw(whitelabelSettings)
+	out.WhitelabelSettings = whitelabelSettings
+	d.Append(diags...)
+
+	//  end whitelabelSettings
+
 	if v.ColorPaletteDark != nil {
 		colorPaletteDarkTf := customColorPaletteToTF(*v.ColorPaletteDark)
 		colorPaletteDark, diags := types.ObjectValueFrom(ctx, colorPaletteDarkTf.AttributeTypes(), colorPaletteDarkTf)
