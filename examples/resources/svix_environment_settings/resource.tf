@@ -6,26 +6,10 @@ resource "svix_environment" "example_environment" {
 resource "svix_environment_settings" "example_environment_settings" {
   environment_id = svix_environment.example_environment.id
   color_palette_dark = {
-    background_hover     = "#1A202C"
-    background_primary   = "#1A202C"
-    background_secondary = "#171923"
-    button_primary       = "#4299E1"
-    interactive_accent   = "#4299E1"
-    navigation_accent    = "#4299E1"
-    primary              = "#3182CE"
-    text_danger          = "#FC8181"
-    text_primary         = "#FFFFFF"
+    primary = "#3182CE"
   }
   color_palette_light = {
-    background_hover     = "#EDF2F7"
-    background_primary   = "#F8F9FD"
-    background_secondary = "#FFFFFF"
-    button_primary       = "#3182CE"
-    interactive_accent   = "#3182CE"
-    navigation_accent    = "#3182CE"
-    primary              = "#3182CE"
-    text_danger          = "#E53E3E"
-    text_primary         = "#1A202C"
+    primary = "#3182CE"
   }
   base_font_size  = 16
   font_family     = "Custom"
