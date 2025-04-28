@@ -45,12 +45,13 @@ resource "svix_environment_settings" "example_environment_settings" {
   base_font_size  = 16
   font_family     = "Custom"
   font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
+  logo_url        = "https://www.example.com/static/logo.png"
   custom_strings_override = {
     channels_one  = "channel"
     channels_many = "channels"
     channels_help = "Channels are an extra dimension of filtering messages orthogonal to event types. They are case-sensitive and only messages with the corresponding channel will be sent to this endpoint."
   }
-  custom_theme_override = {
+  theme_override = {
     border_radius = {
       button = "full"
       card   = "lg"
@@ -86,9 +87,7 @@ resource "svix_environment_settings" "example_environment_settings" {
 - `base_font_size` (Number) This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px
 - `color_palette_dark` (Attributes) (see [below for nested schema](#nestedatt--color_palette_dark))
 - `color_palette_light` (Attributes) (see [below for nested schema](#nestedatt--color_palette_light))
-- `custom_logo_url` (String) Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).
 - `custom_strings_override` (Attributes) Rename 'channels' in the App Portal, depending on the usage you give them in your application. (see [below for nested schema](#nestedatt--custom_strings_override))
-- `custom_theme_override` (Attributes) (see [below for nested schema](#nestedatt--custom_theme_override))
 - `disable_endpoint_on_failure` (Boolean) If messages to a particular endpoint have been consistently failing for
 some time, we will automatically disable the endpoint and let 
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
@@ -116,8 +115,10 @@ If you chose to use the `font_family_url` make sure to set this to `Custom`
 - `font_family_url` (String) URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)
 
 Make sure to set `font_family` to `Custom`
+- `logo_url` (String) Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).
 - `read_only` (Boolean) Sets your Consumer App Portal to read only so your customers can view but not modify their data
 - `require_endpoint_channel` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
+- `theme_override` (Attributes) (see [below for nested schema](#nestedatt--theme_override))
 - `whitelabel_headers` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Changes the prefix of the webhook HTTP headers to use the`webhook-` prefix. <strong>Changing this setting can break existing integrations</strong>
 - `wipe_successful_payload` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Delete message payloads from Svix after they are successfully
 delivered to the endpoint. Only affects messages sent after this
@@ -165,15 +166,15 @@ Optional:
 - `channels_one` (String) Singular form.
 
 
-<a id="nestedatt--custom_theme_override"></a>
-### Nested Schema for `custom_theme_override`
+<a id="nestedatt--theme_override"></a>
+### Nested Schema for `theme_override`
 
 Optional:
 
-- `border_radius` (Attributes) Borders (see [below for nested schema](#nestedatt--custom_theme_override--border_radius))
+- `border_radius` (Attributes) Borders (see [below for nested schema](#nestedatt--theme_override--border_radius))
 
-<a id="nestedatt--custom_theme_override--border_radius"></a>
-### Nested Schema for `custom_theme_override.border_radius`
+<a id="nestedatt--theme_override--border_radius"></a>
+### Nested Schema for `theme_override.border_radius`
 
 Optional:
 

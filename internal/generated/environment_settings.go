@@ -65,9 +65,9 @@ type EnvironmentSettingsResourceModel struct {
 	CustomBaseFontSize          types.Int64           `tfsdk:"base_font_size"`
 	CustomFontFamily            types.String          `tfsdk:"font_family"`
 	CustomFontFamilyUrl         types.String          `tfsdk:"font_family_url"`
-	CustomLogoUrl               types.String          `tfsdk:"custom_logo_url"`
+	CustomLogoUrl               types.String          `tfsdk:"logo_url"`
 	CustomStringsOverride       basetypes.ObjectValue `tfsdk:"custom_strings_override"`
-	CustomThemeOverride         basetypes.ObjectValue `tfsdk:"custom_theme_override"`
+	CustomThemeOverride         basetypes.ObjectValue `tfsdk:"theme_override"`
 	DisableEndpointOnFailure    types.Bool            `tfsdk:"disable_endpoint_on_failure"`
 	DisplayName                 types.String          `tfsdk:"display_name"`
 	EnableChannels              types.Bool            `tfsdk:"enable_channels"`

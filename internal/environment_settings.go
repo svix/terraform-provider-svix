@@ -218,7 +218,7 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 				MarkdownDescription: "URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)\n\n" +
 					"Make sure to set `font_family` to `Custom`",
 			},
-			"custom_logo_url": schema.StringAttribute{
+			"logo_url": schema.StringAttribute{
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Optional:            true,
 				Description:         "Icon URL",
@@ -246,7 +246,7 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 					},
 				},
 			},
-			"custom_theme_override": schema.SingleNestedAttribute{
+			"theme_override": schema.SingleNestedAttribute{
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"border_radius": schema.SingleNestedAttribute{

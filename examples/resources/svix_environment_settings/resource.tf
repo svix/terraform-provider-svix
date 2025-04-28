@@ -30,12 +30,13 @@ resource "svix_environment_settings" "example_environment_settings" {
   base_font_size  = 16
   font_family     = "Custom"
   font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
+  logo_url        = "https://www.example.com/static/logo.png"
   custom_strings_override = {
     channels_one  = "channel"
     channels_many = "channels"
     channels_help = "Channels are an extra dimension of filtering messages orthogonal to event types. They are case-sensitive and only messages with the corresponding channel will be sent to this endpoint."
   }
-  custom_theme_override = {
+  theme_override = {
     border_radius = {
       button = "full"
       card   = "lg"
