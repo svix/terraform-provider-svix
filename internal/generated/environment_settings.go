@@ -63,7 +63,6 @@ type EnvironmentSettingsResourceModel struct {
 	ColorPaletteDark            basetypes.ObjectValue `tfsdk:"color_palette_dark"`
 	ColorPaletteLight           basetypes.ObjectValue `tfsdk:"color_palette_light"`
 	CustomStringsOverride       basetypes.ObjectValue `tfsdk:"channels_strings_override"`
-	CustomThemeOverride         basetypes.ObjectValue `tfsdk:"theme_override"`
 	DisableEndpointOnFailure    types.Bool            `tfsdk:"disable_endpoint_on_failure"`
 	EnableChannels              types.Bool            `tfsdk:"enable_channels"`
 	EnableEndpointMtlsConfig    types.Bool            `tfsdk:"enable_endpoint_mtls_config"`
@@ -87,6 +86,8 @@ type WhitelabelSettings struct {
 	CustomFontFamily    types.String `tfsdk:"font_family"`
 	CustomFontFamilyUrl types.String `tfsdk:"font_family_url"`
 	CustomLogoUrl       types.String `tfsdk:"logo_url"`
+
+	BorderRadius basetypes.ObjectValue `tfsdk:"border_radius"`
 }
 
 func WhitelabelSettings_TF_AttributeTypes() map[string]attr.Type {
@@ -96,6 +97,14 @@ func WhitelabelSettings_TF_AttributeTypes() map[string]attr.Type {
 		"font_family":     types.StringType,
 		"font_family_url": types.StringType,
 		"logo_url":        types.StringType,
+
+		"border_radius": basetypes.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"button": types.StringType,
+				"card":   types.StringType,
+				"input":  types.StringType,
+			},
+		},
 	}
 }
 
@@ -161,7 +170,34 @@ func PatchSettingsInternalInWithPlan(
 		if !planedWhitelabelSettings.CustomLogoUrl.IsUnknown() {
 			outModel.CustomLogoUrl = planedWhitelabelSettings.CustomLogoUrl.ValueStringPointer()
 		}
-		Spw(outModel)
+
+		{
+			var planedBorderRadius BorderRadius
+			d.Append(planedWhitelabelSettings.BorderRadius.As(ctx, &planedBorderRadius, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    false,
+				UnhandledUnknownAsEmpty: false,
+			})...)
+			if !planedBorderRadius.Button.IsUnknown() || !planedBorderRadius.Card.IsUnknown() || !planedBorderRadius.Input.IsUnknown() {
+				borderRadiusOut := svixmodels.BorderRadiusConfig{
+					Button: nil,
+					Card:   nil,
+					Input:  nil,
+				}
+				if !planedBorderRadius.Button.IsUnknown() && !planedBorderRadius.Button.IsNull() {
+					borderRadiusOut.Button = ptr(svixmodels.BorderRadiusEnumFromString[planedBorderRadius.Button.ValueString()])
+				}
+				if !planedBorderRadius.Card.IsUnknown() && !planedBorderRadius.Card.IsNull() {
+					borderRadiusOut.Card = ptr(svixmodels.BorderRadiusEnumFromString[planedBorderRadius.Card.ValueString()])
+				}
+				if !planedBorderRadius.Input.IsUnknown() && !planedBorderRadius.Input.IsNull() {
+					borderRadiusOut.Input = ptr(svixmodels.BorderRadiusEnumFromString[planedBorderRadius.Input.ValueString()])
+				}
+				outModel.CustomThemeOverride = &svixmodels.CustomThemeOverride{
+					BorderRadius: &borderRadiusOut,
+				}
+			}
+
+		}
 
 	}
 	// override fields in outModel with variables from planed model
@@ -199,19 +235,6 @@ func PatchSettingsInternalInWithPlan(
 				UnhandledUnknownAsEmpty: false,
 			})...)
 			outModel.CustomStringsOverride = ptr(PatchCustomStringsOverrideWithPlan(ctx, d, existingModel.CustomStringsOverride, existingCustomStringsOverride))
-		}
-	}
-
-	if !planedModel.CustomThemeOverride.IsUnknown() {
-		if planedModel.CustomThemeOverride.IsNull() {
-			outModel.CustomThemeOverride = nil
-		} else {
-			var existingCustomThemeOverride CustomThemeOverride_TF
-			d.Append(planedModel.CustomThemeOverride.As(ctx, &existingCustomThemeOverride, basetypes.ObjectAsOptions{
-				UnhandledNullAsEmpty:    false,
-				UnhandledUnknownAsEmpty: false,
-			})...)
-			outModel.CustomThemeOverride = ptr(PatchCustomThemeOverrideWithPlan(ctx, d, existingModel.CustomThemeOverride, existingCustomThemeOverride))
 		}
 	}
 
@@ -386,87 +409,28 @@ func PatchCustomStringsOverrideWithPlan(
 	return outModel
 }
 
-// Terraform wrapper around `svixmodels.CustomThemeOverride`
-type CustomThemeOverride_TF struct {
-	BorderRadius basetypes.ObjectValue `tfsdk:"border_radius"`
-}
-
-func CustomThemeOverride_TF_AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{
-		"border_radius": basetypes.ObjectType{
-			AttrTypes: map[string]attr.Type{
-				"button": types.StringType,
-				"card":   types.StringType,
-				"input":  types.StringType,
-			},
-		},
-	}
-}
-
-func (v *CustomThemeOverride_TF) AttributeTypes() map[string]attr.Type {
-	return CustomThemeOverride_TF_AttributeTypes()
-}
-
-func PatchCustomThemeOverrideWithPlan(
-	ctx context.Context,
-	d *diag.Diagnostics,
-	existingModel *svixmodels.CustomThemeOverride,
-	planedModel CustomThemeOverride_TF,
-) svixmodels.CustomThemeOverride {
-	// initialize model as empty
-	outModel := svixmodels.CustomThemeOverride{}
-	// load variables from the existing model
-	if existingModel != nil {
-		outModel.BorderRadius = existingModel.BorderRadius
-		outModel.FontSize = existingModel.FontSize
-	}
-	// override fields in outModel with variables from planed model
-	if !planedModel.BorderRadius.IsUnknown() {
-		if planedModel.BorderRadius.IsNull() {
-			outModel.BorderRadius = nil
-		} else {
-			var existingBorderRadius BorderRadiusConfig_TF
-			d.Append(planedModel.BorderRadius.As(ctx, &existingBorderRadius, basetypes.ObjectAsOptions{
-				UnhandledNullAsEmpty:    false,
-				UnhandledUnknownAsEmpty: false,
-			})...)
-			var existingBorderRadiusConfig *svixmodels.BorderRadiusConfig
-			if existingModel != nil {
-				if existingModel.BorderRadius != nil {
-					existingBorderRadiusConfig = existingModel.BorderRadius
-				}
-			}
-
-			outModel.BorderRadius = ptr(PatchBorderRadiusConfigWithPlan(ctx, d, existingBorderRadiusConfig, existingBorderRadius))
-		}
-
-	}
-	return outModel
-}
-
-// Terraform wrapper around `svixmodels.BorderRadiusConfig`
-type BorderRadiusConfig_TF struct {
+type BorderRadius struct {
 	Button types.String `tfsdk:"button"`
 	Card   types.String `tfsdk:"card"`
 	Input  types.String `tfsdk:"input"`
 }
 
-func BorderRadiusConfig_TF_AttributeTypes() map[string]attr.Type {
+func BorderRadius_AttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
 		"button": types.StringType,
 		"card":   types.StringType,
 		"input":  types.StringType,
 	}
 }
-func (v *BorderRadiusConfig_TF) AttributeTypes() map[string]attr.Type {
-	return BorderRadiusConfig_TF_AttributeTypes()
+func (v *BorderRadius) AttributeTypes() map[string]attr.Type {
+	return BorderRadius_AttributeTypes()
 }
 
 func PatchBorderRadiusConfigWithPlan(
 	ctx context.Context,
 	d *diag.Diagnostics,
 	existingModel *svixmodels.BorderRadiusConfig,
-	planedModel BorderRadiusConfig_TF,
+	planedModel BorderRadius,
 ) svixmodels.BorderRadiusConfig {
 	// initialize model as empty
 	outModel := svixmodels.BorderRadiusConfig{}
@@ -500,3 +464,11 @@ func PatchBorderRadiusConfigWithPlan(
 	}
 	return outModel
 }
+
+// // if unknown return nil, else return value
+// func strOrNil(v types.String) *string {
+// 	if v.IsUnknown() {
+// 		return nil
+// 	}
+// 	return v.ValueStringPointer()
+// }

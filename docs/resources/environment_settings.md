@@ -93,7 +93,6 @@ method, destination URL, and payload body in-flight.
 - `event_catalog_published` (Boolean) Enable this to make your Event Catalog public. You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog
 - `read_only` (Boolean) Sets your Consumer App Portal to read only so your customers can view but not modify their data
 - `require_endpoint_channel` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
-- `theme_override` (Attributes) (see [below for nested schema](#nestedatt--theme_override))
 - `whitelabel_headers` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Changes the prefix of the webhook HTTP headers to use the`webhook-` prefix. <strong>Changing this setting can break existing integrations</strong>
 - `whitelabel_settings` (Attributes) Customize how the [Consumer App Portal](https://docs.svix.com/management-ui) will look for your users in this environment. (see [below for nested schema](#nestedatt--whitelabel_settings))
 - `wipe_successful_payload` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Delete message payloads from Svix after they are successfully
@@ -142,30 +141,13 @@ Optional:
 - `text_primary` (String) Text Primary
 
 
-<a id="nestedatt--theme_override"></a>
-### Nested Schema for `theme_override`
-
-Optional:
-
-- `border_radius` (Attributes) Borders (see [below for nested schema](#nestedatt--theme_override--border_radius))
-
-<a id="nestedatt--theme_override--border_radius"></a>
-### Nested Schema for `theme_override.border_radius`
-
-Optional:
-
-- `button` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
-- `card` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
-- `input` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
-
-
-
 <a id="nestedatt--whitelabel_settings"></a>
 ### Nested Schema for `whitelabel_settings`
 
 Optional:
 
 - `base_font_size` (Number) This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px
+- `border_radius` (Attributes) Borders (see [below for nested schema](#nestedatt--whitelabel_settings--border_radius))
 - `display_name` (String) The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).
 - `font_family` (String) Can be one of `Helvetica`, `Roboto`, `Open Sans`, `Lato`, `Source Sans Pro`, `Raleway`, `Ubuntu`, `Manrope`, `DM Sans`, `Poppins`, `Lexend Deca`, `Rubik` and `Custom`
 
@@ -176,3 +158,12 @@ If you chose to use the `font_family_url` make sure to set this to `Custom`
 
 Make sure to set `font_family` to `Custom`
 - `logo_url` (String) Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).
+
+<a id="nestedatt--whitelabel_settings--border_radius"></a>
+### Nested Schema for `whitelabel_settings.border_radius`
+
+Optional:
+
+- `button` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
+- `card` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
+- `input` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped

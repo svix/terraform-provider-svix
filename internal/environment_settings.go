@@ -179,35 +179,7 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 						Description:         "Icon URL",
 						MarkdownDescription: "Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).",
 					},
-				},
-			},
-			"color_palette_dark":  colorPaletteSchema,
-			"color_palette_light": colorPaletteSchema,
-			"channels_strings_override": schema.SingleNestedAttribute{
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Description:   "Rename 'channels' in the App Portal, depending on the usage you give them in your application.",
-				Attributes: map[string]schema.Attribute{
-					"channels_help": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Channels help text.",
-					},
-					"channels_many": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Plural form.",
-					},
-					"channels_one": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Singular form.",
-					},
-				},
-			},
-			"theme_override": schema.SingleNestedAttribute{
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
+
 					"border_radius": schema.SingleNestedAttribute{
 						Optional:    true,
 						Description: "Borders",
@@ -240,6 +212,30 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 								MarkdownDescription: "Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped",
 							},
 						},
+					},
+				},
+			},
+			"color_palette_dark":  colorPaletteSchema,
+			"color_palette_light": colorPaletteSchema,
+			"channels_strings_override": schema.SingleNestedAttribute{
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				Optional:      true,
+				Description:   "Rename 'channels' in the App Portal, depending on the usage you give them in your application.",
+				Attributes: map[string]schema.Attribute{
+					"channels_help": schema.StringAttribute{
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:      true,
+						Description:   "Channels help text.",
+					},
+					"channels_many": schema.StringAttribute{
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:      true,
+						Description:   "Plural form.",
+					},
+					"channels_one": schema.StringAttribute{
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:      true,
+						Description:   "Singular form.",
 					},
 				},
 			},
@@ -498,7 +494,6 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		ColorPaletteDark:            basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
 		ColorPaletteLight:           basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
 		CustomStringsOverride:       basetypes.NewObjectNull(generated.CustomStringsOverride_TF_AttributeTypes()),
-		CustomThemeOverride:         basetypes.NewObjectNull(generated.CustomThemeOverride_TF_AttributeTypes()),
 		WhitelabelSettings:          basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
 		EnvironmentId:               types.StringValue(envId),
 		DisableEndpointOnFailure:    types.BoolPointerValue(v.DisableEndpointOnFailure),
@@ -516,21 +511,33 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		WipeSuccessfulPayload:       types.BoolPointerValue(v.WipeSuccessfulPayload),
 	}
 
-	//  whitelabelSettings
+	{
 
-	whitelabelSettingsTf := generated.WhitelabelSettings{
-		DisplayName:         types.StringPointerValue(v.DisplayName),
-		CustomBaseFontSize:  types.Int64PointerValue(v.CustomBaseFontSize),
-		CustomFontFamily:    types.StringPointerValue(v.CustomFontFamily),
-		CustomFontFamilyUrl: types.StringPointerValue(v.CustomFontFamilyUrl),
-		CustomLogoUrl:       types.StringPointerValue(v.CustomLogoUrl),
+		whitelabelSettingsTf := generated.WhitelabelSettings{
+			BorderRadius:        basetypes.NewObjectNull(generated.BorderRadius_AttributeTypes()),
+			DisplayName:         types.StringPointerValue(v.DisplayName),
+			CustomBaseFontSize:  types.Int64PointerValue(v.CustomBaseFontSize),
+			CustomFontFamily:    types.StringPointerValue(v.CustomFontFamily),
+			CustomFontFamilyUrl: types.StringPointerValue(v.CustomFontFamilyUrl),
+			CustomLogoUrl:       types.StringPointerValue(v.CustomLogoUrl),
+		}
+		if v.CustomThemeOverride != nil {
+			if v.CustomThemeOverride.BorderRadius != nil {
+				existingBorderRadius := v.CustomThemeOverride.BorderRadius
+				borderRadiusTf := generated.BorderRadius{
+					Button: types.StringPointerValue((*string)(existingBorderRadius.Button)),
+					Card:   types.StringPointerValue((*string)(existingBorderRadius.Card)),
+					Input:  types.StringPointerValue((*string)(existingBorderRadius.Input)),
+				}
+				borderRadius, diags := types.ObjectValueFrom(ctx, borderRadiusTf.AttributeTypes(), borderRadiusTf)
+				d.Append(diags...)
+				whitelabelSettingsTf.BorderRadius = borderRadius
+			}
+		}
+		whitelabelSettings, diags := types.ObjectValueFrom(ctx, whitelabelSettingsTf.AttributeTypes(), whitelabelSettingsTf)
+		d.Append(diags...)
+		out.WhitelabelSettings = whitelabelSettings
 	}
-	whitelabelSettings, diags := types.ObjectValueFrom(ctx, whitelabelSettingsTf.AttributeTypes(), whitelabelSettingsTf)
-
-	out.WhitelabelSettings = whitelabelSettings
-	d.Append(diags...)
-
-	//  end whitelabelSettings
 
 	if v.ColorPaletteDark != nil {
 		colorPaletteDarkTf := customColorPaletteToTF(*v.ColorPaletteDark)
@@ -553,25 +560,6 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		}
 		customStringsOverride, diags := types.ObjectValueFrom(ctx, customStringsOverrideTF.AttributeTypes(), customStringsOverrideTF)
 		out.CustomStringsOverride = customStringsOverride
-		d.Append(diags...)
-	}
-
-	if v.CustomThemeOverride != nil {
-		customThemeOverrideTF := generated.CustomThemeOverride_TF{
-			BorderRadius: basetypes.NewObjectNull(generated.BorderRadiusConfig_TF_AttributeTypes()),
-		}
-		if v.CustomThemeOverride.BorderRadius != nil {
-			borderRadiusTF := generated.BorderRadiusConfig_TF{
-				Button: BorderRadiusEnumStringValue(v.CustomThemeOverride.BorderRadius.Button),
-				Card:   BorderRadiusEnumStringValue(v.CustomThemeOverride.BorderRadius.Card),
-				Input:  BorderRadiusEnumStringValue(v.CustomThemeOverride.BorderRadius.Input),
-			}
-			borderRadius, diags := types.ObjectValueFrom(ctx, borderRadiusTF.AttributeTypes(), borderRadiusTF)
-			customThemeOverrideTF.BorderRadius = borderRadius
-			d.Append(diags...)
-		}
-		customThemeOverride, diags := types.ObjectValueFrom(ctx, customThemeOverrideTF.AttributeTypes(), customThemeOverrideTF)
-		out.CustomThemeOverride = customThemeOverride
 		d.Append(diags...)
 	}
 
