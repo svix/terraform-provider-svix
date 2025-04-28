@@ -170,7 +170,7 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 					},
 				},
 			},
-			"custom_base_font_size": schema.Int64Attribute{
+			"base_font_size": schema.Int64Attribute{
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 				Validators: []validator.Int64{
 					// this is the limit we have in the front-end

@@ -42,7 +42,7 @@ resource "svix_environment_settings" "example_environment_settings" {
     text_danger          = "#E53E3E"
     text_primary         = "#1A202C"
   }
-  custom_base_font_size  = 16
+  base_font_size         = 16
   custom_font_family     = "Custom"
   custom_font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
   custom_strings_override = {
@@ -83,9 +83,9 @@ resource "svix_environment_settings" "example_environment_settings" {
 
 ### Optional
 
+- `base_font_size` (Number) This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px
 - `color_palette_dark` (Attributes) (see [below for nested schema](#nestedatt--color_palette_dark))
 - `color_palette_light` (Attributes) (see [below for nested schema](#nestedatt--color_palette_light))
-- `custom_base_font_size` (Number) This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px
 - `custom_color` (String)
 - `custom_font_family` (String) You can also set a custom font by providing a URL to a font file. 
 

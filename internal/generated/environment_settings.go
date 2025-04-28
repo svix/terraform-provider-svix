@@ -62,7 +62,7 @@ type EnvironmentSettingsResourceModel struct {
 	EnvironmentId               types.String          `tfsdk:"environment_id"`
 	ColorPaletteDark            basetypes.ObjectValue `tfsdk:"color_palette_dark"`
 	ColorPaletteLight           basetypes.ObjectValue `tfsdk:"color_palette_light"`
-	CustomBaseFontSize          types.Int64           `tfsdk:"custom_base_font_size"`
+	CustomBaseFontSize          types.Int64           `tfsdk:"base_font_size"`
 	CustomColor                 types.String          `tfsdk:"custom_color"`
 	CustomFontFamily            types.String          `tfsdk:"custom_font_family"`
 	CustomFontFamilyUrl         types.String          `tfsdk:"custom_font_family_url"`
