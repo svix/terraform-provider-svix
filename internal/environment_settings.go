@@ -185,21 +185,21 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Optional:      true,
 			},
-			"custom_font_family": schema.StringAttribute{
+			"font_family": schema.StringAttribute{
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators:    []validator.String{customFontFamilyValidator{}},
 				Optional:      true,
-				Description:   "Custom Font",
+				Description:   "Font Family",
 				MarkdownDescription: "You can also set a custom font by providing a URL to a font file. \n\n" +
-					"If you chose to use the `custom_font_family_url` make sure to set this to `Custom`",
+					"If you chose to use the `font_family_url` make sure to set this to `Custom`",
 			},
-			"custom_font_family_url": schema.StringAttribute{
+			"font_family_url": schema.StringAttribute{
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators:    []validator.String{customFontURLValidator{}},
 				Optional:      true,
-				Description:   "Custom Font URL",
+				Description:   "Font Family URL",
 				MarkdownDescription: "URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)\n\n" +
-					"Make sure to set `custom_font_family` to `Custom`",
+					"Make sure to set `font_family` to `Custom`",
 			},
 			"custom_logo_url": schema.StringAttribute{
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},

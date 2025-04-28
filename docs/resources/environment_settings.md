@@ -42,9 +42,9 @@ resource "svix_environment_settings" "example_environment_settings" {
     text_danger          = "#E53E3E"
     text_primary         = "#1A202C"
   }
-  base_font_size         = 16
-  custom_font_family     = "Custom"
-  custom_font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
+  base_font_size  = 16
+  font_family     = "Custom"
+  font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
   custom_strings_override = {
     channels_one  = "channel"
     channels_many = "channels"
@@ -87,12 +87,6 @@ resource "svix_environment_settings" "example_environment_settings" {
 - `color_palette_dark` (Attributes) (see [below for nested schema](#nestedatt--color_palette_dark))
 - `color_palette_light` (Attributes) (see [below for nested schema](#nestedatt--color_palette_light))
 - `custom_color` (String)
-- `custom_font_family` (String) You can also set a custom font by providing a URL to a font file. 
-
-If you chose to use the `custom_font_family_url` make sure to set this to `Custom`
-- `custom_font_family_url` (String) URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)
-
-Make sure to set `custom_font_family` to `Custom`
 - `custom_logo_url` (String) Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).
 - `custom_strings_override` (Attributes) Rename 'channels' in the App Portal, depending on the usage you give them in your application. (see [below for nested schema](#nestedatt--custom_strings_override))
 - `custom_theme_override` (Attributes) (see [below for nested schema](#nestedatt--custom_theme_override))
@@ -115,6 +109,12 @@ endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.
 - `enforce_https` (Boolean) Enforces HTTPS on all endpoints of this environment
 - `event_catalog_published` (Boolean) Enable this to make your Event Catalog public. You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog
+- `font_family` (String) You can also set a custom font by providing a URL to a font file. 
+
+If you chose to use the `font_family_url` make sure to set this to `Custom`
+- `font_family_url` (String) URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)
+
+Make sure to set `font_family` to `Custom`
 - `read_only` (Boolean) Sets your Consumer App Portal to read only so your customers can view but not modify their data
 - `require_endpoint_channel` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
 - `whitelabel_headers` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Changes the prefix of the webhook HTTP headers to use the`webhook-` prefix. <strong>Changing this setting can break existing integrations</strong>

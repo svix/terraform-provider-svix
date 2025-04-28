@@ -27,9 +27,9 @@ resource "svix_environment_settings" "example_environment_settings" {
     text_danger          = "#E53E3E"
     text_primary         = "#1A202C"
   }
-  base_font_size         = 16
-  custom_font_family     = "Custom"
-  custom_font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
+  base_font_size  = 16
+  font_family     = "Custom"
+  font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
   custom_strings_override = {
     channels_one  = "channel"
     channels_many = "channels"

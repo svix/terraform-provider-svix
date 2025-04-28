@@ -64,8 +64,8 @@ type EnvironmentSettingsResourceModel struct {
 	ColorPaletteLight           basetypes.ObjectValue `tfsdk:"color_palette_light"`
 	CustomBaseFontSize          types.Int64           `tfsdk:"base_font_size"`
 	CustomColor                 types.String          `tfsdk:"custom_color"`
-	CustomFontFamily            types.String          `tfsdk:"custom_font_family"`
-	CustomFontFamilyUrl         types.String          `tfsdk:"custom_font_family_url"`
+	CustomFontFamily            types.String          `tfsdk:"font_family"`
+	CustomFontFamilyUrl         types.String          `tfsdk:"font_family_url"`
 	CustomLogoUrl               types.String          `tfsdk:"custom_logo_url"`
 	CustomStringsOverride       basetypes.ObjectValue `tfsdk:"custom_strings_override"`
 	CustomThemeOverride         basetypes.ObjectValue `tfsdk:"custom_theme_override"`
