@@ -5,25 +5,32 @@ resource "svix_environment" "example_environment" {
 
 resource "svix_environment_settings" "example_environment_settings" {
   environment_id = svix_environment.example_environment.id
-  color_palette_dark = {
-    primary = "#3182CE"
-  }
-  color_palette_light = {
-    primary = "#3182CE"
-  }
-  base_font_size  = 16
-  font_family     = "Custom"
-  font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
-  logo_url        = "https://www.example.com/static/logo.png"
-  theme_override = {
+  whitelabel_settings = {
+    display_name    = "My Company"
+    logo_url        = "https://www.example.com/static/logo.png"
+    base_font_size  = 16
+    font_family     = "Custom"
+    font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
+    color_palette_dark = {
+      primary = "#3182CE"
+    }
+    color_palette_light = {
+      primary = "#3182CE"
+    }
     border_radius = {
       button = "full"
       card   = "lg"
       input  = "none"
     }
+    # Advanced settings
+    channels_strings_override = {
+      channels_one  = "channel"
+      channels_many = "channels"
+      channels_help = "Channels are an extra dimension of filtering messages orthogonal to event types. They are case-sensitive and only messages with the corresponding channel will be sent to this endpoint."
+    }
   }
+
   disable_endpoint_on_failure    = false
-  display_name                   = "My company"
   enable_channels                = false
   enable_endpoint_mtls_config    = false # Requires Enterprise plan
   enable_endpoint_oauth_config   = false # Requires Enterprise plan
@@ -36,11 +43,4 @@ resource "svix_environment_settings" "example_environment_settings" {
   require_endpoint_channel       = false
   whitelabel_headers             = false # Requires Pro or Enterprise plan
   wipe_successful_payload        = false # Requires Pro or Enterprise plan
-
-  # Advanced settings
-  channels_strings_override = {
-    channels_one  = "channel"
-    channels_many = "channels"
-    channels_help = "Channels are an extra dimension of filtering messages orthogonal to event types. They are case-sensitive and only messages with the corresponding channel will be sent to this endpoint."
-  }
 }

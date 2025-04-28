@@ -59,21 +59,20 @@ func PatchFontSizeConfigWithPlan(
 
 // Terraform wrapper around `svixmodels.SettingsInternalIn`
 type EnvironmentSettingsResourceModel struct {
-	EnvironmentId               types.String          `tfsdk:"environment_id"`
-	CustomStringsOverride       basetypes.ObjectValue `tfsdk:"channels_strings_override"`
-	DisableEndpointOnFailure    types.Bool            `tfsdk:"disable_endpoint_on_failure"`
-	EnableChannels              types.Bool            `tfsdk:"enable_channels"`
-	EnableEndpointMtlsConfig    types.Bool            `tfsdk:"enable_endpoint_mtls_config"`
-	EnableEndpointOauthConfig   types.Bool            `tfsdk:"enable_endpoint_oauth_config"`
-	EnableIntegrationManagement types.Bool            `tfsdk:"enable_integration_management"`
-	EnableMessageStream         types.Bool            `tfsdk:"enable_advanced_endpoint_types"`
-	EnableTransformations       types.Bool            `tfsdk:"enable_transformations"`
-	EnforceHttps                types.Bool            `tfsdk:"enforce_https"`
-	EventCatalogPublished       types.Bool            `tfsdk:"event_catalog_published"`
-	ReadOnly                    types.Bool            `tfsdk:"read_only"`
-	RequireEndpointChannel      types.Bool            `tfsdk:"require_endpoint_channel"`
-	WhitelabelHeaders           types.Bool            `tfsdk:"whitelabel_headers"`
-	WipeSuccessfulPayload       types.Bool            `tfsdk:"wipe_successful_payload"`
+	EnvironmentId               types.String `tfsdk:"environment_id"`
+	DisableEndpointOnFailure    types.Bool   `tfsdk:"disable_endpoint_on_failure"`
+	EnableChannels              types.Bool   `tfsdk:"enable_channels"`
+	EnableEndpointMtlsConfig    types.Bool   `tfsdk:"enable_endpoint_mtls_config"`
+	EnableEndpointOauthConfig   types.Bool   `tfsdk:"enable_endpoint_oauth_config"`
+	EnableIntegrationManagement types.Bool   `tfsdk:"enable_integration_management"`
+	EnableMessageStream         types.Bool   `tfsdk:"enable_advanced_endpoint_types"`
+	EnableTransformations       types.Bool   `tfsdk:"enable_transformations"`
+	EnforceHttps                types.Bool   `tfsdk:"enforce_https"`
+	EventCatalogPublished       types.Bool   `tfsdk:"event_catalog_published"`
+	ReadOnly                    types.Bool   `tfsdk:"read_only"`
+	RequireEndpointChannel      types.Bool   `tfsdk:"require_endpoint_channel"`
+	WhitelabelHeaders           types.Bool   `tfsdk:"whitelabel_headers"`
+	WipeSuccessfulPayload       types.Bool   `tfsdk:"wipe_successful_payload"`
 
 	WhitelabelSettings basetypes.ObjectValue `tfsdk:"whitelabel_settings"`
 }
@@ -85,9 +84,10 @@ type WhitelabelSettings struct {
 	CustomFontFamilyUrl types.String `tfsdk:"font_family_url"`
 	CustomLogoUrl       types.String `tfsdk:"logo_url"`
 
-	BorderRadius      basetypes.ObjectValue `tfsdk:"border_radius"`
-	ColorPaletteDark  basetypes.ObjectValue `tfsdk:"color_palette_dark"`
-	ColorPaletteLight basetypes.ObjectValue `tfsdk:"color_palette_light"`
+	BorderRadius          basetypes.ObjectValue `tfsdk:"border_radius"`
+	ColorPaletteDark      basetypes.ObjectValue `tfsdk:"color_palette_dark"`
+	ColorPaletteLight     basetypes.ObjectValue `tfsdk:"color_palette_light"`
+	CustomStringsOverride basetypes.ObjectValue `tfsdk:"channels_strings_override"`
 }
 
 func WhitelabelSettings_TF_AttributeTypes() map[string]attr.Type {
@@ -104,7 +104,9 @@ func WhitelabelSettings_TF_AttributeTypes() map[string]attr.Type {
 		"color_palette_light": basetypes.ObjectType{
 			AttrTypes: CustomColorPalette_TF_AttributeTypes(),
 		},
-
+		"channels_strings_override": basetypes.ObjectType{
+			AttrTypes: CustomStringsOverride_TF_AttributeTypes(),
+		},
 		"border_radius": basetypes.ObjectType{
 			AttrTypes: map[string]attr.Type{
 				"button": types.StringType,
@@ -226,19 +228,28 @@ func PatchSettingsInternalInWithPlan(
 			outModel.ColorPaletteLight = colorPaletteOut
 		}
 
-	}
-
-	if !planedModel.CustomStringsOverride.IsUnknown() {
-		if planedModel.CustomStringsOverride.IsNull() {
-			outModel.CustomStringsOverride = nil
-		} else {
-			var existingCustomStringsOverride CustomStringsOverride_TF
-			d.Append(planedModel.CustomStringsOverride.As(ctx, &existingCustomStringsOverride, basetypes.ObjectAsOptions{
+		{
+			var planedCustomStringsOverride CustomStringsOverride_TF
+			d.Append(planedWhitelabelSettings.CustomStringsOverride.As(ctx, &planedCustomStringsOverride, basetypes.ObjectAsOptions{
 				UnhandledNullAsEmpty:    false,
 				UnhandledUnknownAsEmpty: false,
 			})...)
-			outModel.CustomStringsOverride = ptr(PatchCustomStringsOverrideWithPlan(ctx, d, existingModel.CustomStringsOverride, existingCustomStringsOverride))
+			if !planedCustomStringsOverride.ChannelsHelp.IsUnknown() || !planedCustomStringsOverride.ChannelsMany.IsUnknown() || !planedCustomStringsOverride.ChannelsOne.IsUnknown() {
+				customStringsOverrideOut := svixmodels.CustomStringsOverride{}
+				if !planedCustomStringsOverride.ChannelsHelp.IsUnknown() {
+					customStringsOverrideOut.ChannelsHelp = planedCustomStringsOverride.ChannelsHelp.ValueStringPointer()
+				}
+				if !planedCustomStringsOverride.ChannelsMany.IsUnknown() {
+					customStringsOverrideOut.ChannelsMany = planedCustomStringsOverride.ChannelsMany.ValueStringPointer()
+				}
+				if !planedCustomStringsOverride.ChannelsOne.IsUnknown() {
+					customStringsOverrideOut.ChannelsOne = planedCustomStringsOverride.ChannelsOne.ValueStringPointer()
+				}
+				outModel.CustomStringsOverride = &customStringsOverrideOut
+			}
+
 		}
+
 	}
 
 	if !planedModel.DisableEndpointOnFailure.IsUnknown() {
@@ -315,57 +326,6 @@ func (v *CustomColorPalette_TF) AttributeTypes() map[string]attr.Type {
 
 }
 
-func PatchCustomColorPaletteWithPlan(
-	ctx context.Context,
-	d *diag.Diagnostics,
-	existingModel *svixmodels.CustomColorPalette,
-	planedModel CustomColorPalette_TF,
-) svixmodels.CustomColorPalette {
-	// initialize model as empty
-	outModel := svixmodels.CustomColorPalette{}
-	// load variables from the existing model
-	if existingModel != nil {
-		outModel.BackgroundHover = existingModel.BackgroundHover
-		outModel.BackgroundPrimary = existingModel.BackgroundPrimary
-		outModel.BackgroundSecondary = existingModel.BackgroundSecondary
-		outModel.ButtonPrimary = existingModel.ButtonPrimary
-		outModel.InteractiveAccent = existingModel.InteractiveAccent
-		outModel.NavigationAccent = existingModel.NavigationAccent
-		outModel.Primary = existingModel.Primary
-		outModel.TextDanger = existingModel.TextDanger
-		outModel.TextPrimary = existingModel.TextPrimary
-	}
-	// override fields in outModel with variables from planed model
-	if !planedModel.BackgroundHover.IsUnknown() {
-		outModel.BackgroundHover = planedModel.BackgroundHover.ValueStringPointer()
-	}
-	if !planedModel.BackgroundPrimary.IsUnknown() {
-		outModel.BackgroundPrimary = planedModel.BackgroundPrimary.ValueStringPointer()
-	}
-	if !planedModel.BackgroundSecondary.IsUnknown() {
-		outModel.BackgroundSecondary = planedModel.BackgroundSecondary.ValueStringPointer()
-	}
-	if !planedModel.ButtonPrimary.IsUnknown() {
-		outModel.ButtonPrimary = planedModel.ButtonPrimary.ValueStringPointer()
-	}
-	if !planedModel.InteractiveAccent.IsUnknown() {
-		outModel.InteractiveAccent = planedModel.InteractiveAccent.ValueStringPointer()
-	}
-	if !planedModel.NavigationAccent.IsUnknown() {
-		outModel.NavigationAccent = planedModel.NavigationAccent.ValueStringPointer()
-	}
-	if !planedModel.Primary.IsUnknown() {
-		outModel.Primary = planedModel.Primary.ValueStringPointer()
-	}
-	if !planedModel.TextDanger.IsUnknown() {
-		outModel.TextDanger = planedModel.TextDanger.ValueStringPointer()
-	}
-	if !planedModel.TextPrimary.IsUnknown() {
-		outModel.TextPrimary = planedModel.TextPrimary.ValueStringPointer()
-	}
-	return outModel
-}
-
 // Terraform wrapper around `svixmodels.CustomStringsOverride`
 type CustomStringsOverride_TF struct {
 	ChannelsHelp types.String `tfsdk:"channels_help"`
@@ -385,33 +345,6 @@ func (v *CustomStringsOverride_TF) AttributeTypes() map[string]attr.Type {
 	return CustomStringsOverride_TF_AttributeTypes()
 }
 
-func PatchCustomStringsOverrideWithPlan(
-	ctx context.Context,
-	d *diag.Diagnostics,
-	existingModel *svixmodels.CustomStringsOverride,
-	planedModel CustomStringsOverride_TF,
-) svixmodels.CustomStringsOverride {
-	// initialize model as empty
-	outModel := svixmodels.CustomStringsOverride{}
-	// load variables from the existing model
-	if existingModel != nil {
-		outModel.ChannelsHelp = existingModel.ChannelsHelp
-		outModel.ChannelsMany = existingModel.ChannelsMany
-		outModel.ChannelsOne = existingModel.ChannelsOne
-	}
-	// override fields in outModel with variables from planed model
-	if !planedModel.ChannelsHelp.IsUnknown() {
-		outModel.ChannelsHelp = planedModel.ChannelsHelp.ValueStringPointer()
-	}
-	if !planedModel.ChannelsMany.IsUnknown() {
-		outModel.ChannelsMany = planedModel.ChannelsMany.ValueStringPointer()
-	}
-	if !planedModel.ChannelsOne.IsUnknown() {
-		outModel.ChannelsOne = planedModel.ChannelsOne.ValueStringPointer()
-	}
-	return outModel
-}
-
 type BorderRadius struct {
 	Button types.String `tfsdk:"button"`
 	Card   types.String `tfsdk:"card"`
@@ -428,53 +361,6 @@ func BorderRadius_AttributeTypes() map[string]attr.Type {
 func (v *BorderRadius) AttributeTypes() map[string]attr.Type {
 	return BorderRadius_AttributeTypes()
 }
-
-func PatchBorderRadiusConfigWithPlan(
-	ctx context.Context,
-	d *diag.Diagnostics,
-	existingModel *svixmodels.BorderRadiusConfig,
-	planedModel BorderRadius,
-) svixmodels.BorderRadiusConfig {
-	// initialize model as empty
-	outModel := svixmodels.BorderRadiusConfig{}
-	// load variables from the existing model
-	if existingModel != nil {
-		outModel.Button = existingModel.Button
-		outModel.Card = existingModel.Card
-		outModel.Input = existingModel.Input
-	}
-	// override fields in outModel with variables from planed model
-	if !planedModel.Button.IsUnknown() {
-		if planedModel.Button.IsNull() {
-			outModel.Button = nil
-		} else {
-			outModel.Button = ptr(svixmodels.BorderRadiusEnum(planedModel.Button.ValueString()))
-		}
-	}
-	if !planedModel.Card.IsUnknown() {
-		if planedModel.Card.IsNull() {
-			outModel.Card = nil
-		} else {
-			outModel.Card = ptr(svixmodels.BorderRadiusEnum(planedModel.Card.ValueString()))
-		}
-	}
-	if !planedModel.Input.IsUnknown() {
-		if planedModel.Input.IsNull() {
-			outModel.Input = nil
-		} else {
-			outModel.Input = ptr(svixmodels.BorderRadiusEnum(planedModel.Input.ValueString()))
-		}
-	}
-	return outModel
-}
-
-// // if unknown return nil, else return value
-// func strOrNil(v types.String) *string {
-// 	if v.IsUnknown() {
-// 		return nil
-// 	}
-// 	return v.ValueStringPointer()
-// }
 
 func patchColorPaletteWithPlan(ctx context.Context, d *diag.Diagnostics, planedWhitelabelSettings WhitelabelSettings) *svixmodels.CustomColorPalette {
 	var planedColorPalette CustomColorPalette_TF

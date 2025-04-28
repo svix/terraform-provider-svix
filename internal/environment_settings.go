@@ -216,27 +216,27 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 							},
 						},
 					},
-				},
-			},
-			"channels_strings_override": schema.SingleNestedAttribute{
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Description:   "Rename 'channels' in the App Portal, depending on the usage you give them in your application.",
-				Attributes: map[string]schema.Attribute{
-					"channels_help": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+					"channels_strings_override": schema.SingleNestedAttribute{
+						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 						Optional:      true,
-						Description:   "Channels help text.",
-					},
-					"channels_many": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Plural form.",
-					},
-					"channels_one": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Singular form.",
+						Description:   "Rename 'channels' in the App Portal, depending on the usage you give them in your application.",
+						Attributes: map[string]schema.Attribute{
+							"channels_help": schema.StringAttribute{
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Optional:      true,
+								Description:   "Channels help text.",
+							},
+							"channels_many": schema.StringAttribute{
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Optional:      true,
+								Description:   "Plural form.",
+							},
+							"channels_one": schema.StringAttribute{
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Optional:      true,
+								Description:   "Singular form.",
+							},
+						},
 					},
 				},
 			},
@@ -492,7 +492,6 @@ func customColorPaletteToTF(v models.CustomColorPalette) generated.CustomColorPa
 }
 func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string) generated.EnvironmentSettingsResourceModel {
 	out := generated.EnvironmentSettingsResourceModel{
-		CustomStringsOverride:       basetypes.NewObjectNull(generated.CustomStringsOverride_TF_AttributeTypes()),
 		WhitelabelSettings:          basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
 		EnvironmentId:               types.StringValue(envId),
 		DisableEndpointOnFailure:    types.BoolPointerValue(v.DisableEndpointOnFailure),
@@ -513,15 +512,15 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 	{
 
 		whitelabelSettingsTf := generated.WhitelabelSettings{
-			BorderRadius:      basetypes.NewObjectNull(generated.BorderRadius_AttributeTypes()),
-			ColorPaletteDark:  basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
-			ColorPaletteLight: basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
-
-			DisplayName:         types.StringPointerValue(v.DisplayName),
-			CustomBaseFontSize:  types.Int64PointerValue(v.CustomBaseFontSize),
-			CustomFontFamily:    types.StringPointerValue(v.CustomFontFamily),
-			CustomFontFamilyUrl: types.StringPointerValue(v.CustomFontFamilyUrl),
-			CustomLogoUrl:       types.StringPointerValue(v.CustomLogoUrl),
+			CustomStringsOverride: basetypes.NewObjectNull(generated.CustomStringsOverride_TF_AttributeTypes()),
+			BorderRadius:          basetypes.NewObjectNull(generated.BorderRadius_AttributeTypes()),
+			ColorPaletteDark:      basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
+			ColorPaletteLight:     basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
+			DisplayName:           types.StringPointerValue(v.DisplayName),
+			CustomBaseFontSize:    types.Int64PointerValue(v.CustomBaseFontSize),
+			CustomFontFamily:      types.StringPointerValue(v.CustomFontFamily),
+			CustomFontFamilyUrl:   types.StringPointerValue(v.CustomFontFamilyUrl),
+			CustomLogoUrl:         types.StringPointerValue(v.CustomLogoUrl),
 		}
 		if v.CustomThemeOverride != nil {
 			if v.CustomThemeOverride.BorderRadius != nil {
@@ -549,20 +548,20 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 			d.Append(diags...)
 		}
 
+		if v.CustomStringsOverride != nil {
+			customStringsOverrideTF := generated.CustomStringsOverride_TF{
+				ChannelsHelp: types.StringPointerValue(v.CustomStringsOverride.ChannelsHelp),
+				ChannelsMany: types.StringPointerValue(v.CustomStringsOverride.ChannelsMany),
+				ChannelsOne:  types.StringPointerValue(v.CustomStringsOverride.ChannelsOne),
+			}
+			customStringsOverride, diags := types.ObjectValueFrom(ctx, customStringsOverrideTF.AttributeTypes(), customStringsOverrideTF)
+			whitelabelSettingsTf.CustomStringsOverride = customStringsOverride
+			d.Append(diags...)
+		}
+
 		whitelabelSettings, diags := types.ObjectValueFrom(ctx, whitelabelSettingsTf.AttributeTypes(), whitelabelSettingsTf)
 		d.Append(diags...)
 		out.WhitelabelSettings = whitelabelSettings
-	}
-
-	if v.CustomStringsOverride != nil {
-		customStringsOverrideTF := generated.CustomStringsOverride_TF{
-			ChannelsHelp: types.StringPointerValue(v.CustomStringsOverride.ChannelsHelp),
-			ChannelsMany: types.StringPointerValue(v.CustomStringsOverride.ChannelsMany),
-			ChannelsOne:  types.StringPointerValue(v.CustomStringsOverride.ChannelsOne),
-		}
-		customStringsOverride, diags := types.ObjectValueFrom(ctx, customStringsOverrideTF.AttributeTypes(), customStringsOverrideTF)
-		out.CustomStringsOverride = customStringsOverride
-		d.Append(diags...)
 	}
 
 	return out

@@ -20,25 +20,32 @@ resource "svix_environment" "example_environment" {
 
 resource "svix_environment_settings" "example_environment_settings" {
   environment_id = svix_environment.example_environment.id
-  color_palette_dark = {
-    primary = "#3182CE"
-  }
-  color_palette_light = {
-    primary = "#3182CE"
-  }
-  base_font_size  = 16
-  font_family     = "Custom"
-  font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
-  logo_url        = "https://www.example.com/static/logo.png"
-  theme_override = {
+  whitelabel_settings = {
+    display_name    = "My Company"
+    logo_url        = "https://www.example.com/static/logo.png"
+    base_font_size  = 16
+    font_family     = "Custom"
+    font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
+    color_palette_dark = {
+      primary = "#3182CE"
+    }
+    color_palette_light = {
+      primary = "#3182CE"
+    }
     border_radius = {
       button = "full"
       card   = "lg"
       input  = "none"
     }
+    # Advanced settings
+    channels_strings_override = {
+      channels_one  = "channel"
+      channels_many = "channels"
+      channels_help = "Channels are an extra dimension of filtering messages orthogonal to event types. They are case-sensitive and only messages with the corresponding channel will be sent to this endpoint."
+    }
   }
+
   disable_endpoint_on_failure    = false
-  display_name                   = "My company"
   enable_channels                = false
   enable_endpoint_mtls_config    = false # Requires Enterprise plan
   enable_endpoint_oauth_config   = false # Requires Enterprise plan
@@ -51,13 +58,6 @@ resource "svix_environment_settings" "example_environment_settings" {
   require_endpoint_channel       = false
   whitelabel_headers             = false # Requires Pro or Enterprise plan
   wipe_successful_payload        = false # Requires Pro or Enterprise plan
-
-  # Advanced settings
-  channels_strings_override = {
-    channels_one  = "channel"
-    channels_many = "channels"
-    channels_help = "Channels are an extra dimension of filtering messages orthogonal to event types. They are case-sensitive and only messages with the corresponding channel will be sent to this endpoint."
-  }
 }
 ```
 
@@ -70,7 +70,6 @@ resource "svix_environment_settings" "example_environment_settings" {
 
 ### Optional
 
-- `channels_strings_override` (Attributes) Rename 'channels' in the App Portal, depending on the usage you give them in your application. (see [below for nested schema](#nestedatt--channels_strings_override))
 - `disable_endpoint_on_failure` (Boolean) If messages to a particular endpoint have been consistently failing for
 some time, we will automatically disable the endpoint and let 
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
@@ -97,16 +96,6 @@ method, destination URL, and payload body in-flight.
 delivered to the endpoint. Only affects messages sent after this
 setting is enabled.
 
-<a id="nestedatt--channels_strings_override"></a>
-### Nested Schema for `channels_strings_override`
-
-Optional:
-
-- `channels_help` (String) Channels help text.
-- `channels_many` (String) Plural form.
-- `channels_one` (String) Singular form.
-
-
 <a id="nestedatt--whitelabel_settings"></a>
 ### Nested Schema for `whitelabel_settings`
 
@@ -114,6 +103,7 @@ Optional:
 
 - `base_font_size` (Number) This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px
 - `border_radius` (Attributes) Borders (see [below for nested schema](#nestedatt--whitelabel_settings--border_radius))
+- `channels_strings_override` (Attributes) Rename 'channels' in the App Portal, depending on the usage you give them in your application. (see [below for nested schema](#nestedatt--whitelabel_settings--channels_strings_override))
 - `color_palette_dark` (Attributes) (see [below for nested schema](#nestedatt--whitelabel_settings--color_palette_dark))
 - `color_palette_light` (Attributes) (see [below for nested schema](#nestedatt--whitelabel_settings--color_palette_light))
 - `display_name` (String) The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).
@@ -135,6 +125,16 @@ Optional:
 - `button` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
 - `card` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
 - `input` (String) Use `none` for a square border, `lg` for large rounded `md` for medium rounded, `sm` for small rounded and `full` for Pill-shaped
+
+
+<a id="nestedatt--whitelabel_settings--channels_strings_override"></a>
+### Nested Schema for `whitelabel_settings.channels_strings_override`
+
+Optional:
+
+- `channels_help` (String) Channels help text.
+- `channels_many` (String) Plural form.
+- `channels_one` (String) Singular form.
 
 
 <a id="nestedatt--whitelabel_settings--color_palette_dark"></a>
