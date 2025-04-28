@@ -142,47 +142,47 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 						Description:         "Display Name",
 						MarkdownDescription: "The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).",
 					},
+					"base_font_size": schema.Int64Attribute{
+						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+						Validators: []validator.Int64{
+							// this is the limit we have in the front-end
+							int64validator.AtMost(23),
+							int64validator.AtLeast(8),
+						},
+						Optional:            true,
+						MarkdownDescription: "This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px",
+						Description:         "Base Font Size (in pixels)",
+					},
+					"font_family": schema.StringAttribute{
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Validators: []validator.String{
+							stringvalidator.OneOf(fontFamilyEnum...),
+							customFontFamilyValidator{},
+						},
+						Optional:    true,
+						Description: "Font Family",
+						MarkdownDescription: "Can be one of `" + strings.Join(fontFamilyEnum[:len(fontFamilyEnum)-1], "`, `") + "` and `Custom`\n\n" +
+							"You can also set a custom font by providing a URL to a font file. \n\n" +
+							"If you chose to use the `font_family_url` make sure to set this to `Custom`\n",
+					},
+					"font_family_url": schema.StringAttribute{
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Validators:    []validator.String{customFontURLValidator{}},
+						Optional:      true,
+						Description:   "Font Family URL",
+						MarkdownDescription: "URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)\n\n" +
+							"Make sure to set `font_family` to `Custom`",
+					},
+					"logo_url": schema.StringAttribute{
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Optional:            true,
+						Description:         "Icon URL",
+						MarkdownDescription: "Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).",
+					},
 				},
 			},
 			"color_palette_dark":  colorPaletteSchema,
 			"color_palette_light": colorPaletteSchema,
-			"base_font_size": schema.Int64Attribute{
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
-				Validators: []validator.Int64{
-					// this is the limit we have in the front-end
-					int64validator.AtMost(23),
-					int64validator.AtLeast(8),
-				},
-				Optional:            true,
-				MarkdownDescription: "This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px",
-				Description:         "Base Font Size (in pixels)",
-			},
-			"font_family": schema.StringAttribute{
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Validators: []validator.String{
-					stringvalidator.OneOf(fontFamilyEnum...),
-					customFontFamilyValidator{},
-				},
-				Optional:    true,
-				Description: "Font Family",
-				MarkdownDescription: "Can be one of `" + strings.Join(fontFamilyEnum[:len(fontFamilyEnum)-1], "`, `") + "` and `Custom`\n\n" +
-					"You can also set a custom font by providing a URL to a font file. \n\n" +
-					"If you chose to use the `font_family_url` make sure to set this to `Custom`\n",
-			},
-			"font_family_url": schema.StringAttribute{
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Validators:    []validator.String{customFontURLValidator{}},
-				Optional:      true,
-				Description:   "Font Family URL",
-				MarkdownDescription: "URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)\n\n" +
-					"Make sure to set `font_family` to `Custom`",
-			},
-			"logo_url": schema.StringAttribute{
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Optional:            true,
-				Description:         "Icon URL",
-				MarkdownDescription: "Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).",
-			},
 			"channels_strings_override": schema.SingleNestedAttribute{
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Optional:      true,
@@ -501,10 +501,6 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		CustomThemeOverride:         basetypes.NewObjectNull(generated.CustomThemeOverride_TF_AttributeTypes()),
 		WhitelabelSettings:          basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
 		EnvironmentId:               types.StringValue(envId),
-		CustomBaseFontSize:          types.Int64PointerValue(v.CustomBaseFontSize),
-		CustomFontFamily:            types.StringPointerValue(v.CustomFontFamily),
-		CustomFontFamilyUrl:         types.StringPointerValue(v.CustomFontFamilyUrl),
-		CustomLogoUrl:               types.StringPointerValue(v.CustomLogoUrl),
 		DisableEndpointOnFailure:    types.BoolPointerValue(v.DisableEndpointOnFailure),
 		EnableChannels:              types.BoolPointerValue(v.EnableChannels),
 		EnableEndpointMtlsConfig:    types.BoolPointerValue(v.EnableEndpointMtlsConfig),
@@ -521,13 +517,16 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 	}
 
 	//  whitelabelSettings
-	Spw(v)
+
 	whitelabelSettingsTf := generated.WhitelabelSettings{
-		DisplayName: types.StringPointerValue(v.DisplayName),
+		DisplayName:         types.StringPointerValue(v.DisplayName),
+		CustomBaseFontSize:  types.Int64PointerValue(v.CustomBaseFontSize),
+		CustomFontFamily:    types.StringPointerValue(v.CustomFontFamily),
+		CustomFontFamilyUrl: types.StringPointerValue(v.CustomFontFamilyUrl),
+		CustomLogoUrl:       types.StringPointerValue(v.CustomLogoUrl),
 	}
-	Spw(whitelabelSettingsTf)
 	whitelabelSettings, diags := types.ObjectValueFrom(ctx, whitelabelSettingsTf.AttributeTypes(), whitelabelSettingsTf)
-	Spw(whitelabelSettings)
+
 	out.WhitelabelSettings = whitelabelSettings
 	d.Append(diags...)
 
@@ -628,7 +627,7 @@ func (v customFontURLValidator) ValidateString(ctx context.Context, req validato
 
 	// Get the font_family value to check
 	var fontFamily types.String
-	diags := req.Config.GetAttribute(ctx, path.Root("font_family"), &fontFamily)
+	diags := req.Config.GetAttribute(ctx, path.Root("whitelabel_settings").AtName("font_family"), &fontFamily)
 
 	if diags.HasError() {
 		resp.Diagnostics.Append(diags...)
@@ -686,7 +685,7 @@ func (v customFontFamilyValidator) ValidateString(ctx context.Context, req valid
 
 	// Get the font_family_url value to check
 	var fontURL types.String
-	diags := req.Config.GetAttribute(ctx, path.Root("font_family_url"), &fontURL)
+	diags := req.Config.GetAttribute(ctx, path.Root("whitelabel_settings").AtName("font_family_url"), &fontURL)
 
 	if diags.HasError() {
 		resp.Diagnostics.Append(diags...)

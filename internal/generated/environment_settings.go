@@ -62,10 +62,6 @@ type EnvironmentSettingsResourceModel struct {
 	EnvironmentId               types.String          `tfsdk:"environment_id"`
 	ColorPaletteDark            basetypes.ObjectValue `tfsdk:"color_palette_dark"`
 	ColorPaletteLight           basetypes.ObjectValue `tfsdk:"color_palette_light"`
-	CustomBaseFontSize          types.Int64           `tfsdk:"base_font_size"`
-	CustomFontFamily            types.String          `tfsdk:"font_family"`
-	CustomFontFamilyUrl         types.String          `tfsdk:"font_family_url"`
-	CustomLogoUrl               types.String          `tfsdk:"logo_url"`
 	CustomStringsOverride       basetypes.ObjectValue `tfsdk:"channels_strings_override"`
 	CustomThemeOverride         basetypes.ObjectValue `tfsdk:"theme_override"`
 	DisableEndpointOnFailure    types.Bool            `tfsdk:"disable_endpoint_on_failure"`
@@ -86,12 +82,20 @@ type EnvironmentSettingsResourceModel struct {
 }
 
 type WhitelabelSettings struct {
-	DisplayName types.String `tfsdk:"display_name"`
+	DisplayName         types.String `tfsdk:"display_name"`
+	CustomBaseFontSize  types.Int64  `tfsdk:"base_font_size"`
+	CustomFontFamily    types.String `tfsdk:"font_family"`
+	CustomFontFamilyUrl types.String `tfsdk:"font_family_url"`
+	CustomLogoUrl       types.String `tfsdk:"logo_url"`
 }
 
 func WhitelabelSettings_TF_AttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
-		"display_name": types.StringType,
+		"display_name":    types.StringType,
+		"base_font_size":  types.Int64Type,
+		"font_family":     types.StringType,
+		"font_family_url": types.StringType,
+		"logo_url":        types.StringType,
 	}
 }
 
@@ -137,12 +141,26 @@ func PatchSettingsInternalInWithPlan(
 	}
 
 	if !planedModel.WhitelabelSettings.IsUnknown() && !planedModel.WhitelabelSettings.IsNull() {
-		var existingWhitelabelSettings WhitelabelSettings
-		d.Append(planedModel.WhitelabelSettings.As(ctx, &existingWhitelabelSettings, basetypes.ObjectAsOptions{
+		var planedWhitelabelSettings WhitelabelSettings
+		d.Append(planedModel.WhitelabelSettings.As(ctx, &planedWhitelabelSettings, basetypes.ObjectAsOptions{
 			UnhandledNullAsEmpty:    false,
 			UnhandledUnknownAsEmpty: false,
 		})...)
-		outModel.DisplayName = strOrNil(existingWhitelabelSettings.DisplayName)
+		if !planedWhitelabelSettings.DisplayName.IsUnknown() {
+			outModel.DisplayName = planedWhitelabelSettings.DisplayName.ValueStringPointer()
+		}
+		if !planedWhitelabelSettings.CustomBaseFontSize.IsUnknown() {
+			outModel.CustomBaseFontSize = planedWhitelabelSettings.CustomBaseFontSize.ValueInt64Pointer()
+		}
+		if !planedWhitelabelSettings.CustomFontFamily.IsUnknown() {
+			outModel.CustomFontFamily = planedWhitelabelSettings.CustomFontFamily.ValueStringPointer()
+		}
+		if !planedWhitelabelSettings.CustomFontFamilyUrl.IsUnknown() {
+			outModel.CustomFontFamilyUrl = planedWhitelabelSettings.CustomFontFamilyUrl.ValueStringPointer()
+		}
+		if !planedWhitelabelSettings.CustomLogoUrl.IsUnknown() {
+			outModel.CustomLogoUrl = planedWhitelabelSettings.CustomLogoUrl.ValueStringPointer()
+		}
 		Spw(outModel)
 
 	}
@@ -197,18 +215,6 @@ func PatchSettingsInternalInWithPlan(
 		}
 	}
 
-	if !planedModel.CustomBaseFontSize.IsUnknown() {
-		outModel.CustomBaseFontSize = planedModel.CustomBaseFontSize.ValueInt64Pointer()
-	}
-	if !planedModel.CustomFontFamily.IsUnknown() {
-		outModel.CustomFontFamily = planedModel.CustomFontFamily.ValueStringPointer()
-	}
-	if !planedModel.CustomFontFamilyUrl.IsUnknown() {
-		outModel.CustomFontFamilyUrl = planedModel.CustomFontFamilyUrl.ValueStringPointer()
-	}
-	if !planedModel.CustomLogoUrl.IsUnknown() {
-		outModel.CustomLogoUrl = planedModel.CustomLogoUrl.ValueStringPointer()
-	}
 	if !planedModel.DisableEndpointOnFailure.IsUnknown() {
 		outModel.DisableEndpointOnFailure = planedModel.DisableEndpointOnFailure.ValueBoolPointer()
 	}
@@ -494,19 +500,3 @@ func PatchBorderRadiusConfigWithPlan(
 	}
 	return outModel
 }
-
-// if unknown return nil, else return value
-func strOrNil(v types.String) *string {
-	if v.IsUnknown() {
-		return nil
-	}
-	return v.ValueStringPointer()
-}
-
-// // if unknown return nil, else return value
-// func boolOrNil(v types.Bool) *bool {
-// 	if v.IsUnknown() {
-// 		return nil
-// 	}
-// 	return v.ValueBoolPointer()
-// }

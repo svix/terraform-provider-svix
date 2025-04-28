@@ -70,7 +70,6 @@ resource "svix_environment_settings" "example_environment_settings" {
 
 ### Optional
 
-- `base_font_size` (Number) This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px
 - `channels_strings_override` (Attributes) Rename 'channels' in the App Portal, depending on the usage you give them in your application. (see [below for nested schema](#nestedatt--channels_strings_override))
 - `color_palette_dark` (Attributes) (see [below for nested schema](#nestedatt--color_palette_dark))
 - `color_palette_light` (Attributes) (see [below for nested schema](#nestedatt--color_palette_light))
@@ -92,15 +91,6 @@ endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.
 - `enforce_https` (Boolean) Enforces HTTPS on all endpoints of this environment
 - `event_catalog_published` (Boolean) Enable this to make your Event Catalog public. You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog
-- `font_family` (String) Can be one of `Helvetica`, `Roboto`, `Open Sans`, `Lato`, `Source Sans Pro`, `Raleway`, `Ubuntu`, `Manrope`, `DM Sans`, `Poppins`, `Lexend Deca`, `Rubik` and `Custom`
-
-You can also set a custom font by providing a URL to a font file. 
-
-If you chose to use the `font_family_url` make sure to set this to `Custom`
-- `font_family_url` (String) URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)
-
-Make sure to set `font_family` to `Custom`
-- `logo_url` (String) Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).
 - `read_only` (Boolean) Sets your Consumer App Portal to read only so your customers can view but not modify their data
 - `require_endpoint_channel` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
 - `theme_override` (Attributes) (see [below for nested schema](#nestedatt--theme_override))
@@ -175,4 +165,14 @@ Optional:
 
 Optional:
 
+- `base_font_size` (Number) This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px
 - `display_name` (String) The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).
+- `font_family` (String) Can be one of `Helvetica`, `Roboto`, `Open Sans`, `Lato`, `Source Sans Pro`, `Raleway`, `Ubuntu`, `Manrope`, `DM Sans`, `Poppins`, `Lexend Deca`, `Rubik` and `Custom`
+
+You can also set a custom font by providing a URL to a font file. 
+
+If you chose to use the `font_family_url` make sure to set this to `Custom`
+- `font_family_url` (String) URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)
+
+Make sure to set `font_family` to `Custom`
+- `logo_url` (String) Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).
