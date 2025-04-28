@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -170,7 +171,12 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 				},
 			},
 			"custom_base_font_size": schema.Int64Attribute{
-				PlanModifiers:       []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+				Validators: []validator.Int64{
+					// this is the limit we have in the front-end
+					int64validator.AtMost(23),
+					int64validator.AtLeast(8),
+				},
 				Optional:            true,
 				MarkdownDescription: "This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px",
 				Description:         "Base Font Size (in pixels)",
