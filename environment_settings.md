@@ -21,26 +21,10 @@ resource "svix_environment" "example_environment" {
 resource "svix_environment_settings" "example_environment_settings" {
   environment_id = svix_environment.example_environment.id
   color_palette_dark = {
-    background_hover     = "#1A202C"
-    background_primary   = "#1A202C"
-    background_secondary = "#171923"
-    button_primary       = "#4299E1"
-    interactive_accent   = "#4299E1"
-    navigation_accent    = "#4299E1"
-    primary              = "#3182CE"
-    text_danger          = "#FC8181"
-    text_primary         = "#FFFFFF"
+    primary = "#3182CE"
   }
   color_palette_light = {
-    background_hover     = "#EDF2F7"
-    background_primary   = "#F8F9FD"
-    background_secondary = "#FFFFFF"
-    button_primary       = "#3182CE"
-    interactive_accent   = "#3182CE"
-    navigation_accent    = "#3182CE"
-    primary              = "#3182CE"
-    text_danger          = "#E53E3E"
-    text_primary         = "#1A202C"
+    primary = "#3182CE"
   }
   base_font_size  = 16
   font_family     = "Custom"
@@ -53,20 +37,20 @@ resource "svix_environment_settings" "example_environment_settings" {
       input  = "none"
     }
   }
-  disable_endpoint_on_failure   = false
-  display_name                  = "My company"
-  enable_channels               = false
-  enable_endpoint_mtls_config   = false # Requires Enterprise plan
-  enable_endpoint_oauth_config  = false # Requires Enterprise plan
-  enable_integration_management = true
-  enable_message_stream         = false # Requires Pro or Enterprise plan
-  enable_transformations        = false
-  enforce_https                 = true
-  event_catalog_published       = false
-  read_only                     = false
-  require_endpoint_channel      = false
-  whitelabel_headers            = false # Requires Pro or Enterprise plan
-  wipe_successful_payload       = false # Requires Pro or Enterprise plan
+  disable_endpoint_on_failure    = false
+  display_name                   = "My company"
+  enable_channels                = false
+  enable_endpoint_mtls_config    = false # Requires Enterprise plan
+  enable_endpoint_oauth_config   = false # Requires Enterprise plan
+  enable_integration_management  = true
+  enable_advanced_endpoint_types = false # Requires Pro or Enterprise plan
+  enable_transformations         = false
+  enforce_https                  = true
+  event_catalog_published        = false
+  read_only                      = false
+  require_endpoint_channel       = false
+  whitelabel_headers             = false # Requires Pro or Enterprise plan
+  wipe_successful_payload        = false # Requires Pro or Enterprise plan
 
   # Advanced settings
   channels_strings_override = {
@@ -95,6 +79,8 @@ some time, we will automatically disable the endpoint and let
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
 more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endpoints).
 - `display_name` (String) The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).
+- `enable_advanced_endpoint_types` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Allows users to configure Polling Endpoints and FIFO endpoints to get
+messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).
 - `enable_channels` (Boolean) Controls whether or not your users can configure
 <strong>channels</strong> from the Consumer App Portal.
 - `enable_endpoint_mtls_config` (Boolean) <strong>Requires Enterprise plan</strong>, Allows users to configure mutual TLS (mTLS) for their endpoints.
@@ -102,8 +88,6 @@ more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endp
 - `enable_integration_management` (Boolean) Controls whether or not your users can manage integrations from the
 Consumer App Portal. We recommend disabling this if you manage
 integrations on your users' behalf.
-- `enable_message_stream` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Allows users to configure Polling Endpoints and FIFO endpoints to get
-messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).
 - `enable_transformations` (Boolean) Controls whether or not your users can add transformations to their
 endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.
@@ -141,13 +125,13 @@ Optional:
 
 Optional:
 
-- `background_hover` (String) Background for card headers and table headers
-- `background_primary` (String) Background
-- `background_secondary` (String) Background for cards, tables and other surfaces
+- `background` (String) Background
 - `button_primary` (String) For the main action buttons
 - `interactive_accent` (String) For secondary buttons, links, and other interactive elements
 - `navigation_accent` (String) For the top-level navigation items
 - `primary` (String) Primary color
+- `surface_background` (String) Background for cards, tables and other surfaces
+- `surface_hover` (String) Background for card headers and table headers
 - `text_danger` (String) For error messages and other warnings
 - `text_primary` (String) Text Primary
 
@@ -157,13 +141,13 @@ Optional:
 
 Optional:
 
-- `background_hover` (String) Background for card headers and table headers
-- `background_primary` (String) Background
-- `background_secondary` (String) Background for cards, tables and other surfaces
+- `background` (String) Background
 - `button_primary` (String) For the main action buttons
 - `interactive_accent` (String) For secondary buttons, links, and other interactive elements
 - `navigation_accent` (String) For the top-level navigation items
 - `primary` (String) Primary color
+- `surface_background` (String) Background for cards, tables and other surfaces
+- `surface_hover` (String) Background for card headers and table headers
 - `text_danger` (String) For error messages and other warnings
 - `text_primary` (String) Text Primary
 
