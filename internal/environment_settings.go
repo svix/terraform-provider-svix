@@ -224,7 +224,7 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 				Description:         "Icon URL",
 				MarkdownDescription: "Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).",
 			},
-			"custom_strings_override": schema.SingleNestedAttribute{
+			"channels_strings_override": schema.SingleNestedAttribute{
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Optional:      true,
 				Description:   "Rename 'channels' in the App Portal, depending on the usage you give them in your application.",

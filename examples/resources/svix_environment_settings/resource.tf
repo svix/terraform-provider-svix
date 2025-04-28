@@ -31,11 +31,6 @@ resource "svix_environment_settings" "example_environment_settings" {
   font_family     = "Custom"
   font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
   logo_url        = "https://www.example.com/static/logo.png"
-  custom_strings_override = {
-    channels_one  = "channel"
-    channels_many = "channels"
-    channels_help = "Channels are an extra dimension of filtering messages orthogonal to event types. They are case-sensitive and only messages with the corresponding channel will be sent to this endpoint."
-  }
   theme_override = {
     border_radius = {
       button = "full"
@@ -57,4 +52,11 @@ resource "svix_environment_settings" "example_environment_settings" {
   require_endpoint_channel      = false
   whitelabel_headers            = false # Requires Pro or Enterprise plan
   wipe_successful_payload       = false # Requires Pro or Enterprise plan
+
+  # Advanced settings
+  channels_strings_override = {
+    channels_one  = "channel"
+    channels_many = "channels"
+    channels_help = "Channels are an extra dimension of filtering messages orthogonal to event types. They are case-sensitive and only messages with the corresponding channel will be sent to this endpoint."
+  }
 }

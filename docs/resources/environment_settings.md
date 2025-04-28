@@ -46,11 +46,6 @@ resource "svix_environment_settings" "example_environment_settings" {
   font_family     = "Custom"
   font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
   logo_url        = "https://www.example.com/static/logo.png"
-  custom_strings_override = {
-    channels_one  = "channel"
-    channels_many = "channels"
-    channels_help = "Channels are an extra dimension of filtering messages orthogonal to event types. They are case-sensitive and only messages with the corresponding channel will be sent to this endpoint."
-  }
   theme_override = {
     border_radius = {
       button = "full"
@@ -72,6 +67,13 @@ resource "svix_environment_settings" "example_environment_settings" {
   require_endpoint_channel      = false
   whitelabel_headers            = false # Requires Pro or Enterprise plan
   wipe_successful_payload       = false # Requires Pro or Enterprise plan
+
+  # Advanced settings
+  channels_strings_override = {
+    channels_one  = "channel"
+    channels_many = "channels"
+    channels_help = "Channels are an extra dimension of filtering messages orthogonal to event types. They are case-sensitive and only messages with the corresponding channel will be sent to this endpoint."
+  }
 }
 ```
 
@@ -85,9 +87,9 @@ resource "svix_environment_settings" "example_environment_settings" {
 ### Optional
 
 - `base_font_size` (Number) This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px
+- `channels_strings_override` (Attributes) Rename 'channels' in the App Portal, depending on the usage you give them in your application. (see [below for nested schema](#nestedatt--channels_strings_override))
 - `color_palette_dark` (Attributes) (see [below for nested schema](#nestedatt--color_palette_dark))
 - `color_palette_light` (Attributes) (see [below for nested schema](#nestedatt--color_palette_light))
-- `custom_strings_override` (Attributes) Rename 'channels' in the App Portal, depending on the usage you give them in your application. (see [below for nested schema](#nestedatt--custom_strings_override))
 - `disable_endpoint_on_failure` (Boolean) If messages to a particular endpoint have been consistently failing for
 some time, we will automatically disable the endpoint and let 
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
@@ -124,6 +126,16 @@ Make sure to set `font_family` to `Custom`
 delivered to the endpoint. Only affects messages sent after this
 setting is enabled.
 
+<a id="nestedatt--channels_strings_override"></a>
+### Nested Schema for `channels_strings_override`
+
+Optional:
+
+- `channels_help` (String) Channels help text.
+- `channels_many` (String) Plural form.
+- `channels_one` (String) Singular form.
+
+
 <a id="nestedatt--color_palette_dark"></a>
 ### Nested Schema for `color_palette_dark`
 
@@ -154,16 +166,6 @@ Optional:
 - `primary` (String) Primary color
 - `text_danger` (String) For error messages and other warnings
 - `text_primary` (String) Text Primary
-
-
-<a id="nestedatt--custom_strings_override"></a>
-### Nested Schema for `custom_strings_override`
-
-Optional:
-
-- `channels_help` (String) Channels help text.
-- `channels_many` (String) Plural form.
-- `channels_one` (String) Singular form.
 
 
 <a id="nestedatt--theme_override"></a>
