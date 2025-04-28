@@ -635,12 +635,12 @@ type customFontURLValidator struct{}
 
 // Description returns a description of the validator
 func (v customFontURLValidator) Description(ctx context.Context) string {
-	return "When a custom font URL is provided, custom_font_family must be set to 'Custom'"
+	return "When a font URL is provided, font_family must be set to 'Custom'"
 }
 
 // MarkdownDescription returns a markdown description of the validator
 func (v customFontURLValidator) MarkdownDescription(ctx context.Context) string {
-	return "When a custom font URL is provided, custom_font_family must be set to 'Custom'"
+	return "When a font URL is provided, font_family must be set to 'Custom'"
 }
 
 // ValidateString performs the validation
@@ -658,47 +658,47 @@ func (v customFontURLValidator) ValidateString(ctx context.Context, req validato
 		return
 	}
 
-	// Get the custom_font_family value to check
+	// Get the font_family value to check
 	var fontFamily types.String
-	diags := req.Config.GetAttribute(ctx, path.Root("custom_font_family"), &fontFamily)
+	diags := req.Config.GetAttribute(ctx, path.Root("font_family"), &fontFamily)
 
 	if diags.HasError() {
 		resp.Diagnostics.Append(diags...)
 		return
 	}
 
-	// If custom_font_family is unknown or null, add error
+	// If font_family is unknown or null, add error
 	if fontFamily.IsNull() || fontFamily.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			req.Path,
-			"Invalid Custom Font Configuration",
-			"When providing a custom_font_family_url, the custom_font_family attribute must be set to 'Custom'",
+			"Invalid Font Configuration",
+			"When providing a font_family_url, the font_family attribute must be set to 'Custom'",
 		)
 		return
 	}
 
-	// Verify that custom_font_family is set to "Custom"
+	// Verify that font_family is set to "Custom"
 	if fontFamily.ValueString() != "Custom" {
 		resp.Diagnostics.AddAttributeError(
 			req.Path,
-			"Invalid Custom Font Configuration",
-			"When providing a custom_font_family_url, the custom_font_family attribute must be set to 'Custom'",
+			"Invalid Font Configuration",
+			"When providing a font_family_url, the font_family attribute must be set to 'Custom'",
 		)
 	}
 }
 
-// customFontFamilyValidator validates that when custom_font_family is set to "Custom",
-// a custom_font_family_url must be provided
+// customFontFamilyValidator validates that when font_family is set to "Custom",
+// a font_family_url must be provided
 type customFontFamilyValidator struct{}
 
 // Description returns a description of the validator
 func (v customFontFamilyValidator) Description(ctx context.Context) string {
-	return "When custom_font_family is set to 'Custom', a custom_font_family_url must be provided"
+	return "When font_family is set to 'Custom', a font_family_url must be provided"
 }
 
 // MarkdownDescription returns a markdown description of the validator
 func (v customFontFamilyValidator) MarkdownDescription(ctx context.Context) string {
-	return "When custom_font_family is set to 'Custom', a custom_font_family_url must be provided"
+	return "When font_family is set to 'Custom', a font_family_url must be provided"
 }
 
 // ValidateString performs the validation
@@ -716,21 +716,21 @@ func (v customFontFamilyValidator) ValidateString(ctx context.Context, req valid
 		return
 	}
 
-	// Get the custom_font_family_url value to check
+	// Get the font_family_url value to check
 	var fontURL types.String
-	diags := req.Config.GetAttribute(ctx, path.Root("custom_font_family_url"), &fontURL)
+	diags := req.Config.GetAttribute(ctx, path.Root("font_family_url"), &fontURL)
 
 	if diags.HasError() {
 		resp.Diagnostics.Append(diags...)
 		return
 	}
 
-	// If custom_font_family_url is null, unknown, or empty, add error
+	// If font_family_url is null, unknown, or empty, add error
 	if fontURL.IsNull() || fontURL.IsUnknown() || fontURL.ValueString() == "" {
 		resp.Diagnostics.AddAttributeError(
 			req.Path,
-			"Missing Custom Font URL",
-			"When custom_font_family is set to 'Custom', a valid custom_font_family_url must be provided",
+			"Missing Font URL",
+			"When font_family is set to 'Custom', a valid font_family_url must be provided",
 		)
 	}
 }
