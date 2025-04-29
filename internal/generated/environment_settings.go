@@ -70,7 +70,7 @@ type EnvironmentSettingsResourceModel struct {
 	EnforceHttps                types.Bool   `tfsdk:"enforce_https"`
 	EventCatalogPublished       types.Bool   `tfsdk:"event_catalog_published"`
 	ReadOnly                    types.Bool   `tfsdk:"read_only"`
-	RequireEndpointChannel      types.Bool   `tfsdk:"require_endpoint_channel"`
+	RequireEndpointChannel      types.Bool   `tfsdk:"require_channel_filtering"`
 	WhitelabelHeaders           types.Bool   `tfsdk:"whitelabel_headers"`
 	WipeSuccessfulPayload       types.Bool   `tfsdk:"wipe_successful_payload"`
 
@@ -154,6 +154,7 @@ func PatchSettingsInternalInWithPlan(
 		outModel.EventCatalogPublished = existingModel.EventCatalogPublished
 		outModel.ReadOnly = existingModel.ReadOnly
 		outModel.RequireEndpointChannel = existingModel.RequireEndpointChannel
+		outModel.RequireEndpointFilterTypes = existingModel.RequireEndpointFilterTypes
 		outModel.WhitelabelHeaders = existingModel.WhitelabelHeaders
 		outModel.WipeSuccessfulPayload = existingModel.WipeSuccessfulPayload
 	}

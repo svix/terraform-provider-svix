@@ -55,7 +55,7 @@ resource "svix_environment_settings" "example_environment_settings" {
   enforce_https                  = true
   event_catalog_published        = false
   read_only                      = false
-  require_endpoint_channel       = false
+  require_channel_filtering      = false
   whitelabel_headers             = false # Requires Pro or Enterprise plan
   wipe_successful_payload        = false # Requires Pro or Enterprise plan
 }
@@ -89,7 +89,7 @@ method, destination URL, and payload body in-flight.
 - `enforce_https` (Boolean) Enforces HTTPS on all endpoints of this environment
 - `event_catalog_published` (Boolean) Enable this to make your Event Catalog public. You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog
 - `read_only` (Boolean) Sets your Consumer App Portal to read only so your customers can view but not modify their data
-- `require_endpoint_channel` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
+- `require_channel_filtering` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
 - `whitelabel_headers` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Changes the prefix of the webhook HTTP headers to use the`webhook-` prefix. <strong>Changing this setting can break existing integrations</strong>
 - `whitelabel_settings` (Attributes) Customize how the [Consumer App Portal](https://docs.svix.com/management-ui) will look for your users in this environment. (see [below for nested schema](#nestedatt--whitelabel_settings))
 - `wipe_successful_payload` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Delete message payloads from Svix after they are successfully

@@ -319,7 +319,7 @@ method, destination URL, and payload body in-flight.`,
 				Description:         "Read Only mode",
 				MarkdownDescription: `Sets your Consumer App Portal to read only so your customers can view but not modify their data`,
 			},
-			"require_endpoint_channel": schema.BoolAttribute{
+			"require_channel_filtering": schema.BoolAttribute{
 				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:            true,
 				Computed:            true,

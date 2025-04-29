@@ -40,7 +40,7 @@ resource "svix_environment_settings" "example_environment_settings" {
   enforce_https                  = true
   event_catalog_published        = false
   read_only                      = false
-  require_endpoint_channel       = false
+  require_channel_filtering      = false
   whitelabel_headers             = false # Requires Pro or Enterprise plan
   wipe_successful_payload        = false # Requires Pro or Enterprise plan
 }
