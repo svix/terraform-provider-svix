@@ -71,6 +71,7 @@ type EnvironmentSettingsResourceModel struct {
 	EventCatalogPublished       types.Bool   `tfsdk:"event_catalog_published"`
 	ReadOnly                    types.Bool   `tfsdk:"read_only"`
 	RequireEndpointChannel      types.Bool   `tfsdk:"require_channel_filtering"`
+	RequireEndpointFilterTypes  types.Bool   `tfsdk:"require_event_type_filtering"`
 	WhitelabelHeaders           types.Bool   `tfsdk:"whitelabel_headers"`
 	WipeSuccessfulPayload       types.Bool   `tfsdk:"wipe_successful_payload"`
 
@@ -285,6 +286,9 @@ func PatchSettingsInternalInWithPlan(
 	}
 	if !planedModel.RequireEndpointChannel.IsUnknown() {
 		outModel.RequireEndpointChannel = planedModel.RequireEndpointChannel.ValueBoolPointer()
+	}
+	if !planedModel.RequireEndpointFilterTypes.IsUnknown() {
+		outModel.RequireEndpointFilterTypes = planedModel.RequireEndpointFilterTypes.ValueBoolPointer()
 	}
 	if !planedModel.WhitelabelHeaders.IsUnknown() {
 		outModel.WhitelabelHeaders = planedModel.WhitelabelHeaders.ValueBoolPointer()

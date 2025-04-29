@@ -326,6 +326,13 @@ method, destination URL, and payload body in-flight.`,
 				Description:         "Require channel filters for endpoints",
 				MarkdownDescription: "If enabled, all new Endpoints must filter on at least one channel.",
 			},
+			"require_event_type_filtering": schema.BoolAttribute{
+				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+				Optional:            true,
+				Computed:            true,
+				Description:         "Require event type filters for endpoints",
+				MarkdownDescription: "If enabled, all new Endpoints must filter on at least one event type.",
+			},
 			"whitelabel_headers": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:      true,
@@ -505,6 +512,7 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		EventCatalogPublished:       types.BoolPointerValue(v.EventCatalogPublished),
 		ReadOnly:                    types.BoolPointerValue(v.ReadOnly),
 		RequireEndpointChannel:      types.BoolPointerValue(v.RequireEndpointChannel),
+		RequireEndpointFilterTypes:  types.BoolPointerValue(v.RequireEndpointFilterTypes),
 		WhitelabelHeaders:           types.BoolPointerValue(v.WhitelabelHeaders),
 		WipeSuccessfulPayload:       types.BoolPointerValue(v.WipeSuccessfulPayload),
 	}
