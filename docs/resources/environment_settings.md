@@ -54,7 +54,6 @@ resource "svix_environment_settings" "example_environment_settings" {
   enable_transformations         = false
   enforce_https                  = true
   event_catalog_published        = false
-  read_only                      = false
   require_channel_filtering      = false
   require_event_type_filtering   = false
   whitelabel_headers             = false # Requires Pro or Enterprise plan
@@ -89,7 +88,6 @@ endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.
 - `enforce_https` (Boolean) Enforces HTTPS on all endpoints of this environment
 - `event_catalog_published` (Boolean) Enable this to make your Event Catalog public. You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog
-- `read_only` (Boolean) Sets your Consumer App Portal to read only so your customers can view but not modify their data
 - `require_channel_filtering` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
 - `require_event_type_filtering` (Boolean) If enabled, all new Endpoints must filter on at least one event type.
 - `whitelabel_headers` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Changes the prefix of the webhook HTTP headers to use the`webhook-` prefix. <strong>Changing this setting can break existing integrations</strong>

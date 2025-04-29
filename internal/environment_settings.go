@@ -312,13 +312,6 @@ method, destination URL, and payload body in-flight.`,
 				MarkdownDescription: "Enable this to make your Event Catalog public. " +
 					"You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog",
 			},
-			"read_only": schema.BoolAttribute{
-				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
-				Optional:            true,
-				Computed:            true,
-				Description:         "Read Only mode",
-				MarkdownDescription: `Sets your Consumer App Portal to read only so your customers can view but not modify their data`,
-			},
 			"require_channel_filtering": schema.BoolAttribute{
 				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:            true,
@@ -510,7 +503,6 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		EnableTransformations:       types.BoolPointerValue(v.EnableTransformations),
 		EnforceHttps:                types.BoolPointerValue(v.EnforceHttps),
 		EventCatalogPublished:       types.BoolPointerValue(v.EventCatalogPublished),
-		ReadOnly:                    types.BoolPointerValue(v.ReadOnly),
 		RequireEndpointChannel:      types.BoolPointerValue(v.RequireEndpointChannel),
 		RequireEndpointFilterTypes:  types.BoolPointerValue(v.RequireEndpointFilterTypes),
 		WhitelabelHeaders:           types.BoolPointerValue(v.WhitelabelHeaders),

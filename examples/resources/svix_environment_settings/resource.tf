@@ -39,7 +39,6 @@ resource "svix_environment_settings" "example_environment_settings" {
   enable_transformations         = false
   enforce_https                  = true
   event_catalog_published        = false
-  read_only                      = false
   require_channel_filtering      = false
   require_event_type_filtering   = false
   whitelabel_headers             = false # Requires Pro or Enterprise plan
