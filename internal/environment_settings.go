@@ -281,14 +281,6 @@ more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endp
 Consumer App Portal. We recommend disabling this if you manage
 integrations on your users' behalf.`,
 			},
-			"enable_advanced_endpoint_types": schema.BoolAttribute{
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Computed:      true,
-				Description:   "Advanced endpoint types",
-				MarkdownDescription: REQUIRES_PRO_OR_ENTERPRISE_PLAN + `Allows users to configure Polling Endpoints and FIFO endpoints to get
-messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).`,
-			},
 			"enable_transformations": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:      true,
@@ -499,7 +491,6 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		EnableEndpointMtlsConfig:    types.BoolPointerValue(v.EnableEndpointMtlsConfig),
 		EnableEndpointOauthConfig:   types.BoolPointerValue(v.EnableEndpointOauthConfig),
 		EnableIntegrationManagement: types.BoolPointerValue(v.EnableIntegrationManagement),
-		EnableMessageStream:         types.BoolPointerValue(v.EnableMessageStream),
 		EnableTransformations:       types.BoolPointerValue(v.EnableTransformations),
 		EnforceHttps:                types.BoolPointerValue(v.EnforceHttps),
 		EventCatalogPublished:       types.BoolPointerValue(v.EventCatalogPublished),
