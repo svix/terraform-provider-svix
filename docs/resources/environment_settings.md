@@ -45,18 +45,18 @@ resource "svix_environment_settings" "example_environment_settings" {
     }
   }
 
-  disable_endpoint_on_failure   = false
-  enable_channels               = false
-  enable_endpoint_mtls_config   = false # Requires Enterprise plan
-  enable_endpoint_oauth_config  = false # Requires Enterprise plan
-  enable_integration_management = true
-  enable_transformations        = false
-  enforce_https                 = true
-  event_catalog_published       = false
-  require_channel_filtering     = false
-  require_event_type_filtering  = false
-  whitelabel_headers            = false # Requires Pro or Enterprise plan
-  purge_delivered_payloads      = false # Requires Pro or Enterprise plan
+  disable_endpoint_on_failure           = false
+  enable_channels                       = false
+  enable_endpoint_mtls_config           = false # Requires Enterprise plan
+  enable_endpoint_oauth_config          = false # Requires Enterprise plan
+  enable_integration_management         = true
+  enable_transformations                = false
+  enforce_https                         = true
+  event_catalog_published               = false
+  require_channel_filtering             = false
+  require_event_type_filtering          = false
+  whitelabel_headers                    = false # Requires Pro or Enterprise plan
+  delete_payload_on_successful_delivery = false # Requires Pro or Enterprise plan
 }
 ```
 
@@ -69,6 +69,9 @@ resource "svix_environment_settings" "example_environment_settings" {
 
 ### Optional
 
+- `delete_payload_on_successful_delivery` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Delete message payloads from Svix after they are successfully
+delivered to the endpoint. Only affects messages sent after this
+setting is enabled.
 - `disable_endpoint_on_failure` (Boolean) If messages to a particular endpoint have been consistently failing for
 some time, we will automatically disable the endpoint and let 
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
@@ -85,9 +88,6 @@ endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.
 - `enforce_https` (Boolean) Enforces HTTPS on all endpoints of this environment
 - `event_catalog_published` (Boolean) Enable this to make your Event Catalog public. You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog
-- `purge_delivered_payloads` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Delete message payloads from Svix after they are successfully
-delivered to the endpoint. Only affects messages sent after this
-setting is enabled.
 - `require_channel_filtering` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
 - `require_event_type_filtering` (Boolean) If enabled, all new Endpoints must filter on at least one event type.
 - `whitelabel_headers` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Changes the prefix of the webhook HTTP headers to use the`webhook-` prefix. <strong>Changing this setting can break existing integrations</strong>

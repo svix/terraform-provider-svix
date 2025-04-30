@@ -327,7 +327,7 @@ method, destination URL, and payload body in-flight.`,
 					"Changes the prefix of the webhook HTTP headers to use the" +
 					"`webhook-` prefix. <strong>Changing this setting can break existing integrations</strong>",
 			},
-			"purge_delivered_payloads": schema.BoolAttribute{
+			"delete_payload_on_successful_delivery": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:      true,
 				Computed:      true,

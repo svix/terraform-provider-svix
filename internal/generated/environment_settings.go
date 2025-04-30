@@ -71,7 +71,7 @@ type EnvironmentSettingsResourceModel struct {
 	RequireEndpointChannel      types.Bool   `tfsdk:"require_channel_filtering"`
 	RequireEndpointFilterTypes  types.Bool   `tfsdk:"require_event_type_filtering"`
 	WhitelabelHeaders           types.Bool   `tfsdk:"whitelabel_headers"`
-	WipeSuccessfulPayload       types.Bool   `tfsdk:"purge_delivered_payloads"`
+	WipeSuccessfulPayload       types.Bool   `tfsdk:"delete_payload_on_successful_delivery"`
 
 	WhitelabelSettings basetypes.ObjectValue `tfsdk:"whitelabel_settings"`
 }
