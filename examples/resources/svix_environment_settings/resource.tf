@@ -38,8 +38,8 @@ resource "svix_environment_settings" "example_environment_settings" {
   enable_transformations                = false
   enforce_https                         = true
   event_catalog_published               = false
-  require_channel_filtering             = false
-  require_event_type_filtering          = false
+  require_endpoint_channels             = false
+  require_endpoint_event_types          = false
   whitelabel_headers                    = false # Requires Pro or Enterprise plan
   delete_payload_on_successful_delivery = false # Requires Pro or Enterprise plan
 }

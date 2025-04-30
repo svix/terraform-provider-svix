@@ -68,8 +68,8 @@ type EnvironmentSettingsResourceModel struct {
 	EnableTransformations       types.Bool   `tfsdk:"enable_transformations"`
 	EnforceHttps                types.Bool   `tfsdk:"enforce_https"`
 	EventCatalogPublished       types.Bool   `tfsdk:"event_catalog_published"`
-	RequireEndpointChannel      types.Bool   `tfsdk:"require_channel_filtering"`
-	RequireEndpointFilterTypes  types.Bool   `tfsdk:"require_event_type_filtering"`
+	RequireEndpointChannel      types.Bool   `tfsdk:"require_endpoint_channels"`
+	RequireEndpointFilterTypes  types.Bool   `tfsdk:"require_endpoint_event_types"`
 	WhitelabelHeaders           types.Bool   `tfsdk:"whitelabel_headers"`
 	WipeSuccessfulPayload       types.Bool   `tfsdk:"delete_payload_on_successful_delivery"`
 

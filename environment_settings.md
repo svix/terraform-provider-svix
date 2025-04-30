@@ -53,8 +53,8 @@ resource "svix_environment_settings" "example_environment_settings" {
   enable_transformations                = false
   enforce_https                         = true
   event_catalog_published               = false
-  require_channel_filtering             = false
-  require_event_type_filtering          = false
+  require_endpoint_channels             = false
+  require_endpoint_event_types          = false
   whitelabel_headers                    = false # Requires Pro or Enterprise plan
   delete_payload_on_successful_delivery = false # Requires Pro or Enterprise plan
 }
@@ -88,8 +88,8 @@ endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.
 - `enforce_https` (Boolean) Enforces HTTPS on all endpoints of this environment
 - `event_catalog_published` (Boolean) Enable this to make your Event Catalog public. You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog
-- `require_channel_filtering` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
-- `require_event_type_filtering` (Boolean) If enabled, all new Endpoints must filter on at least one event type.
+- `require_endpoint_channels` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
+- `require_endpoint_event_types` (Boolean) If enabled, all new Endpoints must filter on at least one event type.
 - `whitelabel_headers` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Changes the prefix of the webhook HTTP headers to use the`webhook-` prefix. <strong>Changing this setting can break existing integrations</strong>
 - `whitelabel_settings` (Attributes) Customize how the [Consumer App Portal](https://docs.svix.com/management-ui) will look for your users in this environment. (see [below for nested schema](#nestedatt--whitelabel_settings))
 

@@ -304,14 +304,14 @@ method, destination URL, and payload body in-flight.`,
 				MarkdownDescription: "Enable this to make your Event Catalog public. " +
 					"You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog",
 			},
-			"require_channel_filtering": schema.BoolAttribute{
+			"require_endpoint_channels": schema.BoolAttribute{
 				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:            true,
 				Computed:            true,
 				Description:         "Require channel filters for endpoints",
 				MarkdownDescription: "If enabled, all new Endpoints must filter on at least one channel.",
 			},
-			"require_event_type_filtering": schema.BoolAttribute{
+			"require_endpoint_event_types": schema.BoolAttribute{
 				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:            true,
 				Computed:            true,
