@@ -49,7 +49,6 @@ resource "svix_environment_settings" "example_environment_settings" {
   enable_channels                       = false
   enable_endpoint_mtls_config           = false # Requires Enterprise plan
   enable_endpoint_oauth_config          = false # Requires Enterprise plan
-  enable_integration_management         = true
   enable_transformations                = false
   enforce_https                         = true
   event_catalog_published               = false
@@ -80,9 +79,6 @@ more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endp
 <strong>channels</strong> from the Consumer App Portal.
 - `enable_endpoint_mtls_config` (Boolean) <strong>Requires Enterprise plan</strong>, Allows users to configure mutual TLS (mTLS) for their endpoints.
 - `enable_endpoint_oauth_config` (Boolean) <strong>Requires Enterprise plan</strong>, Allows users to configure OAuth for their endpoints.
-- `enable_integration_management` (Boolean) Controls whether or not your users can manage integrations from the
-Consumer App Portal. We recommend disabling this if you manage
-integrations on your users' behalf.
 - `enable_transformations` (Boolean) Controls whether or not your users can add transformations to their
 endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.

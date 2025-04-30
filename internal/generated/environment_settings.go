@@ -59,19 +59,18 @@ func PatchFontSizeConfigWithPlan(
 
 // Terraform wrapper around `svixmodels.SettingsInternalIn`
 type EnvironmentSettingsResourceModel struct {
-	EnvironmentId               types.String `tfsdk:"environment_id"`
-	DisableEndpointOnFailure    types.Bool   `tfsdk:"disable_endpoint_on_failure"`
-	EnableChannels              types.Bool   `tfsdk:"enable_channels"`
-	EnableEndpointMtlsConfig    types.Bool   `tfsdk:"enable_endpoint_mtls_config"`
-	EnableEndpointOauthConfig   types.Bool   `tfsdk:"enable_endpoint_oauth_config"`
-	EnableIntegrationManagement types.Bool   `tfsdk:"enable_integration_management"`
-	EnableTransformations       types.Bool   `tfsdk:"enable_transformations"`
-	EnforceHttps                types.Bool   `tfsdk:"enforce_https"`
-	EventCatalogPublished       types.Bool   `tfsdk:"event_catalog_published"`
-	RequireEndpointChannel      types.Bool   `tfsdk:"require_endpoint_channels"`
-	RequireEndpointFilterTypes  types.Bool   `tfsdk:"require_endpoint_event_types"`
-	WhitelabelHeaders           types.Bool   `tfsdk:"whitelabel_headers"`
-	WipeSuccessfulPayload       types.Bool   `tfsdk:"delete_payload_on_successful_delivery"`
+	EnvironmentId              types.String `tfsdk:"environment_id"`
+	DisableEndpointOnFailure   types.Bool   `tfsdk:"disable_endpoint_on_failure"`
+	EnableChannels             types.Bool   `tfsdk:"enable_channels"`
+	EnableEndpointMtlsConfig   types.Bool   `tfsdk:"enable_endpoint_mtls_config"`
+	EnableEndpointOauthConfig  types.Bool   `tfsdk:"enable_endpoint_oauth_config"`
+	EnableTransformations      types.Bool   `tfsdk:"enable_transformations"`
+	EnforceHttps               types.Bool   `tfsdk:"enforce_https"`
+	EventCatalogPublished      types.Bool   `tfsdk:"event_catalog_published"`
+	RequireEndpointChannel     types.Bool   `tfsdk:"require_endpoint_channels"`
+	RequireEndpointFilterTypes types.Bool   `tfsdk:"require_endpoint_event_types"`
+	WhitelabelHeaders          types.Bool   `tfsdk:"whitelabel_headers"`
+	WipeSuccessfulPayload      types.Bool   `tfsdk:"delete_payload_on_successful_delivery"`
 
 	WhitelabelSettings basetypes.ObjectValue `tfsdk:"whitelabel_settings"`
 }
@@ -263,9 +262,6 @@ func PatchSettingsInternalInWithPlan(
 	}
 	if !planedModel.EnableEndpointOauthConfig.IsUnknown() {
 		outModel.EnableEndpointOauthConfig = planedModel.EnableEndpointOauthConfig.ValueBoolPointer()
-	}
-	if !planedModel.EnableIntegrationManagement.IsUnknown() {
-		outModel.EnableIntegrationManagement = planedModel.EnableIntegrationManagement.ValueBoolPointer()
 	}
 	if !planedModel.EnableTransformations.IsUnknown() {
 		outModel.EnableTransformations = planedModel.EnableTransformations.ValueBoolPointer()

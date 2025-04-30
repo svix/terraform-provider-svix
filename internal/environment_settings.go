@@ -272,15 +272,6 @@ more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endp
 				Description:         "Enable OAuth configuration",
 				MarkdownDescription: REQUIRES_ENTERPRISE_PLAN + "Allows users to configure OAuth for their endpoints.",
 			},
-			"enable_integration_management": schema.BoolAttribute{
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Computed:      true,
-				Description:   "Allow users to manage integrations",
-				MarkdownDescription: `Controls whether or not your users can manage integrations from the
-Consumer App Portal. We recommend disabling this if you manage
-integrations on your users' behalf.`,
-			},
 			"enable_transformations": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:      true,
@@ -484,20 +475,19 @@ func customColorPaletteToTF(v models.CustomColorPalette) generated.CustomColorPa
 }
 func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string) generated.EnvironmentSettingsResourceModel {
 	out := generated.EnvironmentSettingsResourceModel{
-		WhitelabelSettings:          basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
-		EnvironmentId:               types.StringValue(envId),
-		DisableEndpointOnFailure:    types.BoolPointerValue(v.DisableEndpointOnFailure),
-		EnableChannels:              types.BoolPointerValue(v.EnableChannels),
-		EnableEndpointMtlsConfig:    types.BoolPointerValue(v.EnableEndpointMtlsConfig),
-		EnableEndpointOauthConfig:   types.BoolPointerValue(v.EnableEndpointOauthConfig),
-		EnableIntegrationManagement: types.BoolPointerValue(v.EnableIntegrationManagement),
-		EnableTransformations:       types.BoolPointerValue(v.EnableTransformations),
-		EnforceHttps:                types.BoolPointerValue(v.EnforceHttps),
-		EventCatalogPublished:       types.BoolPointerValue(v.EventCatalogPublished),
-		RequireEndpointChannel:      types.BoolPointerValue(v.RequireEndpointChannel),
-		RequireEndpointFilterTypes:  types.BoolPointerValue(v.RequireEndpointFilterTypes),
-		WhitelabelHeaders:           types.BoolPointerValue(v.WhitelabelHeaders),
-		WipeSuccessfulPayload:       types.BoolPointerValue(v.WipeSuccessfulPayload),
+		WhitelabelSettings:         basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
+		EnvironmentId:              types.StringValue(envId),
+		DisableEndpointOnFailure:   types.BoolPointerValue(v.DisableEndpointOnFailure),
+		EnableChannels:             types.BoolPointerValue(v.EnableChannels),
+		EnableEndpointMtlsConfig:   types.BoolPointerValue(v.EnableEndpointMtlsConfig),
+		EnableEndpointOauthConfig:  types.BoolPointerValue(v.EnableEndpointOauthConfig),
+		EnableTransformations:      types.BoolPointerValue(v.EnableTransformations),
+		EnforceHttps:               types.BoolPointerValue(v.EnforceHttps),
+		EventCatalogPublished:      types.BoolPointerValue(v.EventCatalogPublished),
+		RequireEndpointChannel:     types.BoolPointerValue(v.RequireEndpointChannel),
+		RequireEndpointFilterTypes: types.BoolPointerValue(v.RequireEndpointFilterTypes),
+		WhitelabelHeaders:          types.BoolPointerValue(v.WhitelabelHeaders),
+		WipeSuccessfulPayload:      types.BoolPointerValue(v.WipeSuccessfulPayload),
 	}
 
 	{

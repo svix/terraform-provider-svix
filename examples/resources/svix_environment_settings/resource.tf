@@ -34,7 +34,6 @@ resource "svix_environment_settings" "example_environment_settings" {
   enable_channels                       = false
   enable_endpoint_mtls_config           = false # Requires Enterprise plan
   enable_endpoint_oauth_config          = false # Requires Enterprise plan
-  enable_integration_management         = true
   enable_transformations                = false
   enforce_https                         = true
   event_catalog_published               = false
