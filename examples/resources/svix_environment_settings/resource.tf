@@ -11,12 +11,6 @@ resource "svix_environment_settings" "example_environment_settings" {
     base_font_size  = 16
     font_family     = "Custom"
     font_family_url = "https://fonts.gstatic.com/s/librebaskerville.woff2"
-    color_palette_dark = {
-      primary = "#3182CE"
-    }
-    color_palette_light = {
-      primary = "#3182CE"
-    }
     border_radius = {
       button = "full"
       card   = "lg"
