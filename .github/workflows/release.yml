@@ -9,7 +9,7 @@ on:
       - "v*"
 
 jobs:
-  check-version:
+  check-release-tag:
     runs-on: ubuntu-24.04
     permissions: {}
     steps:
@@ -25,7 +25,7 @@ jobs:
 
   goreleaser:
     needs:
-      - check-version
+      - check-release-tag
     permissions:
       contents: write
     runs-on: ubuntu-24.04
