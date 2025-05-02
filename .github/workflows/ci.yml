@@ -3,6 +3,8 @@ name: CI
 on:
   pull_request:
   push:
+    branches:
+      - main
 
 # Testing only needs permissions to read the repository contents.
 permissions:
