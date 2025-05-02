@@ -213,7 +213,7 @@ func PatchSettingsInternalInWithPlan(
 				UnhandledNullAsEmpty:    false,
 				UnhandledUnknownAsEmpty: false,
 			})...)
-			colorPaletteOut := patchColorPaletteWithPlan(ctx, d, planedWhitelabelSettings)
+			colorPaletteOut := patchColorPaletteWithPlan(ctx, d, planedWhitelabelSettings.ColorPaletteDark)
 			outModel.ColorPaletteDark = colorPaletteOut
 		}
 
@@ -223,7 +223,7 @@ func PatchSettingsInternalInWithPlan(
 				UnhandledNullAsEmpty:    false,
 				UnhandledUnknownAsEmpty: false,
 			})...)
-			colorPaletteOut := patchColorPaletteWithPlan(ctx, d, planedWhitelabelSettings)
+			colorPaletteOut := patchColorPaletteWithPlan(ctx, d, planedWhitelabelSettings.ColorPaletteLight)
 			outModel.ColorPaletteLight = colorPaletteOut
 		}
 
@@ -355,9 +355,9 @@ func (v *BorderRadius) AttributeTypes() map[string]attr.Type {
 	return BorderRadius_AttributeTypes()
 }
 
-func patchColorPaletteWithPlan(ctx context.Context, d *diag.Diagnostics, planedWhitelabelSettings WhitelabelSettings) *svixmodels.CustomColorPalette {
+func patchColorPaletteWithPlan(ctx context.Context, d *diag.Diagnostics, colorPalette basetypes.ObjectValue) *svixmodels.CustomColorPalette {
 	var planedColorPalette CustomColorPalette_TF
-	d.Append(planedWhitelabelSettings.ColorPaletteLight.As(ctx, &planedColorPalette, basetypes.ObjectAsOptions{
+	d.Append(colorPalette.As(ctx, &planedColorPalette, basetypes.ObjectAsOptions{
 		UnhandledNullAsEmpty:    false,
 		UnhandledUnknownAsEmpty: false,
 	})...)

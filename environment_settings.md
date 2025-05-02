@@ -31,6 +31,28 @@ resource "svix_environment_settings" "example_environment_settings" {
       card   = "lg"
       input  = "none"
     }
+    color_palette_dark = {
+      surface_hover      = "#1A202C"
+      background         = "#1A202C"
+      surface_secondary  = "#171923"
+      button_primary     = "#4299E1"
+      interactive_accent = "#4299E1"
+      navigation_accent  = "#4299E1"
+      primary            = "#3182CE"
+      text_danger        = "#FC8181"
+      text_primary       = "#FFFFFF"
+    }
+    color_palette_light = {
+      surface_hover      = "#EDF2F7"
+      background         = "#F8F9FD"
+      surface_secondary  = "#FFFFFF"
+      button_primary     = "#3182CE"
+      interactive_accent = "#3182CE"
+      navigation_accent  = "#3182CE"
+      primary            = "#3182CE"
+      text_danger        = "#E53E3E"
+      text_primary       = "#1A202C"
+    }
     # Advanced settings
     channels_strings_override = {
       channels_one  = "channel"
@@ -38,7 +60,6 @@ resource "svix_environment_settings" "example_environment_settings" {
       channels_help = "Channels are an extra dimension of filtering messages orthogonal to event types. They are case-sensitive and only messages with the corresponding channel will be sent to this endpoint."
     }
   }
-
   disable_endpoint_on_failure           = false
   enable_channels                       = false
   enable_endpoint_mtls_config           = false # Requires Enterprise plan

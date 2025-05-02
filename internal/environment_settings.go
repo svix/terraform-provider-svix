@@ -358,8 +358,6 @@ func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	Spw(data)
-
 	// create svix client
 	svx, err := r.state.InternalClientWithEnvId(envId)
 	if err != nil {
@@ -391,7 +389,6 @@ func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.C
 func (r *EnvironmentSettingsResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// load state/plan
 	var envId string
-	Spw(req.State.Raw)
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -409,11 +406,9 @@ func (r *EnvironmentSettingsResource) Read(ctx context.Context, req resource.Rea
 		logSvixError(&resp.Diagnostics, err, "Failed to get environment settings")
 		return
 	}
-	Spw(res)
 	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, *res, envId)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, outModel)...)
-	Spw(resp.State.Raw)
 }
 
 func (r *EnvironmentSettingsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
