@@ -22,7 +22,6 @@ var _ provider.ProviderWithFunctions = &SvixProvider{}
 var _ provider.ProviderWithEphemeralResources = &SvixProvider{}
 
 type SvixProvider struct {
-	version string
 }
 
 type SvixProviderModel struct {
@@ -32,7 +31,7 @@ type SvixProviderModel struct {
 
 func (p *SvixProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "svix"
-	resp.Version = p.version
+	resp.Version = Version
 }
 
 func (p *SvixProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
@@ -129,11 +128,9 @@ func (p *SvixProvider) Functions(ctx context.Context) []func() function.Function
 	return nil
 }
 
-func New(version string) func() provider.Provider {
+func New() func() provider.Provider {
 	return func() provider.Provider {
-		return &SvixProvider{
-			version: version,
-		}
+		return &SvixProvider{}
 	}
 }
 

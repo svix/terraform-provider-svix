@@ -9,8 +9,6 @@ import (
 	provider "github.com/svix/terraform-provider-svix/internal"
 )
 
-var version string = "dev"
-
 func main() {
 	var debug bool
 
@@ -23,7 +21,7 @@ func main() {
 		ProtocolVersion: 6,
 	}
 
-	err := providerserver.Serve(context.Background(), provider.New(version), opts)
+	err := providerserver.Serve(context.Background(), provider.New(), opts)
 
 	if err != nil {
 		log.Fatal(err.Error())
