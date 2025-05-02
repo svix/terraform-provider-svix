@@ -14,3 +14,11 @@ generate:
 
 fmt:
   gofmt -s -w -e .
+
+bump-version new_version:
+  cd tools; go run version-util.go bump {{ new_version }}
+  just generate
+
+check-version version:
+  cd tools; go run version-util.go check {{ version }}
+  just generate
