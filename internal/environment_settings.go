@@ -57,6 +57,64 @@ var fontFamilyEnum = []string{
 	"Custom",
 }
 
+var colorPaletteSchema = schema.SingleNestedAttribute{
+	Optional:      true,
+	PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+	Attributes: map[string]schema.Attribute{
+		"primary": schema.StringAttribute{
+			PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:      true,
+			Description:   "Primary color",
+		},
+		"background": schema.StringAttribute{
+			PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:      true,
+			Description:   "Background",
+		},
+		"surface_background": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Surface Background",
+			MarkdownDescription: "Background for cards, tables and other surfaces",
+		},
+		"surface_hover": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Surface Header",
+			MarkdownDescription: "Background for card headers and table headers",
+		},
+		"interactive_accent": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Interactive Accent",
+			MarkdownDescription: "For secondary buttons, links, and other interactive elements",
+		},
+		"navigation_accent": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Navigation Accent",
+			MarkdownDescription: "For the top-level navigation items",
+		},
+		"button_primary": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Button Primary",
+			MarkdownDescription: "For the main action buttons",
+		},
+		"text_primary": schema.StringAttribute{
+			PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:      true,
+			Description:   "Text Primary",
+		},
+		"text_danger": schema.StringAttribute{
+			PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			Optional:            true,
+			Description:         "Text Danger",
+			MarkdownDescription: "For error messages and other warnings",
+		},
+	},
+}
+
 // Metadata implements resource.Resource.
 func (r *EnvironmentSettingsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = "svix_environment_settings"
@@ -72,183 +130,59 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"color_palette_dark": schema.SingleNestedAttribute{
-				Optional:      true,
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+			"whitelabel_settings": schema.SingleNestedAttribute{
+				PlanModifiers:       []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				Optional:            true,
+				MarkdownDescription: "Customize how the [Consumer App Portal](https://docs.svix.com/management-ui) will look for your users in this environment.",
 				Attributes: map[string]schema.Attribute{
-					"background_hover": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+					"display_name": schema.StringAttribute{
 						Optional:            true,
-						Description:         "Surface Header",
-						MarkdownDescription: "Background for card headers and table headers",
+						Computed:            true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Description:         "Display Name",
+						MarkdownDescription: "The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).",
 					},
-					"background_primary": schema.StringAttribute{
+					"base_font_size": schema.Int64Attribute{
+						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+						Validators: []validator.Int64{
+							// this is the limit we have in the front-end
+							int64validator.AtMost(23),
+							int64validator.AtLeast(8),
+						},
+						Optional:            true,
+						MarkdownDescription: "This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px",
+						Description:         "Base Font Size (in pixels)",
+					},
+					"font_family": schema.StringAttribute{
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Background",
+						Validators: []validator.String{
+							stringvalidator.OneOf(fontFamilyEnum...),
+							customFontFamilyValidator{},
+						},
+						Optional:    true,
+						Description: "Font Family",
+						MarkdownDescription: "Can be one of `" + strings.Join(fontFamilyEnum[:len(fontFamilyEnum)-1], "`, `") + "` and `Custom`\n\n" +
+							"You can also set a custom font by providing a URL to a font file. \n\n" +
+							"If you chose to use the `font_family_url` make sure to set this to `Custom`\n",
 					},
-					"background_secondary": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Surface Background",
-						MarkdownDescription: "Background for cards, tables and other surfaces",
-					},
-					"button_primary": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Button Primary",
-						MarkdownDescription: "For the main action buttons",
-					},
-					"interactive_accent": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Interactive Accent",
-						MarkdownDescription: "For secondary buttons, links, and other interactive elements",
-					},
-					"navigation_accent": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Navigation Accent",
-						MarkdownDescription: "For the top-level navigation items",
-					},
-					"primary": schema.StringAttribute{
+					"font_family_url": schema.StringAttribute{
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Validators:    []validator.String{customFontURLValidator{}},
 						Optional:      true,
-						Description:   "Primary color",
+						Description:   "Font Family URL",
+						MarkdownDescription: "URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)\n\n" +
+							"Make sure to set `font_family` to `Custom`",
 					},
-					"text_danger": schema.StringAttribute{
+					"logo_url": schema.StringAttribute{
 						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Optional:            true,
-						Description:         "Text Danger",
-						MarkdownDescription: "For error messages and other warnings",
+						Description:         "Icon URL",
+						MarkdownDescription: "Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).",
 					},
-					"text_primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Text Primary",
-					},
-				},
-			},
 
-			"color_palette_light": schema.SingleNestedAttribute{
-				Optional:      true,
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-				Attributes: map[string]schema.Attribute{
-					"background_hover": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Surface Header",
-						MarkdownDescription: "Background for card headers and table headers",
-					},
-					"background_primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Background",
-					},
-					"background_secondary": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Surface Background",
-						MarkdownDescription: "Background for cards, tables and other surfaces",
-					},
-					"button_primary": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Button Primary",
-						MarkdownDescription: "For the main action buttons",
-					},
-					"interactive_accent": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Interactive Accent",
-						MarkdownDescription: "For secondary buttons, links, and other interactive elements",
-					},
-					"navigation_accent": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Navigation Accent",
-						MarkdownDescription: "For the top-level navigation items",
-					},
-					"primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Primary color",
-					},
-					"text_danger": schema.StringAttribute{
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:            true,
-						Description:         "Text Danger",
-						MarkdownDescription: "For error messages and other warnings",
-					},
-					"text_primary": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Text Primary",
-					},
-				},
-			},
-			"base_font_size": schema.Int64Attribute{
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
-				Validators: []validator.Int64{
-					// this is the limit we have in the front-end
-					int64validator.AtMost(23),
-					int64validator.AtLeast(8),
-				},
-				Optional:            true,
-				MarkdownDescription: "This affects all text size on the screen relative to the size of the text in the main body of the page. Default: 16px",
-				Description:         "Base Font Size (in pixels)",
-			},
-			"font_family": schema.StringAttribute{
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Validators: []validator.String{
-					stringvalidator.OneOf(fontFamilyEnum...),
-					customFontFamilyValidator{},
-				},
-				Optional:    true,
-				Description: "Font Family",
-				MarkdownDescription: "Can be one of `" + strings.Join(fontFamilyEnum[:len(fontFamilyEnum)-1], "`, `") + "` and `Custom`\n\n" +
-					"You can also set a custom font by providing a URL to a font file. \n\n" +
-					"If you chose to use the `font_family_url` make sure to set this to `Custom`\n",
-			},
-			"font_family_url": schema.StringAttribute{
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Validators:    []validator.String{customFontURLValidator{}},
-				Optional:      true,
-				Description:   "Font Family URL",
-				MarkdownDescription: "URL of a woff2 font file (e.g. https://fonts.gstatic.com/s/librebaskerville.woff2)\n\n" +
-					"Make sure to set `font_family` to `Custom`",
-			},
-			"logo_url": schema.StringAttribute{
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Optional:            true,
-				Description:         "Icon URL",
-				MarkdownDescription: "Used in the standalone App Portal experience. Not visible in the [embedded App Portal](https://docs.svix.com/management-ui).",
-			},
-			"channels_strings_override": schema.SingleNestedAttribute{
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Description:   "Rename 'channels' in the App Portal, depending on the usage you give them in your application.",
-				Attributes: map[string]schema.Attribute{
-					"channels_help": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Channels help text.",
-					},
-					"channels_many": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Plural form.",
-					},
-					"channels_one": schema.StringAttribute{
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Optional:      true,
-						Description:   "Singular form.",
-					},
-				},
-			},
-			"theme_override": schema.SingleNestedAttribute{
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
+					"color_palette_dark":  colorPaletteSchema,
+					"color_palette_light": colorPaletteSchema,
+
 					"border_radius": schema.SingleNestedAttribute{
 						Optional:    true,
 						Description: "Borders",
@@ -282,6 +216,28 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 							},
 						},
 					},
+					"channels_strings_override": schema.SingleNestedAttribute{
+						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+						Optional:      true,
+						Description:   "Rename 'channels' in the App Portal, depending on the usage you give them in your application.",
+						Attributes: map[string]schema.Attribute{
+							"channels_help": schema.StringAttribute{
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Optional:      true,
+								Description:   "Channels help text.",
+							},
+							"channels_many": schema.StringAttribute{
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Optional:      true,
+								Description:   "Plural form.",
+							},
+							"channels_one": schema.StringAttribute{
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Optional:      true,
+								Description:   "Singular form.",
+							},
+						},
+					},
 				},
 			},
 			"disable_endpoint_on_failure": schema.BoolAttribute{
@@ -293,13 +249,6 @@ func (r *EnvironmentSettingsResource) Schema(ctx context.Context, req resource.S
 some time, we will automatically disable the endpoint and let 
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
 more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endpoints).`,
-			},
-			"display_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Description:         "Display Name",
-				MarkdownDescription: "The name of your company or service. Visible to users in the App Portal and the [Event Catalog](https://docs.svix.com/event-types#publishing-your-event-catalog).",
 			},
 			"enable_channels": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
@@ -322,23 +271,6 @@ more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endp
 				Computed:            true,
 				Description:         "Enable OAuth configuration",
 				MarkdownDescription: REQUIRES_ENTERPRISE_PLAN + "Allows users to configure OAuth for their endpoints.",
-			},
-			"enable_integration_management": schema.BoolAttribute{
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Computed:      true,
-				Description:   "Allow users to manage integrations",
-				MarkdownDescription: `Controls whether or not your users can manage integrations from the
-Consumer App Portal. We recommend disabling this if you manage
-integrations on your users' behalf.`,
-			},
-			"enable_message_stream": schema.BoolAttribute{
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
-				Optional:      true,
-				Computed:      true,
-				Description:   "Advanced endpoint types",
-				MarkdownDescription: REQUIRES_PRO_OR_ENTERPRISE_PLAN + `Allows users to configure Polling Endpoints and FIFO endpoints to get
-messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).`,
 			},
 			"enable_transformations": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
@@ -363,19 +295,19 @@ method, destination URL, and payload body in-flight.`,
 				MarkdownDescription: "Enable this to make your Event Catalog public. " +
 					"You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog",
 			},
-			"read_only": schema.BoolAttribute{
-				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
-				Optional:            true,
-				Computed:            true,
-				Description:         "Read Only mode",
-				MarkdownDescription: `Sets your Consumer App Portal to read only so your customers can view but not modify their data`,
-			},
-			"require_endpoint_channel": schema.BoolAttribute{
+			"require_endpoint_channels": schema.BoolAttribute{
 				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:            true,
 				Computed:            true,
 				Description:         "Require channel filters for endpoints",
 				MarkdownDescription: "If enabled, all new Endpoints must filter on at least one channel.",
+			},
+			"require_endpoint_event_types": schema.BoolAttribute{
+				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+				Optional:            true,
+				Computed:            true,
+				Description:         "Require event type filters for endpoints",
+				MarkdownDescription: "If enabled, all new Endpoints must filter on at least one event type.",
 			},
 			"whitelabel_headers": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
@@ -386,7 +318,7 @@ method, destination URL, and payload body in-flight.`,
 					"Changes the prefix of the webhook HTTP headers to use the" +
 					"`webhook-` prefix. <strong>Changing this setting can break existing integrations</strong>",
 			},
-			"wipe_successful_payload": schema.BoolAttribute{
+			"delete_payload_on_successful_delivery": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:      true,
 				Computed:      true,
@@ -457,7 +389,6 @@ func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.C
 func (r *EnvironmentSettingsResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// load state/plan
 	var envId string
-	Spw(req.State.Raw)
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -475,11 +406,9 @@ func (r *EnvironmentSettingsResource) Read(ctx context.Context, req resource.Rea
 		logSvixError(&resp.Diagnostics, err, "Failed to get environment settings")
 		return
 	}
-	Spw(res)
 	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, *res, envId)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, outModel)...)
-	Spw(resp.State.Raw)
 }
 
 func (r *EnvironmentSettingsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -541,71 +470,74 @@ func customColorPaletteToTF(v models.CustomColorPalette) generated.CustomColorPa
 }
 func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string) generated.EnvironmentSettingsResourceModel {
 	out := generated.EnvironmentSettingsResourceModel{
-		ColorPaletteDark:            basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
-		ColorPaletteLight:           basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
-		CustomStringsOverride:       basetypes.NewObjectNull(generated.CustomStringsOverride_TF_AttributeTypes()),
-		CustomThemeOverride:         basetypes.NewObjectNull(generated.CustomThemeOverride_TF_AttributeTypes()),
-		EnvironmentId:               types.StringValue(envId),
-		CustomBaseFontSize:          types.Int64PointerValue(v.CustomBaseFontSize),
-		CustomFontFamily:            types.StringPointerValue(v.CustomFontFamily),
-		CustomFontFamilyUrl:         types.StringPointerValue(v.CustomFontFamilyUrl),
-		CustomLogoUrl:               types.StringPointerValue(v.CustomLogoUrl),
-		DisableEndpointOnFailure:    types.BoolPointerValue(v.DisableEndpointOnFailure),
-		DisplayName:                 types.StringPointerValue(v.DisplayName),
-		EnableChannels:              types.BoolPointerValue(v.EnableChannels),
-		EnableEndpointMtlsConfig:    types.BoolPointerValue(v.EnableEndpointMtlsConfig),
-		EnableEndpointOauthConfig:   types.BoolPointerValue(v.EnableEndpointOauthConfig),
-		EnableIntegrationManagement: types.BoolPointerValue(v.EnableIntegrationManagement),
-		EnableMessageStream:         types.BoolPointerValue(v.EnableMessageStream),
-		EnableTransformations:       types.BoolPointerValue(v.EnableTransformations),
-		EnforceHttps:                types.BoolPointerValue(v.EnforceHttps),
-		EventCatalogPublished:       types.BoolPointerValue(v.EventCatalogPublished),
-		ReadOnly:                    types.BoolPointerValue(v.ReadOnly),
-		RequireEndpointChannel:      types.BoolPointerValue(v.RequireEndpointChannel),
-		WhitelabelHeaders:           types.BoolPointerValue(v.WhitelabelHeaders),
-		WipeSuccessfulPayload:       types.BoolPointerValue(v.WipeSuccessfulPayload),
-	}
-	if v.ColorPaletteDark != nil {
-		colorPaletteDarkTf := customColorPaletteToTF(*v.ColorPaletteDark)
-		colorPaletteDark, diags := types.ObjectValueFrom(ctx, colorPaletteDarkTf.AttributeTypes(), colorPaletteDarkTf)
-		out.ColorPaletteDark = colorPaletteDark
-		d.Append(diags...)
-	}
-	if v.ColorPaletteLight != nil {
-		colorPaletteLightTf := customColorPaletteToTF(*v.ColorPaletteLight)
-		colorPaletteLight, diags := types.ObjectValueFrom(ctx, colorPaletteLightTf.AttributeTypes(), colorPaletteLightTf)
-		out.ColorPaletteLight = colorPaletteLight
-		d.Append(diags...)
+		WhitelabelSettings:         basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
+		EnvironmentId:              types.StringValue(envId),
+		DisableEndpointOnFailure:   types.BoolPointerValue(v.DisableEndpointOnFailure),
+		EnableChannels:             types.BoolPointerValue(v.EnableChannels),
+		EnableEndpointMtlsConfig:   types.BoolPointerValue(v.EnableEndpointMtlsConfig),
+		EnableEndpointOauthConfig:  types.BoolPointerValue(v.EnableEndpointOauthConfig),
+		EnableTransformations:      types.BoolPointerValue(v.EnableTransformations),
+		EnforceHttps:               types.BoolPointerValue(v.EnforceHttps),
+		EventCatalogPublished:      types.BoolPointerValue(v.EventCatalogPublished),
+		RequireEndpointChannel:     types.BoolPointerValue(v.RequireEndpointChannel),
+		RequireEndpointFilterTypes: types.BoolPointerValue(v.RequireEndpointFilterTypes),
+		WhitelabelHeaders:          types.BoolPointerValue(v.WhitelabelHeaders),
+		WipeSuccessfulPayload:      types.BoolPointerValue(v.WipeSuccessfulPayload),
 	}
 
-	if v.CustomStringsOverride != nil {
-		customStringsOverrideTF := generated.CustomStringsOverride_TF{
-			ChannelsHelp: types.StringPointerValue(v.CustomStringsOverride.ChannelsHelp),
-			ChannelsMany: types.StringPointerValue(v.CustomStringsOverride.ChannelsMany),
-			ChannelsOne:  types.StringPointerValue(v.CustomStringsOverride.ChannelsOne),
-		}
-		customStringsOverride, diags := types.ObjectValueFrom(ctx, customStringsOverrideTF.AttributeTypes(), customStringsOverrideTF)
-		out.CustomStringsOverride = customStringsOverride
-		d.Append(diags...)
-	}
+	{
 
-	if v.CustomThemeOverride != nil {
-		customThemeOverrideTF := generated.CustomThemeOverride_TF{
-			BorderRadius: basetypes.NewObjectNull(generated.BorderRadiusConfig_TF_AttributeTypes()),
+		whitelabelSettingsTf := generated.WhitelabelSettings{
+			CustomStringsOverride: basetypes.NewObjectNull(generated.CustomStringsOverride_TF_AttributeTypes()),
+			BorderRadius:          basetypes.NewObjectNull(generated.BorderRadius_AttributeTypes()),
+			ColorPaletteDark:      basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
+			ColorPaletteLight:     basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
+			DisplayName:           types.StringPointerValue(v.DisplayName),
+			CustomBaseFontSize:    types.Int64PointerValue(v.CustomBaseFontSize),
+			CustomFontFamily:      types.StringPointerValue(v.CustomFontFamily),
+			CustomFontFamilyUrl:   types.StringPointerValue(v.CustomFontFamilyUrl),
+			CustomLogoUrl:         types.StringPointerValue(v.CustomLogoUrl),
 		}
-		if v.CustomThemeOverride.BorderRadius != nil {
-			borderRadiusTF := generated.BorderRadiusConfig_TF{
-				Button: BorderRadiusEnumStringValue(v.CustomThemeOverride.BorderRadius.Button),
-				Card:   BorderRadiusEnumStringValue(v.CustomThemeOverride.BorderRadius.Card),
-				Input:  BorderRadiusEnumStringValue(v.CustomThemeOverride.BorderRadius.Input),
+		if v.CustomThemeOverride != nil {
+			if v.CustomThemeOverride.BorderRadius != nil {
+				existingBorderRadius := v.CustomThemeOverride.BorderRadius
+				borderRadiusTf := generated.BorderRadius{
+					Button: types.StringPointerValue((*string)(existingBorderRadius.Button)),
+					Card:   types.StringPointerValue((*string)(existingBorderRadius.Card)),
+					Input:  types.StringPointerValue((*string)(existingBorderRadius.Input)),
+				}
+				borderRadius, diags := types.ObjectValueFrom(ctx, borderRadiusTf.AttributeTypes(), borderRadiusTf)
+				d.Append(diags...)
+				whitelabelSettingsTf.BorderRadius = borderRadius
 			}
-			borderRadius, diags := types.ObjectValueFrom(ctx, borderRadiusTF.AttributeTypes(), borderRadiusTF)
-			customThemeOverrideTF.BorderRadius = borderRadius
+		}
+		if v.ColorPaletteDark != nil {
+			colorPaletteDarkTf := customColorPaletteToTF(*v.ColorPaletteDark)
+			colorPaletteDark, diags := types.ObjectValueFrom(ctx, colorPaletteDarkTf.AttributeTypes(), colorPaletteDarkTf)
+			whitelabelSettingsTf.ColorPaletteDark = colorPaletteDark
 			d.Append(diags...)
 		}
-		customThemeOverride, diags := types.ObjectValueFrom(ctx, customThemeOverrideTF.AttributeTypes(), customThemeOverrideTF)
-		out.CustomThemeOverride = customThemeOverride
+		if v.ColorPaletteLight != nil {
+			colorPaletteLightTf := customColorPaletteToTF(*v.ColorPaletteLight)
+			colorPaletteLight, diags := types.ObjectValueFrom(ctx, colorPaletteLightTf.AttributeTypes(), colorPaletteLightTf)
+			whitelabelSettingsTf.ColorPaletteLight = colorPaletteLight
+			d.Append(diags...)
+		}
+
+		if v.CustomStringsOverride != nil {
+			customStringsOverrideTF := generated.CustomStringsOverride_TF{
+				ChannelsHelp: types.StringPointerValue(v.CustomStringsOverride.ChannelsHelp),
+				ChannelsMany: types.StringPointerValue(v.CustomStringsOverride.ChannelsMany),
+				ChannelsOne:  types.StringPointerValue(v.CustomStringsOverride.ChannelsOne),
+			}
+			customStringsOverride, diags := types.ObjectValueFrom(ctx, customStringsOverrideTF.AttributeTypes(), customStringsOverrideTF)
+			whitelabelSettingsTf.CustomStringsOverride = customStringsOverride
+			d.Append(diags...)
+		}
+
+		whitelabelSettings, diags := types.ObjectValueFrom(ctx, whitelabelSettingsTf.AttributeTypes(), whitelabelSettingsTf)
 		d.Append(diags...)
+		out.WhitelabelSettings = whitelabelSettings
 	}
 
 	return out
@@ -660,7 +592,7 @@ func (v customFontURLValidator) ValidateString(ctx context.Context, req validato
 
 	// Get the font_family value to check
 	var fontFamily types.String
-	diags := req.Config.GetAttribute(ctx, path.Root("font_family"), &fontFamily)
+	diags := req.Config.GetAttribute(ctx, path.Root("whitelabel_settings").AtName("font_family"), &fontFamily)
 
 	if diags.HasError() {
 		resp.Diagnostics.Append(diags...)
@@ -718,7 +650,7 @@ func (v customFontFamilyValidator) ValidateString(ctx context.Context, req valid
 
 	// Get the font_family_url value to check
 	var fontURL types.String
-	diags := req.Config.GetAttribute(ctx, path.Root("font_family_url"), &fontURL)
+	diags := req.Config.GetAttribute(ctx, path.Root("whitelabel_settings").AtName("font_family_url"), &fontURL)
 
 	if diags.HasError() {
 		resp.Diagnostics.Append(diags...)
