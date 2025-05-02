@@ -1,4 +1,4 @@
-default: fmt lint install generate
+default: fmt check-current-version lint install generate
 
 build:
   go build -v ./...
@@ -21,4 +21,9 @@ bump-version new_version:
 
 check-version version:
   cd tools; go run version-util.go check {{ version }}
-  just generate
+
+check-current-version:
+  #!/usr/bin/env bash
+  set -ue
+  CURRENT_VERSION=$(cat .version)
+  cd tools; go run version-util.go check $CURRENT_VERSION
