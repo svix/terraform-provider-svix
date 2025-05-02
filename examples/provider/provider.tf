@@ -2,7 +2,7 @@ terraform {
   required_providers {
     svix = {
       source  = "registry.terraform.io/svix/svix"
-      version = "TODO" # Find the latest version at https://registry.terraform.io/providers/svix/svix/latest
+      version = "0.0.0-beta11"
     }
   }
 }
