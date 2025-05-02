@@ -38,14 +38,14 @@ func checkVersion() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	versionFromGitTag, err := getVersionFromCliArgs()
+	versionFromCliArgs, err := getVersionFromCliArgs()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// this will strip the leading `v`
-	if currentVersion.String() != versionFromGitTag.String() {
-		log.Fatalf("Version from git tag `%s` does not equal current version `%s`", versionFromGitTag, currentVersion)
+	if currentVersion.String() != versionFromCliArgs.String() {
+		log.Fatalf("Version from git tag `%s` does not equal current version `%s`", versionFromCliArgs, currentVersion)
 	}
 
 	for _, path := range filesToReplace {
