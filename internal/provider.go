@@ -143,9 +143,15 @@ type appState struct {
 	debug     bool
 }
 
+var userAgentSuffix = fmt.Sprintf("tf-provider-v%s", Version)
+
 // get the default client without an envId suffixed
 func (s *appState) DefaultSvixClient() (*svix.Svix, error) {
 	svx, err := svix.New(s.token, &svix.SvixOptions{ServerUrl: &s.serverUrl, Debug: s.debug})
+	if err != nil {
+		return nil, err
+	}
+	err = svix.SetUserAgentSuffix(svx, userAgentSuffix)
 	if err != nil {
 		return nil, err
 	}
@@ -159,6 +165,10 @@ func (s *appState) ClientWithEnvId(envId string) (*svix.Svix, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = svix.SetUserAgentSuffix(svx, userAgentSuffix)
+	if err != nil {
+		return nil, err
+	}
 	return svx, nil
 
 }
@@ -166,7 +176,7 @@ func (s *appState) ClientWithEnvId(envId string) (*svix.Svix, error) {
 // create a new internal svix client with the envId suffixed on the token
 func (s *appState) InternalClientWithEnvId(envId string) (*svix_internal.InternalSvix, error) {
 	bearerToken := fmt.Sprintf("%s|%s", s.token, envId)
-	svx, err := svix_internal.New(bearerToken, &s.serverUrl, s.debug)
+	svx, err := svix_internal.New(bearerToken, &s.serverUrl, s.debug, userAgentSuffix)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +186,7 @@ func (s *appState) InternalClientWithEnvId(envId string) (*svix_internal.Interna
 
 // get the default internal svix client without an envId suffixed
 func (s *appState) InternalDefaultSvixClient() (*svix_internal.InternalSvix, error) {
-	svx, err := svix_internal.New(s.token, &s.serverUrl, s.debug)
+	svx, err := svix_internal.New(s.token, &s.serverUrl, s.debug, userAgentSuffix)
 	if err != nil {
 		return nil, err
 	}
