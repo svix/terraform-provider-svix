@@ -468,6 +468,20 @@ func customColorPaletteToTF(v models.CustomColorPalette) generated.CustomColorPa
 	}
 
 }
+
+// Helper to check if all fields in WhitelabelSettings are null
+func isWhitelabelSettingsEmpty(w generated.WhitelabelSettings) bool {
+	return w.DisplayName.IsNull() &&
+		w.CustomBaseFontSize.IsNull() &&
+		w.CustomFontFamily.IsNull() &&
+		w.CustomFontFamilyUrl.IsNull() &&
+		w.CustomLogoUrl.IsNull() &&
+		w.BorderRadius.IsNull() &&
+		w.ColorPaletteDark.IsNull() &&
+		w.ColorPaletteLight.IsNull() &&
+		w.CustomStringsOverride.IsNull()
+}
+
 func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string) generated.EnvironmentSettingsResourceModel {
 	out := generated.EnvironmentSettingsResourceModel{
 		WhitelabelSettings:         basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
@@ -535,9 +549,13 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 			d.Append(diags...)
 		}
 
-		whitelabelSettings, diags := types.ObjectValueFrom(ctx, whitelabelSettingsTf.AttributeTypes(), whitelabelSettingsTf)
-		d.Append(diags...)
-		out.WhitelabelSettings = whitelabelSettings
+		if isWhitelabelSettingsEmpty(whitelabelSettingsTf) {
+			out.WhitelabelSettings = basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes())
+		} else {
+			whitelabelSettings, diags := types.ObjectValueFrom(ctx, whitelabelSettingsTf.AttributeTypes(), whitelabelSettingsTf)
+			d.Append(diags...)
+			out.WhitelabelSettings = whitelabelSettings
+		}
 	}
 
 	return out
