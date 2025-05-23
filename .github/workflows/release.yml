@@ -28,7 +28,7 @@ jobs:
       - check-release-tag
     permissions:
       contents: write
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-16-cores
     environment: release
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
