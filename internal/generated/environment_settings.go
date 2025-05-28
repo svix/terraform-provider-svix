@@ -61,6 +61,7 @@ func PatchFontSizeConfigWithPlan(
 type EnvironmentSettingsResourceModel struct {
 	EnvironmentId              types.String `tfsdk:"environment_id"`
 	DisableEndpointOnFailure   types.Bool   `tfsdk:"disable_endpoint_on_failure"`
+	EnableMessageStream        types.Bool   `tfsdk:"enable_advanced_endpoint_types"`
 	EnableChannels             types.Bool   `tfsdk:"enable_channels"`
 	EnableEndpointMtlsConfig   types.Bool   `tfsdk:"enable_endpoint_mtls_config"`
 	EnableEndpointOauthConfig  types.Bool   `tfsdk:"enable_endpoint_oauth_config"`
@@ -253,6 +254,9 @@ func PatchSettingsInternalInWithPlan(
 
 	if !planedModel.DisableEndpointOnFailure.IsUnknown() {
 		outModel.DisableEndpointOnFailure = planedModel.DisableEndpointOnFailure.ValueBoolPointer()
+	}
+	if !planedModel.EnableMessageStream.IsUnknown() {
+		outModel.EnableMessageStream = planedModel.EnableMessageStream.ValueBoolPointer()
 	}
 	if !planedModel.EnableChannels.IsUnknown() {
 		outModel.EnableChannels = planedModel.EnableChannels.ValueBoolPointer()

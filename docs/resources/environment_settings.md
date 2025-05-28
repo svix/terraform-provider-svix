@@ -61,6 +61,7 @@ resource "svix_environment_settings" "example_environment_settings" {
     }
   }
   disable_endpoint_on_failure           = false
+  enable_advanced_endpoint_types        = false # Requires Pro or Enterprise plan
   enable_channels                       = false
   enable_endpoint_mtls_config           = false # Requires Enterprise plan
   enable_endpoint_oauth_config          = false # Requires Enterprise plan
@@ -90,6 +91,8 @@ setting is enabled.
 some time, we will automatically disable the endpoint and let 
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
 more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endpoints).
+- `enable_advanced_endpoint_types` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Allows users to configure Polling Endpoints and FIFO endpoints to get
+messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).
 - `enable_channels` (Boolean) Controls whether or not your users can configure
 <strong>channels</strong> from the Consumer App Portal.
 - `enable_endpoint_mtls_config` (Boolean) <strong>Requires Enterprise plan</strong>, Allows users to configure mutual TLS (mTLS) for their endpoints.

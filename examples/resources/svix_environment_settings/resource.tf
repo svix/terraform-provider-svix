@@ -46,6 +46,7 @@ resource "svix_environment_settings" "example_environment_settings" {
     }
   }
   disable_endpoint_on_failure           = false
+  enable_advanced_endpoint_types        = false # Requires Pro or Enterprise plan
   enable_channels                       = false
   enable_endpoint_mtls_config           = false # Requires Enterprise plan
   enable_endpoint_oauth_config          = false # Requires Enterprise plan

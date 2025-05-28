@@ -250,6 +250,14 @@ some time, we will automatically disable the endpoint and let
 you know [via webhook](https://docs.svix.com/incoming-webhooks). Read 
 more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endpoints).`,
 			},
+			"enable_advanced_endpoint_types": schema.BoolAttribute{
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+				Optional:      true,
+				Computed:      true,
+				Description:   "Advanced endpoint types",
+				MarkdownDescription: REQUIRES_PRO_OR_ENTERPRISE_PLAN + `Allows users to configure Polling Endpoints and FIFO endpoints to get
+messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).`,
+			},
 			"enable_channels": schema.BoolAttribute{
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:      true,
@@ -490,6 +498,7 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		EnableChannels:             types.BoolPointerValue(v.EnableChannels),
 		EnableEndpointMtlsConfig:   types.BoolPointerValue(v.EnableEndpointMtlsConfig),
 		EnableEndpointOauthConfig:  types.BoolPointerValue(v.EnableEndpointOauthConfig),
+		EnableMessageStream:        types.BoolPointerValue(v.EnableMessageStream),
 		EnableTransformations:      types.BoolPointerValue(v.EnableTransformations),
 		EnforceHttps:               types.BoolPointerValue(v.EnforceHttps),
 		EventCatalogPublished:      types.BoolPointerValue(v.EventCatalogPublished),
