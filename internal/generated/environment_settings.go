@@ -230,24 +230,25 @@ func PatchSettingsInternalInWithPlan(
 
 		{
 			var planedCustomStringsOverride CustomStringsOverride_TF
-			d.Append(planedWhitelabelSettings.CustomStringsOverride.As(ctx, &planedCustomStringsOverride, basetypes.ObjectAsOptions{
-				UnhandledNullAsEmpty:    false,
-				UnhandledUnknownAsEmpty: false,
-			})...)
-			if !planedCustomStringsOverride.ChannelsHelp.IsUnknown() || !planedCustomStringsOverride.ChannelsMany.IsUnknown() || !planedCustomStringsOverride.ChannelsOne.IsUnknown() {
-				customStringsOverrideOut := svixmodels.CustomStringsOverride{}
-				if !planedCustomStringsOverride.ChannelsHelp.IsUnknown() {
-					customStringsOverrideOut.ChannelsHelp = planedCustomStringsOverride.ChannelsHelp.ValueStringPointer()
+			if !planedWhitelabelSettings.CustomStringsOverride.IsNull() && !planedWhitelabelSettings.CustomStringsOverride.IsUnknown() {
+				d.Append(planedWhitelabelSettings.CustomStringsOverride.As(ctx, &planedCustomStringsOverride, basetypes.ObjectAsOptions{
+					UnhandledNullAsEmpty:    false,
+					UnhandledUnknownAsEmpty: false,
+				})...)
+				if !planedCustomStringsOverride.ChannelsHelp.IsUnknown() || !planedCustomStringsOverride.ChannelsMany.IsUnknown() || !planedCustomStringsOverride.ChannelsOne.IsUnknown() {
+					customStringsOverrideOut := svixmodels.CustomStringsOverride{}
+					if !planedCustomStringsOverride.ChannelsHelp.IsUnknown() && !planedCustomStringsOverride.ChannelsHelp.IsNull() {
+						customStringsOverrideOut.ChannelsHelp = planedCustomStringsOverride.ChannelsHelp.ValueStringPointer()
+					}
+					if !planedCustomStringsOverride.ChannelsMany.IsUnknown() && !planedCustomStringsOverride.ChannelsMany.IsNull() {
+						customStringsOverrideOut.ChannelsMany = planedCustomStringsOverride.ChannelsMany.ValueStringPointer()
+					}
+					if !planedCustomStringsOverride.ChannelsOne.IsUnknown() && !planedCustomStringsOverride.ChannelsOne.IsNull() {
+						customStringsOverrideOut.ChannelsOne = planedCustomStringsOverride.ChannelsOne.ValueStringPointer()
+					}
+					outModel.CustomStringsOverride = &customStringsOverrideOut
 				}
-				if !planedCustomStringsOverride.ChannelsMany.IsUnknown() {
-					customStringsOverrideOut.ChannelsMany = planedCustomStringsOverride.ChannelsMany.ValueStringPointer()
-				}
-				if !planedCustomStringsOverride.ChannelsOne.IsUnknown() {
-					customStringsOverrideOut.ChannelsOne = planedCustomStringsOverride.ChannelsOne.ValueStringPointer()
-				}
-				outModel.CustomStringsOverride = &customStringsOverrideOut
 			}
-
 		}
 
 	}
