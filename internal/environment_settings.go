@@ -414,7 +414,8 @@ func (r *EnvironmentSettingsResource) Read(ctx context.Context, req resource.Rea
 		logSvixError(&resp.Diagnostics, err, "Failed to get environment settings")
 		return
 	}
-	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, *res, envId)
+
+	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, svixSettingsInternalOut_To_SettingsInternalUpdateOut(*res), envId)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, outModel)...)
 }
@@ -490,7 +491,40 @@ func isWhitelabelSettingsEmpty(w generated.WhitelabelSettings) bool {
 		w.CustomStringsOverride.IsNull()
 }
 
-func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string) generated.EnvironmentSettingsResourceModel {
+func svixSettingsInternalOut_To_SettingsInternalUpdateOut(in models.SettingsInternalOut) models.SettingsInternalUpdateOut {
+	return models.SettingsInternalUpdateOut{
+		ColorPaletteDark:            in.ColorPaletteDark,
+		ColorPaletteLight:           in.ColorPaletteLight,
+		CustomBaseFontSize:          in.CustomBaseFontSize,
+		CustomColor:                 in.CustomColor,
+		CustomFontFamily:            in.CustomFontFamily,
+		CustomFontFamilyUrl:         in.CustomFontFamilyUrl,
+		CustomLogoUrl:               in.CustomLogoUrl,
+		CustomStringsOverride:       in.CustomStringsOverride,
+		CustomThemeOverride:         in.CustomThemeOverride,
+		DisableEndpointOnFailure:    in.DisableEndpointOnFailure,
+		DisplayName:                 in.DisplayName,
+		EnableChannels:              in.EnableChannels,
+		EnableEndpointMtlsConfig:    in.EnableEndpointMtlsConfig,
+		EnableEndpointOauthConfig:   in.EnableEndpointOauthConfig,
+		EnableIntegrationManagement: in.EnableIntegrationManagement,
+		EnableMessageStream:         in.EnableMessageStream,
+		EnableMsgAtmptLog:           in.EnableMsgAtmptLog,
+		EnableOtlp:                  in.EnableOtlp,
+		EnableTransformations:       in.EnableTransformations,
+		EnforceHttps:                in.EnforceHttps,
+		EventCatalogPublished:       in.EventCatalogPublished,
+		ReadOnly:                    in.ReadOnly,
+		RequireEndpointChannel:      in.RequireEndpointChannel,
+		RequireEndpointFilterTypes:  in.RequireEndpointFilterTypes,
+		RetryPolicy:                 in.RetryPolicy,
+		ShowUseSvixPlay:             in.ShowUseSvixPlay,
+		WhitelabelHeaders:           in.WhitelabelHeaders,
+		WipeSuccessfulPayload:       in.WipeSuccessfulPayload,
+	}
+}
+
+func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalUpdateOut, envId string) generated.EnvironmentSettingsResourceModel {
 	out := generated.EnvironmentSettingsResourceModel{
 		WhitelabelSettings:         basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
 		EnvironmentId:              types.StringValue(envId),
@@ -532,7 +566,11 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 				borderRadius, diags := types.ObjectValueFrom(ctx, borderRadiusTf.AttributeTypes(), borderRadiusTf)
 				d.Append(diags...)
 				whitelabelSettingsTf.BorderRadius = borderRadius
+			} else {
+				whitelabelSettingsTf.BorderRadius = basetypes.NewObjectNull(generated.BorderRadius_AttributeTypes())
 			}
+		} else {
+			whitelabelSettingsTf.BorderRadius = basetypes.NewObjectNull(generated.BorderRadius_AttributeTypes())
 		}
 		if v.ColorPaletteDark != nil {
 			colorPaletteDarkTf := customColorPaletteToTF(*v.ColorPaletteDark)
