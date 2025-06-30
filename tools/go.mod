@@ -3,7 +3,7 @@ module tools
 go 1.23.7
 
 require (
-	github.com/Masterminds/semver/v3 v3.3.1
+	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/hashicorp/terraform-plugin-docs v0.21.0
 )
 
