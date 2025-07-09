@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	svix "github.com/svix/svix-webhooks/go"
+	internalsvix "github.com/svix/svix-webhooks/go/internalapi"
 	"github.com/svix/svix-webhooks/go/models"
 )
 
@@ -104,7 +104,7 @@ func (r *ApiTokenResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	// create svix client
-	svx, err := r.state.ClientWithEnvId(env_id)
+	svx, err := r.state.InternalClientWithEnvId(env_id)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -122,7 +122,7 @@ func (r *ApiTokenResource) Create(ctx context.Context, req resource.CreateReques
 			Name:   data.Name.ValueString(),
 			Scopes: scopes,
 		},
-		&svix.ManagementAuthenticationCreateApiTokenOptions{
+		&internalsvix.ManagementAuthenticationCreateApiTokenOptions{
 			IdempotencyKey: randStr32(),
 		},
 	)
@@ -170,7 +170,7 @@ func (r *ApiTokenResource) Delete(ctx context.Context, req resource.DeleteReques
 	}
 
 	// create svix client
-	svx, err := r.state.ClientWithEnvId(env_id)
+	svx, err := r.state.InternalClientWithEnvId(env_id)
 	if err != nil {
 		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
 		return
@@ -181,7 +181,7 @@ func (r *ApiTokenResource) Delete(ctx context.Context, req resource.DeleteReques
 		ctx, key_id, models.ApiTokenExpireIn{
 			Expiry: ptr(int32(0)),
 		},
-		&svix.ManagementAuthenticationExpireApiTokenOptions{
+		&internalsvix.ManagementAuthenticationExpireApiTokenOptions{
 			IdempotencyKey: randStr32(),
 		},
 	)

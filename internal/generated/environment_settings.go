@@ -34,29 +34,6 @@ func (v *FontSizeConfig_TF) AttributeTypes() map[string]attr.Type {
 	return FontSizeConfig_TF_AttributeTypes()
 }
 
-func PatchFontSizeConfigWithPlan(
-	ctx context.Context,
-	d *diag.Diagnostics,
-	existingModel *svixmodels.FontSizeConfig,
-	planedModel FontSizeConfig_TF,
-) svixmodels.FontSizeConfig {
-	// initialize model as empty
-	outModel := svixmodels.FontSizeConfig{}
-	// load variables from the existing model
-	if existingModel != nil {
-		outModel.Base = existingModel.Base
-	}
-	// override fields in outModel with variables from planed model
-	if !planedModel.Base.IsUnknown() {
-		if planedModel.Base.IsNull() {
-			outModel.Base = nil
-		} else {
-			outModel.Base = ptr(uint16(planedModel.Base.ValueInt64()))
-		}
-	}
-	return outModel
-}
-
 // Terraform wrapper around `svixmodels.SettingsInternalIn`
 type EnvironmentSettingsResourceModel struct {
 	EnvironmentId              types.String `tfsdk:"environment_id"`
@@ -120,43 +97,13 @@ func (v *WhitelabelSettings) AttributeTypes() map[string]attr.Type {
 	return WhitelabelSettings_TF_AttributeTypes()
 }
 
-func PatchSettingsInternalInWithPlan(
+func PatchSettingsInternalPatchWithPlan(
 	ctx context.Context,
 	d *diag.Diagnostics,
-	existingModel *svixmodels.SettingsInternalOut,
 	planedModel EnvironmentSettingsResourceModel,
-) svixmodels.SettingsInternalIn {
+) svixmodels.SettingsInternalPatch {
 	// initialize model as empty
-	outModel := svixmodels.SettingsInternalIn{}
-	// load variables from the existing model
-	if existingModel != nil {
-		outModel.ColorPaletteDark = existingModel.ColorPaletteDark
-		outModel.ColorPaletteLight = existingModel.ColorPaletteLight
-		outModel.CustomBaseFontSize = existingModel.CustomBaseFontSize
-		outModel.CustomColor = existingModel.CustomColor
-		outModel.CustomFontFamily = existingModel.CustomFontFamily
-		outModel.CustomFontFamilyUrl = existingModel.CustomFontFamilyUrl
-		outModel.CustomLogoUrl = existingModel.CustomLogoUrl
-		outModel.CustomStringsOverride = existingModel.CustomStringsOverride
-		outModel.CustomThemeOverride = existingModel.CustomThemeOverride
-		outModel.DisableEndpointOnFailure = existingModel.DisableEndpointOnFailure
-		outModel.DisplayName = existingModel.DisplayName
-		outModel.EnableChannels = existingModel.EnableChannels
-		outModel.EnableEndpointMtlsConfig = existingModel.EnableEndpointMtlsConfig
-		outModel.EnableEndpointOauthConfig = existingModel.EnableEndpointOauthConfig
-		outModel.EnableIntegrationManagement = existingModel.EnableIntegrationManagement
-		outModel.EnableMessageStream = existingModel.EnableMessageStream
-		outModel.EnableMsgAtmptLog = existingModel.EnableMsgAtmptLog
-		outModel.EnableOtlp = existingModel.EnableOtlp
-		outModel.EnableTransformations = existingModel.EnableTransformations
-		outModel.EnforceHttps = existingModel.EnforceHttps
-		outModel.EventCatalogPublished = existingModel.EventCatalogPublished
-		outModel.ReadOnly = existingModel.ReadOnly
-		outModel.RequireEndpointChannel = existingModel.RequireEndpointChannel
-		outModel.RequireEndpointFilterTypes = existingModel.RequireEndpointFilterTypes
-		outModel.WhitelabelHeaders = existingModel.WhitelabelHeaders
-		outModel.WipeSuccessfulPayload = existingModel.WipeSuccessfulPayload
-	}
+	outModel := svixmodels.SettingsInternalPatch{}
 
 	if !planedModel.WhitelabelSettings.IsUnknown() && !planedModel.WhitelabelSettings.IsNull() {
 		var planedWhitelabelSettings WhitelabelSettings
@@ -165,19 +112,39 @@ func PatchSettingsInternalInWithPlan(
 			UnhandledUnknownAsEmpty: false,
 		})...)
 		if !planedWhitelabelSettings.DisplayName.IsUnknown() {
-			outModel.DisplayName = planedWhitelabelSettings.DisplayName.ValueStringPointer()
+			if planedWhitelabelSettings.DisplayName.IsNull() {
+				outModel.DisplayName.Set(nil)
+			} else {
+				outModel.DisplayName.Set(planedWhitelabelSettings.DisplayName.ValueStringPointer())
+			}
 		}
 		if !planedWhitelabelSettings.CustomBaseFontSize.IsUnknown() {
-			outModel.CustomBaseFontSize = planedWhitelabelSettings.CustomBaseFontSize.ValueInt64Pointer()
+			if planedWhitelabelSettings.CustomBaseFontSize.IsNull() {
+				outModel.CustomBaseFontSize.Set(nil)
+			} else {
+				outModel.CustomBaseFontSize.Set(planedWhitelabelSettings.CustomBaseFontSize.ValueInt64Pointer())
+			}
 		}
 		if !planedWhitelabelSettings.CustomFontFamily.IsUnknown() {
-			outModel.CustomFontFamily = planedWhitelabelSettings.CustomFontFamily.ValueStringPointer()
+			if planedWhitelabelSettings.CustomFontFamily.IsNull() {
+				outModel.CustomFontFamily.Set(nil)
+			} else {
+				outModel.CustomFontFamily.Set(planedWhitelabelSettings.CustomFontFamily.ValueStringPointer())
+			}
 		}
 		if !planedWhitelabelSettings.CustomFontFamilyUrl.IsUnknown() {
-			outModel.CustomFontFamilyUrl = planedWhitelabelSettings.CustomFontFamilyUrl.ValueStringPointer()
+			if planedWhitelabelSettings.CustomFontFamilyUrl.IsNull() {
+				outModel.CustomFontFamilyUrl.Set(nil)
+			} else {
+				outModel.CustomFontFamilyUrl.Set(planedWhitelabelSettings.CustomFontFamilyUrl.ValueStringPointer())
+			}
 		}
 		if !planedWhitelabelSettings.CustomLogoUrl.IsUnknown() {
-			outModel.CustomLogoUrl = planedWhitelabelSettings.CustomLogoUrl.ValueStringPointer()
+			if planedWhitelabelSettings.CustomLogoUrl.IsNull() {
+				outModel.CustomLogoUrl.Set(nil)
+			} else {
+				outModel.CustomLogoUrl.Set(planedWhitelabelSettings.CustomLogoUrl.ValueStringPointer())
+			}
 		}
 
 		{
@@ -201,31 +168,25 @@ func PatchSettingsInternalInWithPlan(
 				if !planedBorderRadius.Input.IsUnknown() && !planedBorderRadius.Input.IsNull() {
 					borderRadiusOut.Input = ptr(svixmodels.BorderRadiusEnumFromString[planedBorderRadius.Input.ValueString()])
 				}
-				outModel.CustomThemeOverride = &svixmodels.CustomThemeOverride{
+				themeOverride := svixmodels.CustomThemeOverride{
 					BorderRadius: &borderRadiusOut,
 				}
+				outModel.CustomThemeOverride.Set(&themeOverride)
 			}
-
 		}
 
 		{
-			var planedColorPaletteDark CustomColorPalette_TF
-			d.Append(planedWhitelabelSettings.ColorPaletteDark.As(ctx, &planedColorPaletteDark, basetypes.ObjectAsOptions{
-				UnhandledNullAsEmpty:    false,
-				UnhandledUnknownAsEmpty: false,
-			})...)
 			colorPaletteOut := patchColorPaletteWithPlan(ctx, d, planedWhitelabelSettings.ColorPaletteDark)
-			outModel.ColorPaletteDark = colorPaletteOut
+			if colorPaletteOut != nil {
+				outModel.ColorPaletteDark.Set(colorPaletteOut)
+			}
 		}
 
 		{
-			var planedColorPaletteLight CustomColorPalette_TF
-			d.Append(planedWhitelabelSettings.ColorPaletteLight.As(ctx, &planedColorPaletteLight, basetypes.ObjectAsOptions{
-				UnhandledNullAsEmpty:    false,
-				UnhandledUnknownAsEmpty: false,
-			})...)
 			colorPaletteOut := patchColorPaletteWithPlan(ctx, d, planedWhitelabelSettings.ColorPaletteLight)
-			outModel.ColorPaletteLight = colorPaletteOut
+			if colorPaletteOut != nil {
+				outModel.ColorPaletteLight.Set(colorPaletteOut)
+			}
 		}
 
 		{
@@ -246,11 +207,10 @@ func PatchSettingsInternalInWithPlan(
 					if !planedCustomStringsOverride.ChannelsOne.IsUnknown() && !planedCustomStringsOverride.ChannelsOne.IsNull() {
 						customStringsOverrideOut.ChannelsOne = planedCustomStringsOverride.ChannelsOne.ValueStringPointer()
 					}
-					outModel.CustomStringsOverride = &customStringsOverrideOut
+					outModel.CustomStringsOverride.Set(&customStringsOverrideOut)
 				}
 			}
 		}
-
 	}
 
 	if !planedModel.DisableEndpointOnFailure.IsUnknown() {
