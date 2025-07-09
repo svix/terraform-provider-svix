@@ -355,7 +355,7 @@ func (r *EnvironmentSettingsResource) Configure(ctx context.Context, req resourc
 	r.state = state
 }
 
-// we won't be created the settings here. rather for any defined field, we will run an update query
+// we won't be created the settings here. rather for any defined field, we will run a patch query
 func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// load state/plan
 	var data generated.EnvironmentSettingsResourceModel
@@ -373,20 +373,15 @@ func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	currentSettings, err := svx.Management.EnvironmentSettings.Get(ctx)
-	if err != nil {
-		logSvixError(&resp.Diagnostics, err, "Failed to get environment settings")
-		return
-	}
-	settingsIn := generated.PatchSettingsInternalInWithPlan(ctx, &resp.Diagnostics, currentSettings, data)
+	settingsPatch := generated.PatchSettingsInternalPatchWithPlan(ctx, &resp.Diagnostics, data)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// call api
-	res, err := svx.Management.EnvironmentSettings.Update(ctx, settingsIn)
+	res, err := svx.Management.EnvironmentSettings.Patch(ctx, settingsPatch)
 	if err != nil {
-		logSvixError(&resp.Diagnostics, err, "Failed to update environment settings")
+		logSvixError(&resp.Diagnostics, err, "Failed to patch environment settings")
 		return
 	}
 
@@ -415,7 +410,7 @@ func (r *EnvironmentSettingsResource) Read(ctx context.Context, req resource.Rea
 		return
 	}
 
-	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, svixSettingsInternalOut_To_SettingsInternalUpdateOut(*res), envId)
+	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, *res, envId)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, outModel)...)
 }
@@ -437,20 +432,15 @@ func (r *EnvironmentSettingsResource) Update(ctx context.Context, req resource.U
 		return
 	}
 
-	currentSettings, err := svx.Management.EnvironmentSettings.Get(ctx)
-	if err != nil {
-		logSvixError(&resp.Diagnostics, err, "Failed to get environment settings")
-		return
-	}
-	settingsIn := generated.PatchSettingsInternalInWithPlan(ctx, &resp.Diagnostics, currentSettings, data)
+	settingsPatch := generated.PatchSettingsInternalPatchWithPlan(ctx, &resp.Diagnostics, data)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// call api
-	res, err := svx.Management.EnvironmentSettings.Update(ctx, settingsIn)
+	res, err := svx.Management.EnvironmentSettings.Patch(ctx, settingsPatch)
 	if err != nil {
-		logSvixError(&resp.Diagnostics, err, "Failed to update environment settings")
+		logSvixError(&resp.Diagnostics, err, "Failed to patch environment settings")
 		return
 	}
 
@@ -491,40 +481,7 @@ func isWhitelabelSettingsEmpty(w generated.WhitelabelSettings) bool {
 		w.CustomStringsOverride.IsNull()
 }
 
-func svixSettingsInternalOut_To_SettingsInternalUpdateOut(in models.SettingsInternalOut) models.SettingsInternalUpdateOut {
-	return models.SettingsInternalUpdateOut{
-		ColorPaletteDark:            in.ColorPaletteDark,
-		ColorPaletteLight:           in.ColorPaletteLight,
-		CustomBaseFontSize:          in.CustomBaseFontSize,
-		CustomColor:                 in.CustomColor,
-		CustomFontFamily:            in.CustomFontFamily,
-		CustomFontFamilyUrl:         in.CustomFontFamilyUrl,
-		CustomLogoUrl:               in.CustomLogoUrl,
-		CustomStringsOverride:       in.CustomStringsOverride,
-		CustomThemeOverride:         in.CustomThemeOverride,
-		DisableEndpointOnFailure:    in.DisableEndpointOnFailure,
-		DisplayName:                 in.DisplayName,
-		EnableChannels:              in.EnableChannels,
-		EnableEndpointMtlsConfig:    in.EnableEndpointMtlsConfig,
-		EnableEndpointOauthConfig:   in.EnableEndpointOauthConfig,
-		EnableIntegrationManagement: in.EnableIntegrationManagement,
-		EnableMessageStream:         in.EnableMessageStream,
-		EnableMsgAtmptLog:           in.EnableMsgAtmptLog,
-		EnableOtlp:                  in.EnableOtlp,
-		EnableTransformations:       in.EnableTransformations,
-		EnforceHttps:                in.EnforceHttps,
-		EventCatalogPublished:       in.EventCatalogPublished,
-		ReadOnly:                    in.ReadOnly,
-		RequireEndpointChannel:      in.RequireEndpointChannel,
-		RequireEndpointFilterTypes:  in.RequireEndpointFilterTypes,
-		RetryPolicy:                 in.RetryPolicy,
-		ShowUseSvixPlay:             in.ShowUseSvixPlay,
-		WhitelabelHeaders:           in.WhitelabelHeaders,
-		WipeSuccessfulPayload:       in.WipeSuccessfulPayload,
-	}
-}
-
-func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalUpdateOut, envId string) generated.EnvironmentSettingsResourceModel {
+func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string) generated.EnvironmentSettingsResourceModel {
 	out := generated.EnvironmentSettingsResourceModel{
 		WhitelabelSettings:         basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
 		EnvironmentId:              types.StringValue(envId),

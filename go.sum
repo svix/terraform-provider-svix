@@ -64,6 +64,10 @@ github.com/stretchr/testify v1.8.3 h1:RP3t2pwF7cMEbC1dqtB6poj3niw/9gnV4Cjg5oW5gt
 github.com/stretchr/testify v1.8.3/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 github.com/svix/svix-webhooks v1.69.0 h1:JLskjVZ0V1MF48pvwRxRWxUINJQnlRNY/WeSSpsimXg=
 github.com/svix/svix-webhooks v1.69.0/go.mod h1:BRbQWn/xdv6zSGULojHza0Yx+hDf+xUJ4s09t3HqJpI=
+github.com/svix/svix-webhooks v1.69.1-0.20250709131247-8046065eb4b1 h1:bK0+1RyuJqciLlqZCFn2NwcwTvmuf0x/Lzw+AJiRMkA=
+github.com/svix/svix-webhooks v1.69.1-0.20250709131247-8046065eb4b1/go.mod h1:BRbQWn/xdv6zSGULojHza0Yx+hDf+xUJ4s09t3HqJpI=
+github.com/svix/svix-webhooks v1.69.1-0.20250709134218-efa8ef1d179a h1:UQYmw1hx3q4n5014qC5Nw7WOfvQYDrVXXNh12WbIEqY=
+github.com/svix/svix-webhooks v1.69.1-0.20250709134218-efa8ef1d179a/go.mod h1:BRbQWn/xdv6zSGULojHza0Yx+hDf+xUJ4s09t3HqJpI=
 github.com/vmihailenco/msgpack/v5 v5.4.1 h1:cQriyiUvjTwOHg8QZaPihLWeRAAVoCpE00IUPn0Bjt8=
 github.com/vmihailenco/msgpack/v5 v5.4.1/go.mod h1:GaZTsDaehaPpQVyxrf5mtQlH+pc21PIudVV/E3rRQok=
 github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAhO7/IwNM9g=
