@@ -36,6 +36,7 @@ var opWebhookTypes = []string{
 	"message.attempt.exhausted",
 	"message.attempt.failing",
 	"message.attempt.recovered",
+	"message.attempt.log",
 }
 
 func NewOperationalWebhooksEndpoint() resource.Resource {
