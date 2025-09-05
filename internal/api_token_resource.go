@@ -117,7 +117,7 @@ func (r *ApiTokenResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 	res, err := svx.Management.Authentication.CreateApiToken(
-		ctx,
+		ctx, env_id,
 		models.ApiTokenIn{
 			Name:   data.Name.ValueString(),
 			Scopes: scopes,
@@ -178,7 +178,7 @@ func (r *ApiTokenResource) Delete(ctx context.Context, req resource.DeleteReques
 
 	// call api
 	err = svx.Management.Authentication.ExpireApiToken(
-		ctx, key_id, models.ApiTokenExpireIn{
+		ctx, env_id, key_id, models.ApiTokenExpireIn{
 			Expiry: ptr(int32(0)),
 		},
 		&internalsvix.ManagementAuthenticationExpireApiTokenOptions{
