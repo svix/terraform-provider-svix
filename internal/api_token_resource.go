@@ -5,15 +5,17 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	internalsvix "github.com/svix/svix-webhooks/go/internalapi"
 	"github.com/svix/svix-webhooks/go/models"
+	"github.com/svix/svix-webhooks/go/utils"
 )
 
 var _ resource.Resource = &ApiTokenResource{}
@@ -67,15 +69,12 @@ func (r *ApiTokenResource) Schema(ctx context.Context, req resource.SchemaReques
 			},
 			"name": schema.StringAttribute{
 				Required: true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
 			"scopes": schema.ListAttribute{
 				Optional:    true,
 				ElementType: types.StringType,
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplace(),
+				Validators: []validator.List{
+					listvalidator.SizeAtLeast(1),
 				},
 			},
 			// non modifiable fields
@@ -194,5 +193,38 @@ func (r *ApiTokenResource) Delete(ctx context.Context, req resource.DeleteReques
 }
 
 func (r *ApiTokenResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	resp.Diagnostics.AddError("Terraform tried to update the `svix_api_token` resource, this should not be possible. please contact the developers", "")
+	var data ApiTokenResourceModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	env_id := data.EnvironmentId.ValueString()
+	token_id := data.Id.ValueString()
+
+	svx, err := r.state.InternalClientWithEnvId(env_id)
+	if err != nil {
+		resp.Diagnostics.AddError(UNABLE_TO_CREATE_SVIX_CLIENT, err.Error())
+		return
+	}
+
+	var scopes []string
+	resp.Diagnostics.Append(data.Scopes.ElementsAs(ctx, &scopes, false)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := svx.Management.Authentication.PatchApiToken(
+		ctx, env_id, token_id,
+		models.ApiTokenPatch{
+			Name:   utils.NewNullable(data.Name.ValueString()),
+			Scopes: utils.NewNullable(scopes),
+		},
+	)
+	if err != nil {
+		logSvixError(&resp.Diagnostics, err, "Unable to update api token")
+		return
+	}
+
+	setUpdateState(ctx, resp, rp("name"), res.Name)
+	setUpdateState(ctx, resp, rp("scopes"), res.Scopes)
 }
