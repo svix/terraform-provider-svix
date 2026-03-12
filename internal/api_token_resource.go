@@ -200,7 +200,11 @@ func (r *ApiTokenResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 
 	env_id := data.EnvironmentId.ValueString()
-	token_id := data.Id.ValueString()
+	var token_id string
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &token_id)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	svx, err := r.state.InternalClientWithEnvId(env_id)
 	if err != nil {
