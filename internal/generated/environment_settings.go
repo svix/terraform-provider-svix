@@ -51,6 +51,7 @@ type EnvironmentSettingsResourceModel struct {
 	WipeSuccessfulPayload      types.Bool   `tfsdk:"delete_payload_on_successful_delivery"`
 
 	WhitelabelSettings basetypes.ObjectValue `tfsdk:"whitelabel_settings"`
+	OtelConfig         basetypes.ObjectValue `tfsdk:"otel_config"`
 }
 
 type WhitelabelSettings struct {
