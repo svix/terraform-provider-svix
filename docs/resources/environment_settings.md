@@ -102,10 +102,23 @@ endpoints. Transformations are code that can change a message's HTTP
 method, destination URL, and payload body in-flight.
 - `enforce_https` (Boolean) Enforces HTTPS on all endpoints of this environment
 - `event_catalog_published` (Boolean) Enable this to make your Event Catalog public. You can find the link to the published Event Catalog at https://dashboard.svix.com/settings/organization/catalog
+- `otel_config` (Attributes) <strong>Requires Enterprise plan</strong>, Configure OpenTelemetry (OTEL) tracing for this environment. Setting this block enables OpenTelemetry exports; removing it disables exports and deletes the stored config. (see [below for nested schema](#nestedatt--otel_config))
 - `require_endpoint_channels` (Boolean) If enabled, all new Endpoints must filter on at least one channel.
 - `require_endpoint_event_types` (Boolean) If enabled, all new Endpoints must filter on at least one event type.
 - `whitelabel_headers` (Boolean) <strong>Requires Pro or Enterprise plan</strong>, Changes the prefix of the webhook HTTP headers to use the`webhook-` prefix. <strong>Changing this setting can break existing integrations</strong>
 - `whitelabel_settings` (Attributes) Customize how the [Consumer App Portal](https://docs.svix.com/management-ui) will look for your users in this environment. (see [below for nested schema](#nestedatt--whitelabel_settings))
+
+<a id="nestedatt--otel_config"></a>
+### Nested Schema for `otel_config`
+
+Required:
+
+- `url` (String) OTEL collector endpoint URL
+
+Optional:
+
+- `additional_headers` (Map of String, Sensitive) Additional HTTP headers to include with exports
+
 
 <a id="nestedatt--whitelabel_settings"></a>
 ### Nested Schema for `whitelabel_settings`

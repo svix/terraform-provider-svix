@@ -19,6 +19,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	svix_internal "github.com/svix/svix-webhooks/go/internalapi"
 	"github.com/svix/svix-webhooks/go/models"
 	"github.com/svix/terraform-provider-svix/internal/generated"
 )
@@ -335,6 +336,22 @@ method, destination URL, and payload body in-flight.`,
 delivered to the endpoint. Only affects messages sent after this
 setting is enabled.`,
 			},
+			"otel_config": schema.SingleNestedAttribute{
+				Optional:            true,
+				MarkdownDescription: REQUIRES_ENTERPRISE_PLAN + "Configure OpenTelemetry (OTEL) tracing for this environment. Setting this block enables OpenTelemetry exports; removing it disables exports and deletes the stored config.",
+				Attributes: map[string]schema.Attribute{
+					"url": schema.StringAttribute{
+						Required:    true,
+						Description: "OTEL collector endpoint URL",
+					},
+					"additional_headers": schema.MapAttribute{
+						Optional:    true,
+						Sensitive:   true,
+						ElementType: types.StringType,
+						Description: "Additional HTTP headers to include with exports",
+					},
+				},
+			},
 		},
 	}
 
@@ -359,12 +376,12 @@ func (r *EnvironmentSettingsResource) Configure(ctx context.Context, req resourc
 func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// load state/plan
 	var data generated.EnvironmentSettingsResourceModel
-	var envId string
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
-	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	envId := data.EnvironmentId.ValueString()
 
 	// create svix client
 	svx, err := r.state.InternalClientWithEnvId(envId)
@@ -378,6 +395,23 @@ func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
+	currentOtel, _ := svx.Management.EnvironmentSettings.GetOtelConfig(ctx)
+
+	otelConfigOut, diags := applyOtelConfig(ctx, svx, data)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	if currentOtel == nil || !currentOtel.SvixManaged {
+		if !data.OtelConfig.IsNull() && !data.OtelConfig.IsUnknown() {
+			enabled := true
+			settingsPatch.EnableOtlp = &enabled
+		} else {
+			disabled := false
+			settingsPatch.EnableOtlp = &disabled
+		}
+	}
+
 	// call api
 	res, err := svx.Management.EnvironmentSettings.Patch(ctx, settingsPatch)
 	if err != nil {
@@ -385,7 +419,7 @@ func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, *res, envId)
+	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, *res, envId, otelConfigOut)
 	resp.Diagnostics.Append(resp.State.Set(ctx, outModel)...)
 }
 
@@ -410,7 +444,12 @@ func (r *EnvironmentSettingsResource) Read(ctx context.Context, req resource.Rea
 		return
 	}
 
-	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, *res, envId)
+	var otelConfigOut *models.OtelConfigOut
+	if res.EnableOtlp != nil && *res.EnableOtlp {
+		otelConfigOut, _ = svx.Management.EnvironmentSettings.GetOtelConfig(ctx)
+	}
+
+	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, *res, envId, otelConfigOut)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, outModel)...)
 }
@@ -418,12 +457,12 @@ func (r *EnvironmentSettingsResource) Read(ctx context.Context, req resource.Rea
 func (r *EnvironmentSettingsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// load state/plan
 	var data generated.EnvironmentSettingsResourceModel
-	var envId string
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
-	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("environment_id"), &envId)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	envId := data.EnvironmentId.ValueString()
 
 	// create svix client
 	svx, err := r.state.InternalClientWithEnvId(envId)
@@ -437,6 +476,23 @@ func (r *EnvironmentSettingsResource) Update(ctx context.Context, req resource.U
 		return
 	}
 
+	currentOtel, _ := svx.Management.EnvironmentSettings.GetOtelConfig(ctx)
+
+	otelConfigOut, diags := applyOtelConfig(ctx, svx, data)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	if currentOtel == nil || !currentOtel.SvixManaged {
+		if !data.OtelConfig.IsNull() && !data.OtelConfig.IsUnknown() {
+			enabled := true
+			settingsPatch.EnableOtlp = &enabled
+		} else {
+			disabled := false
+			settingsPatch.EnableOtlp = &disabled
+		}
+	}
+
 	// call api
 	res, err := svx.Management.EnvironmentSettings.Patch(ctx, settingsPatch)
 	if err != nil {
@@ -444,7 +500,11 @@ func (r *EnvironmentSettingsResource) Update(ctx context.Context, req resource.U
 		return
 	}
 
-	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, *res, envId)
+	if data.OtelConfig.IsNull() || data.OtelConfig.IsUnknown() {
+		deleteOtelConfig(ctx, svx, currentOtel)
+	}
+
+	outModel := internalSettingsOutToTF(ctx, &resp.Diagnostics, *res, envId, otelConfigOut)
 	resp.Diagnostics.Append(resp.State.Set(ctx, outModel)...)
 }
 
@@ -481,9 +541,56 @@ func isWhitelabelSettingsEmpty(w generated.WhitelabelSettings) bool {
 		w.CustomStringsOverride.IsNull()
 }
 
-func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string) generated.EnvironmentSettingsResourceModel {
+func deleteOtelConfig(ctx context.Context, svx *svix_internal.InternalSvix, current *models.OtelConfigOut) {
+	if current == nil || current.SvixManaged {
+		return
+	}
+	_ = svx.Management.EnvironmentSettings.DeleteOtelConfig(ctx)
+}
+
+func applyOtelConfig(ctx context.Context, svx *svix_internal.InternalSvix, data generated.EnvironmentSettingsResourceModel) (*models.OtelConfigOut, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if data.OtelConfig.IsNull() || data.OtelConfig.IsUnknown() {
+		return nil, diags
+	}
+
+	var otelCfgTF OtelConfig_TF
+	diags.Append(data.OtelConfig.As(ctx, &otelCfgTF, basetypes.ObjectAsOptions{})...)
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	otelConfig := models.OtelConfig{
+		Url: otelCfgTF.Url.ValueString(),
+	}
+	if !otelCfgTF.AdditionalHeaders.IsNull() && !otelCfgTF.AdditionalHeaders.IsUnknown() {
+		headers := map[string]string{}
+		diags.Append(otelCfgTF.AdditionalHeaders.ElementsAs(ctx, &headers, false)...)
+		if diags.HasError() {
+			return nil, diags
+		}
+		if len(headers) > 0 {
+			otelConfig.AdditionalHeaders = &headers
+		}
+	}
+
+	if err := svx.Management.EnvironmentSettings.UpdateOtelConfig(ctx, otelConfig); err != nil {
+		diags.AddError("Failed to update OTEL config", err.Error())
+		return nil, diags
+	}
+
+	out := &models.OtelConfigOut{
+		Url:               &otelConfig.Url,
+		AdditionalHeaders: otelConfig.AdditionalHeaders,
+	}
+	return out, diags
+}
+
+func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string, otelConfig *models.OtelConfigOut) generated.EnvironmentSettingsResourceModel {
 	out := generated.EnvironmentSettingsResourceModel{
 		WhitelabelSettings:         basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
+		OtelConfig:                 basetypes.NewObjectNull(OtelConfig_TF_AttributeTypes()),
 		EnvironmentId:              types.StringValue(envId),
 		DisableEndpointOnFailure:   types.BoolPointerValue(v.DisableEndpointOnFailure),
 		EnableChannels:             types.BoolPointerValue(v.EnableChannels),
@@ -497,6 +604,22 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		RequireEndpointFilterTypes: types.BoolPointerValue(v.RequireEndpointFilterTypes),
 		WhitelabelHeaders:          types.BoolPointerValue(v.WhitelabelHeaders),
 		WipeSuccessfulPayload:      types.BoolPointerValue(v.WipeSuccessfulPayload),
+	}
+
+	if otelConfig != nil && otelConfig.Url != nil {
+		headers := types.MapNull(types.StringType)
+		if otelConfig.AdditionalHeaders != nil && len(*otelConfig.AdditionalHeaders) > 0 {
+			h, diags := types.MapValueFrom(ctx, types.StringType, *otelConfig.AdditionalHeaders)
+			d.Append(diags...)
+			headers = h
+		}
+		otelCfgTF := OtelConfig_TF{
+			Url:               types.StringPointerValue(otelConfig.Url),
+			AdditionalHeaders: headers,
+		}
+		otelObj, diags := types.ObjectValueFrom(ctx, otelCfgTF.AttributeTypes(), otelCfgTF)
+		d.Append(diags...)
+		out.OtelConfig = otelObj
 	}
 
 	{
