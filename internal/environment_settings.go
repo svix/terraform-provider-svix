@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	svix_internal "github.com/svix/svix-webhooks/go/internalapi"
 	"github.com/svix/svix-webhooks/go/models"
-	"github.com/svix/terraform-provider-svix/internal/generated"
+	"github.com/svix/terraform-provider-svix/internal/model"
 )
 
 var _ resource.Resource = &EnvironmentSettingsResource{}
@@ -375,7 +375,7 @@ func (r *EnvironmentSettingsResource) Configure(ctx context.Context, req resourc
 // we won't be created the settings here. rather for any defined field, we will run a patch query
 func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// load state/plan
-	var data generated.EnvironmentSettingsResourceModel
+	var data model.EnvironmentSettingsResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -390,7 +390,7 @@ func (r *EnvironmentSettingsResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	settingsPatch := generated.PatchSettingsInternalPatchWithPlan(ctx, &resp.Diagnostics, data)
+	settingsPatch := model.PatchSettingsInternalPatchWithPlan(ctx, &resp.Diagnostics, data)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -456,7 +456,7 @@ func (r *EnvironmentSettingsResource) Read(ctx context.Context, req resource.Rea
 
 func (r *EnvironmentSettingsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// load state/plan
-	var data generated.EnvironmentSettingsResourceModel
+	var data model.EnvironmentSettingsResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -471,7 +471,7 @@ func (r *EnvironmentSettingsResource) Update(ctx context.Context, req resource.U
 		return
 	}
 
-	settingsPatch := generated.PatchSettingsInternalPatchWithPlan(ctx, &resp.Diagnostics, data)
+	settingsPatch := model.PatchSettingsInternalPatchWithPlan(ctx, &resp.Diagnostics, data)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -513,8 +513,8 @@ func (r *EnvironmentSettingsResource) Delete(ctx context.Context, req resource.D
 	// env delete will delete the env settings
 }
 
-func customColorPaletteToTF(v models.CustomColorPalette) generated.CustomColorPalette_TF {
-	return generated.CustomColorPalette_TF{
+func customColorPaletteToTF(v models.CustomColorPalette) model.CustomColorPalette_TF {
+	return model.CustomColorPalette_TF{
 		BackgroundHover:     types.StringPointerValue(v.BackgroundHover),
 		BackgroundPrimary:   types.StringPointerValue(v.BackgroundPrimary),
 		BackgroundSecondary: types.StringPointerValue(v.BackgroundSecondary),
@@ -529,7 +529,7 @@ func customColorPaletteToTF(v models.CustomColorPalette) generated.CustomColorPa
 }
 
 // Helper to check if all fields in WhitelabelSettings are null
-func isWhitelabelSettingsEmpty(w generated.WhitelabelSettings) bool {
+func isWhitelabelSettingsEmpty(w model.WhitelabelSettings) bool {
 	return w.DisplayName.IsNull() &&
 		w.CustomBaseFontSize.IsNull() &&
 		w.CustomFontFamily.IsNull() &&
@@ -548,14 +548,14 @@ func deleteOtelConfig(ctx context.Context, svx *svix_internal.InternalSvix, curr
 	_ = svx.Management.EnvironmentSettings.DeleteOtelConfig(ctx)
 }
 
-func applyOtelConfig(ctx context.Context, svx *svix_internal.InternalSvix, data generated.EnvironmentSettingsResourceModel) (*models.OtelConfigOut, diag.Diagnostics) {
+func applyOtelConfig(ctx context.Context, svx *svix_internal.InternalSvix, data model.EnvironmentSettingsResourceModel) (*models.OtelConfigOut, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	if data.OtelConfig.IsNull() || data.OtelConfig.IsUnknown() {
 		return nil, diags
 	}
 
-	var otelCfgTF OtelConfig_TF
+	var otelCfgTF model.OtelConfig_TF
 	diags.Append(data.OtelConfig.As(ctx, &otelCfgTF, basetypes.ObjectAsOptions{})...)
 	if diags.HasError() {
 		return nil, diags
@@ -587,10 +587,10 @@ func applyOtelConfig(ctx context.Context, svx *svix_internal.InternalSvix, data 
 	return out, diags
 }
 
-func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string, otelConfig *models.OtelConfigOut) generated.EnvironmentSettingsResourceModel {
-	out := generated.EnvironmentSettingsResourceModel{
-		WhitelabelSettings:         basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes()),
-		OtelConfig:                 basetypes.NewObjectNull(OtelConfig_TF_AttributeTypes()),
+func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.SettingsInternalOut, envId string, otelConfig *models.OtelConfigOut) model.EnvironmentSettingsResourceModel {
+	out := model.EnvironmentSettingsResourceModel{
+		WhitelabelSettings:         basetypes.NewObjectNull(model.WhitelabelSettings_TF_AttributeTypes()),
+		OtelConfig:                 basetypes.NewObjectNull(model.OtelConfig_TF_AttributeTypes()),
 		EnvironmentId:              types.StringValue(envId),
 		DisableEndpointOnFailure:   types.BoolPointerValue(v.DisableEndpointOnFailure),
 		EnableChannels:             types.BoolPointerValue(v.EnableChannels),
@@ -613,7 +613,7 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 			d.Append(diags...)
 			headers = h
 		}
-		otelCfgTF := OtelConfig_TF{
+		otelCfgTF := model.OtelConfig_TF{
 			Url:               types.StringPointerValue(otelConfig.Url),
 			AdditionalHeaders: headers,
 		}
@@ -624,11 +624,11 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 
 	{
 
-		whitelabelSettingsTf := generated.WhitelabelSettings{
-			CustomStringsOverride: basetypes.NewObjectNull(generated.CustomStringsOverride_TF_AttributeTypes()),
-			BorderRadius:          basetypes.NewObjectNull(generated.BorderRadius_AttributeTypes()),
-			ColorPaletteDark:      basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
-			ColorPaletteLight:     basetypes.NewObjectNull(generated.CustomColorPalette_TF_AttributeTypes()),
+		whitelabelSettingsTf := model.WhitelabelSettings{
+			CustomStringsOverride: basetypes.NewObjectNull(model.CustomStringsOverride_TF_AttributeTypes()),
+			BorderRadius:          basetypes.NewObjectNull(model.BorderRadius_AttributeTypes()),
+			ColorPaletteDark:      basetypes.NewObjectNull(model.CustomColorPalette_TF_AttributeTypes()),
+			ColorPaletteLight:     basetypes.NewObjectNull(model.CustomColorPalette_TF_AttributeTypes()),
 			DisplayName:           types.StringPointerValue(v.DisplayName),
 			CustomBaseFontSize:    types.Int64PointerValue(v.CustomBaseFontSize),
 			CustomFontFamily:      types.StringPointerValue(v.CustomFontFamily),
@@ -638,7 +638,7 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		if v.CustomThemeOverride != nil {
 			if v.CustomThemeOverride.BorderRadius != nil {
 				existingBorderRadius := v.CustomThemeOverride.BorderRadius
-				borderRadiusTf := generated.BorderRadius{
+				borderRadiusTf := model.BorderRadius{
 					Button: types.StringPointerValue((*string)(existingBorderRadius.Button)),
 					Card:   types.StringPointerValue((*string)(existingBorderRadius.Card)),
 					Input:  types.StringPointerValue((*string)(existingBorderRadius.Input)),
@@ -647,10 +647,10 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 				d.Append(diags...)
 				whitelabelSettingsTf.BorderRadius = borderRadius
 			} else {
-				whitelabelSettingsTf.BorderRadius = basetypes.NewObjectNull(generated.BorderRadius_AttributeTypes())
+				whitelabelSettingsTf.BorderRadius = basetypes.NewObjectNull(model.BorderRadius_AttributeTypes())
 			}
 		} else {
-			whitelabelSettingsTf.BorderRadius = basetypes.NewObjectNull(generated.BorderRadius_AttributeTypes())
+			whitelabelSettingsTf.BorderRadius = basetypes.NewObjectNull(model.BorderRadius_AttributeTypes())
 		}
 		if v.ColorPaletteDark != nil {
 			colorPaletteDarkTf := customColorPaletteToTF(*v.ColorPaletteDark)
@@ -666,7 +666,7 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		}
 
 		if v.CustomStringsOverride != nil {
-			customStringsOverrideTF := generated.CustomStringsOverride_TF{
+			customStringsOverrideTF := model.CustomStringsOverride_TF{
 				ChannelsHelp: types.StringPointerValue(v.CustomStringsOverride.ChannelsHelp),
 				ChannelsMany: types.StringPointerValue(v.CustomStringsOverride.ChannelsMany),
 				ChannelsOne:  types.StringPointerValue(v.CustomStringsOverride.ChannelsOne),
@@ -677,7 +677,7 @@ func internalSettingsOutToTF(ctx context.Context, d *diag.Diagnostics, v models.
 		}
 
 		if isWhitelabelSettingsEmpty(whitelabelSettingsTf) {
-			out.WhitelabelSettings = basetypes.NewObjectNull(generated.WhitelabelSettings_TF_AttributeTypes())
+			out.WhitelabelSettings = basetypes.NewObjectNull(model.WhitelabelSettings_TF_AttributeTypes())
 		} else {
 			whitelabelSettings, diags := types.ObjectValueFrom(ctx, whitelabelSettingsTf.AttributeTypes(), whitelabelSettingsTf)
 			d.Append(diags...)
