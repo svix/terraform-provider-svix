@@ -2,7 +2,7 @@ terraform {
   required_providers {
     svix = {
       source  = "registry.terraform.io/svix/svix"
-      version = "0.3.4"
+      version = "0.3.5"
     }
   }
 }
