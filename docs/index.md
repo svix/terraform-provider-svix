@@ -22,13 +22,14 @@ terraform {
   }
 }
 
-# Configuration-based authentication
+# Configuration-based authentication (required for most resources)
 provider "svix" {
   server_url = "https://api.eu.svix.com"
   token      = "***"
 }
 
-# The provider can also be configured via the SVIX_TOKEN and SVIX_SERVER_URL environment variables
+# Credentials can also be set via SVIX_TOKEN and SVIX_SERVER_URL.
+# They are optional when only using svix_autoconfig (auth is in the AutoConfig token).
 provider "svix" {}
 ```
 
@@ -37,5 +38,5 @@ provider "svix" {}
 
 ### Optional
 
-- `server_url` (String) Svix server url
-- `token` (String, Sensitive) Api token
+- `server_url` (String) Svix server URL. Required for most resources, but not for `svix_autoconfig` (credentials are embedded in the AutoConfig token). Can also be set via the `SVIX_SERVER_URL` environment variable.
+- `token` (String, Sensitive) API token. Required for most resources, but not for `svix_autoconfig` (credentials are embedded in the AutoConfig token). Can also be set via the `SVIX_TOKEN` environment variable.
