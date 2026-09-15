@@ -255,8 +255,8 @@ more about it [in the docs](https://docs.svix.com/retries#disabling-failing-endp
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 				Optional:      true,
 				Computed:      true,
-				Description:   "Advanced endpoint types",
-				MarkdownDescription: REQUIRES_PRO_OR_ENTERPRISE_PLAN + `Allows users to configure Polling Endpoints and FIFO endpoints to get
+				Description:   "Advanced destinations",
+				MarkdownDescription: REQUIRES_PRO_OR_ENTERPRISE_PLAN + `Allows users to configure advanced destinations (Polling Endpoints, FIFO endpoints, and more) to get
 messages. Read more about them in the [docs](https://docs.svix.com/advanced-endpoints/intro).`,
 			},
 			"enable_channels": schema.BoolAttribute{
